@@ -193,7 +193,7 @@
   .cat-panel .field input:focus{ outline:2px solid var(--rose); }
   .done-toggle{ display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:700; color:var(--sage); background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:9px 12px; cursor:pointer; }
   .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
-  .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; }
+  .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
   .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
   .copy-btn:hover{ background: #eef4f7; }
 
@@ -208,9 +208,9 @@
   .budget-status.over{ color:#c0392b; }
   .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 22px; border-radius:999px; font-size:13px; z-index:200; box-shadow:0 8px 20px rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition:opacity .25s; }
   .toast.show{ opacity:1; }
-  .pr-btn{ flex:1; min-width:100px; text-decoration:none; font-family:var(--font-body); font-size:11.5px; font-weight:500; color: var(--text); background: #fff; border:1.5px solid var(--line); padding:8px 8px; border-radius:10px; text-align:center; position:relative; transition:.15s; }
-  .pr-btn:hover{ border-color: var(--rose); color:var(--rose-deep); }
-  .pr-badge{ position:absolute; top:-7px; right:-6px; background:var(--butter); color:#5a4213; font-family:var(--font-num); font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:8px; }
+  .pr-btn{ flex:1; min-width:120px; text-decoration:none; font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--text); background:#fff; border:1.5px solid var(--line); padding:10px 8px; border-radius:10px; text-align:center; position:relative; display:block; transition:.15s; }
+  .pr-btn:hover{ border-color:var(--rose); color:var(--rose-deep); background:var(--rose-wash); }
+  .pr-badge{ position:absolute; top:-7px; right:-6px; background:var(--butter); color:#5a4213; font-family:var(--font-num); font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:8px; white-space:nowrap; }
 
   /* ---------- history view ---------- */
   .history-wrap{ padding: 18px 5vw 40px; }
@@ -776,7 +776,7 @@ const PR_LINKS = {
     {label:'じゃらんで探す', url:'https://www.jalan.net/'},
   ],
   transport: [
-    {label:'格安航空券を比較【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B88SV+1HL182+3UZC+60WN5'},
+    {label:'格安航空券を比較【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B88SV%2B1HL182%2B3UZC%2B60WN5'},
     {label:'新幹線予約(楽天トラベル)', url:'https://travel.rakuten.co.jp/'},
   ],
   ticket: [
