@@ -148,6 +148,12 @@
   .card-actions{ display:flex; gap:4px; margin-top:9px; justify-content:flex-end; }
   .icon-btn{ background:var(--surface-2); border:1px solid var(--line); border-radius:8px; width:28px; height:28px; font-size:12.5px; cursor:pointer; line-height:1; }
   .icon-btn:hover{ border-color:var(--rose); background:var(--rose-wash); }
+  .card-share-btn{
+    width:100%; margin-top:14px; padding:10px; border-radius:10px; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--text); font-family:var(--font-body); font-weight:700;
+    font-size:12.5px; cursor:pointer;
+  }
+  .card-share-btn:hover{ border-color:var(--rose); background:var(--rose-wash); color:var(--rose-deep); }
 
   .perforation{ position:relative; height:1px; border-top: 2px dashed var(--line); }
   .perforation::before, .perforation::after{ content:''; position:absolute; top:-9px; width:18px; height:18px; background: var(--bg); border-radius:50%; }
@@ -336,7 +342,7 @@
           <option>その他</option>
         </select>
       </div>
-      <div class="field"><label>応援チーム</label><input id="f-team" placeholder="例）東北イーグルス"></div>
+      <div class="field"><label>応援チーム</label><input id="f-team" list="f-team-list" placeholder="例）東北イーグルス" oninput="handleTeamInput()"><datalist id="f-team-list"></datalist></div>
     </div>
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など"></div>
     <div class="field"><label>対戦カード・イベント名</label><input id="f-match" placeholder="例）vs 湘南ユナイテッド"></div>
@@ -344,7 +350,7 @@
       <div class="field"><label>日付</label><input id="f-date" type="date"></div>
       <div class="field"><label>試合開始時刻</label><input id="f-time" type="time"></div>
     </div>
-    <div class="field"><label>会場・遠征先</label><input id="f-venue" placeholder="例）盛岡タカヤアリーナ"></div>
+    <div class="field"><label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label><input id="f-venue" list="f-venue-list" placeholder="例）盛岡タカヤアリーナ"><datalist id="f-venue-list"></datalist></div>
     <div class="field"><label>想定予算（円）</label><input id="f-cost" type="number" placeholder="例）32000"></div>
     <div class="save-msg" id="modal-save-msg"></div>
     <div class="modal-actions">
@@ -406,6 +412,184 @@ const CATS = [
   {key:'other', label:'その他', icon:'📌', bookable:false},
 ];
 const BOOKABLE_CATS = CATS.filter(c=>c.bookable).map(c=>c.key);
+
+// スポーツ別のチーム候補＋ホームアリーナ（datalistでのサジェスト用。プルダウンではなく自由入力+候補なので、リストに無いチームも入力できます）
+// ⚠️ 昇降格・改称・アリーナの命名権変更などで毎シーズン変わるデータです。特にサッカーは2026年に大会方式が変更されており未確定要素が多いため、
+//    シーズンの変わり目には内容の見直しをおすすめします（下記オブジェクトを直接編集するだけで反映されます）。
+const TEAM_DATA = {
+  'バスケットボール': [ // B.LEAGUE 2025-26シーズン 全55クラブ（B1:26 / B2:14 / B3:15）。ホームアリーナはB1のみ収録。
+    // --- B1（26クラブ） ---
+    {name:'レバンガ北海道', arena:'北海きたえーる'},
+    {name:'仙台89ERS', arena:'ゼビオアリーナ仙台'},
+    {name:'秋田ノーザンハピネッツ', arena:'CNAアリーナあきた'},
+    {name:'茨城ロボッツ', arena:'アダストリアみとアリーナ'},
+    {name:'宇都宮ブレックス', arena:'ブレックスアリーナ宇都宮'},
+    {name:'群馬クレインサンダーズ', arena:'オープンハウスアリーナ太田'},
+    {name:'越谷アルファーズ', arena:'越谷市立総合体育館'},
+    {name:'アルティーリ千葉', arena:'千葉ポートアリーナ'},
+    {name:'千葉ジェッツ', arena:'LaLa arena TOKYO-BAY'},
+    {name:'アルバルク東京', arena:'TOYOTA ARENA TOKYO'},
+    {name:'サンロッカーズ渋谷', arena:'青山学院記念館'},
+    {name:'川崎ブレイブサンダース', arena:'川崎市とどろきアリーナ'},
+    {name:'横浜ビー・コルセアーズ', arena:'横浜国際プール'},
+    {name:'富山グラウジーズ', arena:'富山市総合体育館'},
+    {name:'三遠ネオフェニックス', arena:'豊橋市総合体育館'},
+    {name:'シーホース三河', arena:'ウィングアリーナ刈谷'},
+    {name:'ファイティングイーグルス名古屋', arena:'名古屋市枇杷島スポーツセンター'},
+    {name:'名古屋ダイヤモンドドルフィンズ', arena:'IGアリーナ'},
+    {name:'滋賀レイクス', arena:'滋賀ダイハツアリーナ'},
+    {name:'京都ハンナリーズ', arena:'京都市体育館'},
+    {name:'大阪エヴェッサ', arena:'おおきにアリーナ舞洲'},
+    {name:'島根スサノオマジック', arena:'松江市総合体育館'},
+    {name:'広島ドラゴンフライズ', arena:'広島サンプラザホール'},
+    {name:'佐賀バルーナーズ', arena:'SAGAアリーナ'},
+    {name:'長崎ヴェルカ', arena:'HAPPINESS ARENA'},
+    {name:'琉球ゴールデンキングス', arena:'沖縄サントリーアリーナ'},
+    // --- B2（14クラブ・アリーナ情報は未収録） ---
+    {name:'青森ワッツ', arena:''},
+    {name:'岩手ビッグブルズ', arena:''},
+    {name:'山形ワイヴァンズ', arena:''},
+    {name:'福島ファイヤーボンズ', arena:''},
+    {name:'横浜エクセレンス', arena:''},
+    {name:'福井ブローウィンズ', arena:''},
+    {name:'信州ブレイブウォリアーズ', arena:''},
+    {name:'ベルテックス静岡', arena:''},
+    {name:'神戸ストークス', arena:''},
+    {name:'バンビシャス奈良', arena:''},
+    {name:'愛媛オレンジバイキングス', arena:''},
+    {name:'ライジングゼファー福岡', arena:''},
+    {name:'熊本ヴォルターズ', arena:''},
+    {name:'鹿児島レブナイズ', arena:''},
+    // --- B3（15クラブ・アリーナ情報は未収録） ---
+    {name:'アースフレンズ東京Z', arena:''},
+    {name:'新潟アルビレックスBB', arena:''},
+    {name:'八王子ビートレインズ', arena:''},
+    {name:'湘南ユナイテッドBC', arena:''},
+    {name:'岐阜スゥープス', arena:''},
+    {name:'山口パッツファイブ', arena:''},
+    {name:'トライフープ岡山', arena:''},
+    {name:'香川ファイブアローズ', arena:''},
+    {name:'しながわシティバスケットボールクラブ', arena:''},
+    {name:'立川ダイス', arena:''},
+    {name:'徳島ガンバロウズ', arena:''},
+    {name:'ヴィアティン三重', arena:''},
+    {name:'さいたまブロンコス', arena:''},
+    {name:'金沢武士団', arena:''},
+    {name:'東京ユナイテッドバスケットボールクラブ', arena:''},
+  ],
+  '野球': [ // NPB 12球団（1軍本拠地）
+    {name:'読売ジャイアンツ', arena:'東京ドーム'},
+    {name:'東京ヤクルトスワローズ', arena:'明治神宮野球場'},
+    {name:'横浜DeNAベイスターズ', arena:'横浜スタジアム'},
+    {name:'中日ドラゴンズ', arena:'バンテリンドーム ナゴヤ'},
+    {name:'阪神タイガース', arena:'阪神甲子園球場'},
+    {name:'広島東洋カープ', arena:'MAZDA Zoom-Zoom スタジアム広島'},
+    {name:'福岡ソフトバンクホークス', arena:'みずほPayPayドーム福岡'},
+    {name:'千葉ロッテマリーンズ', arena:'ZOZOマリンスタジアム'},
+    {name:'埼玉西武ライオンズ', arena:'ベルーナドーム'},
+    {name:'東北楽天ゴールデンイーグルス', arena:'楽天モバイルパーク宮城'},
+    {name:'オリックス・バファローズ', arena:'京セラドーム大阪'},
+    {name:'北海道日本ハムファイターズ', arena:'エスコンフィールドHOKKAIDO'},
+  ],
+  'サッカー': [ // 2026/27シーズン Jリーグ 全60クラブ（J1:20 / J2:20 / J3:20）。J1は全クラブ、J2は判明分のみホームスタジアムを収録。
+    // --- J1（20クラブ） ---
+    {name:'鹿島アントラーズ', arena:'メルカリスタジアム'},
+    {name:'水戸ホーリーホック', arena:'ケーズデンキスタジアム水戸'},
+    {name:'浦和レッズ', arena:'埼玉スタジアム2002'},
+    {name:'ジェフユナイテッド千葉', arena:'フクダ電子アリーナ'},
+    {name:'柏レイソル', arena:'三協フロンテア柏スタジアム'},
+    {name:'FC東京', arena:'味の素スタジアム'},
+    {name:'東京ヴェルディ', arena:'味の素スタジアム'},
+    {name:'FC町田ゼルビア', arena:'町田GIONスタジアム'},
+    {name:'川崎フロンターレ', arena:'等々力陸上競技場'},
+    {name:'横浜F・マリノス', arena:'日産スタジアム'},
+    {name:'清水エスパルス', arena:'IAIスタジアム日本平'},
+    {name:'名古屋グランパス', arena:'豊田スタジアム'},
+    {name:'京都サンガF.C.', arena:'サンガスタジアム by KYOCERA'},
+    {name:'ガンバ大阪', arena:'パナソニック スタジアム 吹田'},
+    {name:'セレッソ大阪', arena:'ヨドコウ桜スタジアム'},
+    {name:'ヴィッセル神戸', arena:'ノエビアスタジアム神戸'},
+    {name:'ファジアーノ岡山', arena:'シティライトスタジアム'},
+    {name:'サンフレッチェ広島', arena:'エディオンピースウイング広島'},
+    {name:'アビスパ福岡', arena:'ベスト電器スタジアム'},
+    {name:'V・ファーレン長崎', arena:'トランスコスモススタジアム長崎'},
+    // --- J2（20クラブ） ---
+    {name:'北海道コンサドーレ札幌', arena:'大和ハウス プレミストドーム'},
+    {name:'ヴァンラーレ八戸', arena:'プライフーズスタジアム'},
+    {name:'ベガルタ仙台', arena:'ユアテックスタジアム仙台'},
+    {name:'ブラウブリッツ秋田', arena:'ソユースタジアム'},
+    {name:'モンテディオ山形', arena:'NDソフトスタジアム山形'},
+    {name:'いわきFC', arena:'いわきグリーンフィールド'},
+    {name:'栃木シティ', arena:''},
+    {name:'RB大宮アルディージャ', arena:'NACK5スタジアム大宮'},
+    {name:'横浜FC', arena:'ニッパツ三ツ沢球技場'},
+    {name:'湘南ベルマーレ', arena:'Shonan BMW スタジアム平塚'},
+    {name:'ヴァンフォーレ甲府', arena:'山梨中銀スタジアム'},
+    {name:'アルビレックス新潟', arena:'デンカビッグスワンスタジアム'},
+    {name:'カターレ富山', arena:'富山県総合運動公園陸上競技場'},
+    {name:'ジュビロ磐田', arena:'ヤマハスタジアム'},
+    {name:'藤枝MYFC', arena:'藤枝総合運動公園サッカー場'},
+    {name:'徳島ヴォルティス', arena:'鳴門・大塚スポーツパーク ポカリスエットスタジアム'},
+    {name:'FC今治', arena:'ありがとうサービス.夢スタジアム'},
+    {name:'サガン鳥栖', arena:'駅前不動産スタジアム'},
+    {name:'大分トリニータ', arena:'昭和電工ドーム大分'},
+    {name:'テゲバジャーロ宮崎', arena:''},
+    // --- J3（20クラブ・ホームスタジアムは未収録） ---
+    {name:'福島ユナイテッドFC', arena:''},
+    {name:'栃木SC', arena:''},
+    {name:'ザスパ群馬', arena:''},
+    {name:'SC相模原', arena:''},
+    {name:'松本山雅FC', arena:''},
+    {name:'AC長野パルセイロ', arena:''},
+    {name:'ツエーゲン金沢', arena:''},
+    {name:'FC岐阜', arena:''},
+    {name:'レイラック滋賀FC', arena:''},
+    {name:'FC大阪', arena:''},
+    {name:'奈良クラブ', arena:''},
+    {name:'ガイナーレ鳥取', arena:''},
+    {name:'レノファ山口FC', arena:''},
+    {name:'カマタマーレ讃岐', arena:''},
+    {name:'愛媛FC', arena:''},
+    {name:'高知ユナイテッドSC', arena:''},
+    {name:'ギラヴァンツ北九州', arena:''},
+    {name:'ロアッソ熊本', arena:''},
+    {name:'鹿児島ユナイテッドFC', arena:''},
+    {name:'FC琉球', arena:''},
+  ],
+  'バレーボール': [ // 大同生命SVリーグ男子 2025-26（10クラブ中9クラブ判明分。女子・V2は未収録）。開催地が流動的なクラブが多いためホームアリーナは未収録。
+    {name:'ヴォレアス北海道', arena:''},
+    {name:'東京グレートベアーズ', arena:''},
+    {name:'VC長野トライデンツ', arena:''},
+    {name:'東レアローズ静岡', arena:''},
+    {name:'ジェイテクトSTINGS愛知', arena:''},
+    {name:'ウルフドッグス名古屋', arena:''},
+    {name:'大阪ブルテオン', arena:''},
+    {name:'サントリーサンバーズ大阪', arena:''},
+    {name:'日本製鉄堺ブレイザーズ', arena:''},
+  ],
+};
+
+function renderTeamDatalist(){
+  const sport = document.getElementById('f-sport').value;
+  const teams = TEAM_DATA[sport] || [];
+  document.getElementById('f-team-list').innerHTML = teams.map(t=>`<option value="${t.name}">`).join('');
+  document.getElementById('venue-suggest-note').textContent = '';
+}
+function handleTeamInput(){
+  const sport = document.getElementById('f-sport').value;
+  const teamVal = document.getElementById('f-team').value;
+  const teams = TEAM_DATA[sport] || [];
+  const match = teams.find(t=>t.name===teamVal);
+  const note = document.getElementById('venue-suggest-note');
+  const venueInput = document.getElementById('f-venue');
+  if(match && match.arena){
+    venueInput.value = match.arena;
+    document.getElementById('f-venue-list').innerHTML = `<option value="${match.arena}">`;
+    note.textContent = '（ホームアリーナを自動入力しました。変更もできます）';
+  }else{
+    note.textContent = '';
+  }
+}
 
 const PR_LINKS = {
   hotel: [{label:'ホテル予約', url:'https://travel.rakuten.co.jp/'}, {label:'じゃらんで探す', url:'https://www.jalan.net/'}],
@@ -603,13 +787,12 @@ function renderTicketCard(t, isPast){
           <div class="d">${md}</div>
           <div class="dow">${dow}曜日</div>
           <div class="t">${t.time || ''}</div>
+          ${IS_EDITABLE ? `
           <div class="card-actions">
-            <button class="icon-btn" title="家族に共有" onclick="shareTrip('${t.id}')">📤</button>
-            ${IS_EDITABLE ? `
             <button class="icon-btn" title="編集" onclick="openModal('${t.id}')">✏️</button>
             <button class="icon-btn" title="複製して次を作る" onclick="duplicateTrip('${t.id}')">📋</button>
-            <button class="icon-btn" title="削除" onclick="deleteTrip('${t.id}')">🗑</button>` : ''}
-          </div>
+            <button class="icon-btn" title="削除" onclick="deleteTrip('${t.id}')">🗑</button>
+          </div>` : ''}
         </div>
       </div>
       <div class="perforation"></div>
@@ -639,6 +822,7 @@ function renderTicketCard(t, isPast){
             </div>`;
           }).join('')}
         </div>
+        <button class="card-share-btn" onclick="shareTrip('${t.id}')">📤 家族に共有する</button>
       </div>
     </div>`;
 }
@@ -852,6 +1036,7 @@ const KNOWN_SPORTS = ['バスケットボール','サッカー','野球','バレ
 function toggleCustomSport(){
   const isOther = document.getElementById('f-sport').value === 'その他';
   document.getElementById('f-sport-custom-wrap').style.display = isOther ? 'block' : 'none';
+  renderTeamDatalist();
 }
 
 function fillModalFields(t){
@@ -865,6 +1050,7 @@ function fillModalFields(t){
     document.getElementById('f-sport-custom-wrap').style.display = 'block';
     document.getElementById('f-sport-custom').value = t.sport || '';
   }
+  renderTeamDatalist();
   document.getElementById('f-team').value = t.team || '';
   document.getElementById('f-match').value = t.match || '';
   document.getElementById('f-date').value = t.date || '';
@@ -891,6 +1077,7 @@ function openModal(tripId){
     ['f-team','f-match','f-venue','f-cost','f-date','f-time'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('f-sport').value = 'バスケットボール';
     document.getElementById('f-sport-custom-wrap').style.display = 'none';
+    renderTeamDatalist();
   }
   document.getElementById('overlay').classList.add('open');
   document.getElementById('modal-save-msg').textContent='';
