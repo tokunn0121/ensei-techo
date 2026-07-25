@@ -344,6 +344,7 @@
 <div id="app-main" style="display:none;">
 <div class="tabs">
   <button class="tab active" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
+  <button class="tab" id="tab-calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
   <button class="tab" id="tab-history" onclick="switchTab('history')">予約履歴</button>
 </div>
 
@@ -361,6 +362,29 @@
   <div class="history-wrap">
     <div class="history-controls" id="history-filters"></div>
     <div class="history-list" id="history-list"></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-calendar">
+  <div id="calendar-wrap" style="padding:0 5vw 40px;"></div>
+</div>
+
+<!-- スケジュールまとめ入力モーダル -->
+<div class="overlay" id="schedule-import-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title-si">スケジュールをまとめて入力</div>
+    <div class="modal-sub">公式サイトやLINEメモなどからコピーしたスケジュールテキストを貼り付けると、AIが試合を自動検出して登録します。</div>
+    <div class="field" style="margin-top:14px;">
+      <label>スケジュールテキスト（コピペでOK）</label>
+      <textarea id="schedule-import-text" style="width:100%; min-height:140px; border:1.5px solid var(--line); border-radius:10px; padding:12px; font-size:14px; font-family:var(--font-body); background:var(--surface-2); resize:vertical;" placeholder="例）&#10;10/3(金) 18:00 アルバルク東京 vs 宇都宮ブレックス @ TOYOTA ARENA TOKYO&#10;10/5(日) 14:00 千葉ジェッツ vs 琉球ゴールデンキングス @ LaLa arena TOKYO-BAY"></textarea>
+    </div>
+    <div id="schedule-import-status" style="font-size:12.5px; color:var(--rose-deep); min-height:18px; margin:8px 0;"></div>
+    <div id="schedule-import-result" style="max-height:240px; overflow-y:auto;"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeScheduleImport()">閉じる</button>
+      <button class="btn-tertiary" id="schedule-import-confirm-btn" onclick="confirmScheduleImport()" style="display:none;">✅ チェックした試合を登録</button>
+      <button class="btn-primary" id="schedule-import-btn" onclick="runScheduleImport()">🤖 AIで解析する</button>
+    </div>
   </div>
 </div>
 </div>
@@ -387,13 +411,13 @@
         <label>応援チーム
           <button type="button" id="team-list-toggle" onclick="toggleTeamList()" style="margin-left:8px; font-size:11px; padding:3px 10px; border-radius:6px; border:1px solid var(--line); background:var(--surface-2); color:var(--text-dim); cursor:pointer; vertical-align:middle;">一覧から選ぶ</button>
         </label>
-        <input id="f-team" list="f-team-list" placeholder="例）東北イーグルス" oninput="handleTeamInput()" autocomplete="off" style="font-size:16px;">
+        <input id="f-team" list="f-team-list" placeholder="例）千葉ジェッツ" oninput="handleTeamInput()" autocomplete="off" style="font-size:16px;">
         <datalist id="f-team-list"></datalist>
         <div id="team-list-panel" style="display:none; max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; margin-top:6px; background:var(--surface);"></div>
       </div>
     </div>
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
-    <div class="field"><label>対戦カード・イベント名</label><input id="f-match" list="f-opponent-list" placeholder="例）vs 湘南ユナイテッド" oninput="handleOpponentInput()" style="font-size:16px;" autocomplete="off"><datalist id="f-opponent-list"></datalist></div>
+    <div class="field"><label>対戦相手</label><input id="f-match" list="f-opponent-list" placeholder="例）川崎ブレイブサンダース" oninput="handleOpponentInput()" style="font-size:16px;" autocomplete="off"><datalist id="f-opponent-list"></datalist></div>
     <div class="row">
       <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
       <div class="field"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
@@ -404,7 +428,7 @@
         <button type="button" class="ha-btn" id="btn-home" onclick="setHomeAway('HOME')">🏠 HOME</button>
         <button type="button" class="ha-btn" id="btn-away" onclick="setHomeAway('AWAY')">✈️ AWAY</button>
       </div>
-      <input id="f-venue" list="f-venue-list" placeholder="例）盛岡タカヤアリーナ" style="font-size:16px;">
+      <input id="f-venue" list="f-venue-list" placeholder="例）LaLa arena TOKYO-BAY" style="font-size:16px;">
       <datalist id="f-venue-list"></datalist>
     </div>
     <div class="field"><label>想定予算（円）</label><input id="f-cost" type="number" inputmode="numeric" placeholder="例）32000" style="font-size:16px;"></div>
@@ -635,6 +659,7 @@ function renderTeamDatalist(){
   homeAwayMode = null;
   updateHomeAwayUI();
   renderTeamListPanel();
+  applyPlaceholders(sport);
 }
 
 function renderTeamListPanel(){
@@ -708,7 +733,7 @@ function setHomeAway(mode){
     }else{
       venueInput.value = '';
       venueList.innerHTML = '';
-      note.textContent = '（対戦カード欄に相手チーム名を入れると候補が出ます）';
+      note.textContent = '（対戦相手欄にチーム名を入れると候補が出ます）';
     }
   }
 }
@@ -742,7 +767,7 @@ function handleOpponentInput(){
   const teams = TEAM_DATA[sport] || [];
   const myTeam = document.getElementById('f-team').value;
   const oppList = document.getElementById('f-opponent-list');
-  if(oppList) oppList.innerHTML = teams.filter(t=>t.name!==myTeam).map(t=>`<option value="vs ${t.name}">`).join('');
+  if(oppList) oppList.innerHTML = teams.filter(t=>t.name!==myTeam).map(t=>`<option value="${t.name}">`).join('');
 }
 
 const PR_LINKS = {
@@ -782,16 +807,21 @@ function daysUntil(iso){
   return Math.ceil(ms / (1000*60*60*24));
 }
 function completion(t){
-  const vals = Object.values(t.status);
-  return Math.round(vals.filter(Boolean).length / vals.length * 100);
+  // 進捗の分母: 「不要」マークされていないカテゴリ全体
+  // 不要マークは t.detail[key].notNeeded = true で管理
+  const all = CATS.filter(c=> !t.detail[c.key]?.notNeeded);
+  if(!all.length) return 100;
+  const done = all.filter(c=> t.status[c.key]).length;
+  return Math.round(done / all.length * 100);
 }
 
 function switchTab(name){
-  document.getElementById('tab-cards').classList.toggle('active', name==='cards');
-  document.getElementById('tab-history').classList.toggle('active', name==='history');
-  document.getElementById('panel-cards').classList.toggle('active', name==='cards');
-  document.getElementById('panel-history').classList.toggle('active', name==='history');
+  ['cards','calendar','history'].forEach(n=>{
+    document.getElementById('tab-'+n)?.classList.toggle('active', n===name);
+    document.getElementById('panel-'+n)?.classList.toggle('active', n===name);
+  });
   if(name==='history') renderHistory();
+  if(name==='calendar') renderCalendar();
 }
 
 /* ---------- hero: next upcoming trip ---------- */
@@ -913,13 +943,18 @@ function setFilter(s){ sportFilter = s; render(); }
 
 function catPanelContent(t, c){
   const d = t.detail[c.key];
+  const notNeeded = !!d?.notNeeded;
+  const notNeededChk = IS_EDITABLE
+    ? `<label class="done-toggle" style="color:var(--text-faint); margin-top:4px;"><input type="checkbox" ${notNeeded?'checked':''} onchange="setNotNeeded('${t.id}','${c.key}',this.checked)"> このカテゴリは不要（進捗から除外）</label>`
+    : '';
   if(!c.bookable){
-    // food / other: simple memo + done toggle
     return `
       <div class="cat-panel">
         <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="お店の名前など"></div>
         ${IS_EDITABLE ? `<label class="done-toggle"><input type="checkbox" ${t.status[c.key]?'checked':''} onchange="setStatus('${t.id}','${c.key}',this.checked)"> 予定を決めた（完了）</label>` : ''}
+        ${notNeededChk}
         ${c.key==='food' ? `<div class="pr-row">${PR_LINKS.food.map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
+        ${c.key==='other' ? `<div class="pr-row">${(PR_LINKS.other||[]).map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
       </div>`;
   }
   return `
@@ -933,6 +968,7 @@ function catPanelContent(t, c){
         <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','memo',this.value)"`:'disabled'} placeholder="座席・便名など"></div>
       </div>
       ${IS_EDITABLE ? `<label class="done-toggle"><input type="checkbox" ${t.status[c.key]?'checked':''} onchange="setStatus('${t.id}','${c.key}',this.checked)"> 予約完了としてマークする</label>` : ''}
+      ${notNeededChk}
       ${(IS_EDITABLE && (d.method || d.bookedDate || d.memo)) ? `<button class="copy-btn" onclick="openCopyModal('${t.id}','${c.key}')">📋 この${c.label}情報を他の遠征にもコピー（連泊・同じ移動手段など）</button>` : ''}
       <div class="pr-row">${(PR_LINKS[c.key]||[]).map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>
     </div>`;
@@ -1055,7 +1091,7 @@ function renderBudgetBox(){
         <div class="budget-label">💰 シーズン予算上限
           <input type="number" id="budget-cap-input" value="${budgetCap||''}" placeholder="未設定" ${IS_EDITABLE?`onchange="setBudgetCap(this.value)"`:'disabled'}>円
         </div>
-        <div style="font-family:var(--font-num); font-weight:700; color:${over?'#c0392b':'var(--text-dim)'};">現在 ¥${totalCost.toLocaleString()}</div>
+        <div style="font-family:var(--font-num); font-weight:700; color:${over?'#c0392b':'var(--text-dim)'};">${totalCost>0?'現在 ¥'+totalCost.toLocaleString():'予算未入力'}</div>
       </div>
       ${budgetCap>0 ? `
         <div class="budget-track"><div class="budget-fill ${over?'over':''}" style="width:${pct}%"></div></div>
@@ -1102,6 +1138,17 @@ async function saveBookingDetail(tripId, key, patch){
     console.error(e);
     showToast('保存に失敗しました。通信環境をご確認ください');
   }
+}
+
+function setNotNeeded(tripId, key, val){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t.detail[key] = { ...t.detail[key], notNeeded: val };
+  if(val) t.status[key] = false;
+  // DB側: memoフィールドに"__notNeeded__"フラグを付与して保存（シンプルな暫定実装）
+  saveBookingDetail(tripId, key, { memo: val ? '__notNeeded__' : (t.detail[key].memo||'').replace('__notNeeded__',''), is_booked: false });
+  render();
 }
 
 function setStatus(tripId, key, val){
@@ -1199,6 +1246,48 @@ function renderHistory(){
 /* ---------- add / edit trip modal ---------- */
 let editingTripId = null;
 const KNOWN_SPORTS = ['バスケットボール','サッカー','野球','バレーボール'];
+
+// 競技ごとのplaceholderサンプル（モーダルを開いた時に競技に合わせて切り替わる）
+const SPORT_PLACEHOLDERS = {
+  'バスケットボール': {
+    team:  '例）千葉ジェッツ',
+    match: '例）川崎ブレイブサンダース',
+    venue: '例）LaLa arena TOKYO-BAY',
+    cost:  '例）12000',
+  },
+  'サッカー': {
+    team:  '例）浦和レッズ',
+    match: '例）鹿島アントラーズ',
+    venue: '例）埼玉スタジアム2002',
+    cost:  '例）5000',
+  },
+  '野球': {
+    team:  '例）東北楽天ゴールデンイーグルス',
+    match: '例）福岡ソフトバンクホークス',
+    venue: '例）楽天モバイルパーク宮城',
+    cost:  '例）8000',
+  },
+  'バレーボール': {
+    team:  '例）サントリーサンバーズ大阪',
+    match: '例）ウルフドッグス名古屋',
+    venue: '例）おおきにアリーナ舞洲',
+    cost:  '例）4000',
+  },
+  'その他': {
+    team:  '例）チーム名',
+    match: '例）相手チーム名',
+    venue: '例）会場名',
+    cost:  '例）5000',
+  },
+};
+
+function applyPlaceholders(sport){
+  const ph = SPORT_PLACEHOLDERS[sport] || SPORT_PLACEHOLDERS['その他'];
+  document.getElementById('f-team').placeholder  = ph.team;
+  document.getElementById('f-match').placeholder = ph.match;
+  document.getElementById('f-venue').placeholder = ph.venue;
+  document.getElementById('f-cost').placeholder  = ph.cost;
+}
 
 function toggleCustomSport(){
   const isOther = document.getElementById('f-sport').value === 'その他';
@@ -1443,6 +1532,163 @@ function logClick(tripId, category, partner){
   }catch(e){ console.error(e); }
 }
 
+/* ---------- カレンダービュー ---------- */
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth(); // 0-indexed
+
+function renderCalendar(){
+  const wrap = document.getElementById('calendar-wrap');
+  if(!wrap) return;
+  const y = calYear, m = calMonth;
+  const firstDay = new Date(y, m, 1).getDay(); // 0=日
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const monthLabel = `${y}年${m+1}月`;
+
+  // 試合を日付ごとにインデックス化
+  const byDate = {};
+  trips.forEach(t=>{
+    if(!t.date) return;
+    const [ty,tm,td] = t.date.split('-').map(Number);
+    if(ty===y && tm-1===m){
+      if(!byDate[td]) byDate[td] = [];
+      byDate[td].push(t);
+    }
+  });
+
+  const cells = [];
+  for(let i=0;i<firstDay;i++) cells.push(null); // 空白セル
+  for(let d=1;d<=daysInMonth;d++) cells.push(d);
+  while(cells.length%7!==0) cells.push(null);
+
+  const todayDate = new Date();
+  const isToday = (d)=> d && todayDate.getFullYear()===y && todayDate.getMonth()===m && todayDate.getDate()===d;
+
+  wrap.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 0 10px;">
+      <button onclick="calNav(-1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px;">‹</button>
+      <div style="font-family:var(--font-display); font-weight:700; font-size:18px;">${monthLabel}</div>
+      <button onclick="calNav(1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px;">›</button>
+    </div>
+    ${IS_EDITABLE ? `<div style="text-align:right; margin-bottom:10px;">
+      <button onclick="openScheduleImport()" style="font-size:12px; padding:7px 14px; border-radius:999px; border:1.5px solid var(--rose); background:var(--rose-wash); color:var(--rose-deep); font-family:var(--font-display); font-weight:700; cursor:pointer;">📋 スケジュールをまとめて入力</button>
+    </div>` : ''}
+    <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center;">
+      ${['日','月','火','水','木','金','土'].map((d,i)=>`<div style="font-size:11px; font-weight:700; color:${i===0?'var(--rose-deep)':i===6?'#4a7dc9':'var(--text-dim)'}; padding:4px 0;">${d}</div>`).join('')}
+      ${cells.map((d,i)=>{
+        if(!d) return `<div></div>`;
+        const events = byDate[d]||[];
+        const dow = (firstDay+d-1)%7;
+        const color = dow===0?'var(--rose-deep)':dow===6?'#4a7dc9':'var(--text)';
+        const bg = isToday(d) ? 'var(--rose-wash)' : 'var(--surface)';
+        const border = isToday(d) ? '1.5px solid var(--rose)' : '1px solid var(--line)';
+        return `<div style="min-height:64px; background:${bg}; border:${border}; border-radius:8px; padding:4px; text-align:left; cursor:${events.length?'pointer':'default'};" onclick="${events.length?`focusTrip('${events[0].id}'); switchTab('cards');`:''}">
+          <div style="font-size:12px; font-weight:700; color:${color}; margin-bottom:2px;">${d}</div>
+          ${events.map(t=>{
+            const pct = completion(t);
+            return `<div style="font-size:9.5px; background:${pct===100?'var(--sage)':'var(--rose)'}; color:#fff; border-radius:4px; padding:1px 4px; margin-bottom:2px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.team}</div>`;
+          }).join('')}
+        </div>`;
+      }).join('')}
+    </div>
+    ${Object.keys(byDate).length===0 ? `<div style="text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;">この月の遠征はまだ登録されていません</div>` : ''}
+    <div style="margin-top:14px; display:flex; gap:10px; font-size:11px; color:var(--text-dim);">
+      <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--rose); border-radius:3px; display:inline-block;"></span>準備中</span>
+      <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--sage); border-radius:3px; display:inline-block;"></span>準備完了</span>
+    </div>
+  `;
+}
+
+function calNav(dir){
+  calMonth += dir;
+  if(calMonth < 0){ calMonth = 11; calYear--; }
+  if(calMonth > 11){ calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+/* ---------- スケジュールまとめ入力（AI解析） ---------- */
+function openScheduleImport(){
+  document.getElementById('schedule-import-overlay').classList.add('open');
+  document.getElementById('schedule-import-text').value = '';
+  document.getElementById('schedule-import-status').textContent = '';
+  document.getElementById('schedule-import-result').innerHTML = '';
+}
+function closeScheduleImport(){
+  document.getElementById('schedule-import-overlay').classList.remove('open');
+}
+
+async function runScheduleImport(){
+  const text = document.getElementById('schedule-import-text').value.trim();
+  if(!text){ document.getElementById('schedule-import-status').textContent = 'スケジュールテキストを入力してください'; return; }
+  const btn = document.getElementById('schedule-import-btn');
+  const status = document.getElementById('schedule-import-status');
+  btn.disabled = true;
+  status.innerHTML = '<span class="spinner"></span>解析中…';
+  try{
+    const response = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        messages:[{role:'user', content:`以下はバスケや野球などのスポーツ試合スケジュールのテキストです。各試合を抽出してJSONの配列だけを返してください。前置き・説明文・バッククォートは一切つけないでください。日付はYYYY-MM-DD形式、時刻はHH:MM形式で出力してください。チーム名(team)、対戦カード(opponent)、日付(match_date)、時刻(start_time, 不明はnull)、会場(venue, 不明はnull)を含めてください。\n\n${text}`}]
+      })
+    });
+    const data = await response.json();
+    const rawText = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean = rawText.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    status.textContent = `${parsed.length}件の試合を検出しました。確認して「登録する」を押してください。`;
+    document.getElementById('schedule-import-result').innerHTML = parsed.map((g,i)=>`
+      <div style="background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; align-items:flex-start; gap:10px;">
+        <input type="checkbox" id="ig${i}" checked style="margin-top:3px; width:16px; height:16px; accent-color:var(--rose);">
+        <div style="font-size:13px; line-height:1.7;">
+          <div style="font-weight:700;">${g.team||''} ${g.opponent||''}</div>
+          <div style="color:var(--text-dim);">${g.match_date||''} ${g.start_time||''} ${g.venue?'@ '+g.venue:''}</div>
+        </div>
+      </div>`).join('');
+    document.getElementById('schedule-import-result').dataset.parsed = JSON.stringify(parsed);
+    document.getElementById('schedule-import-confirm-btn').style.display = 'block';
+  }catch(e){
+    status.textContent = '解析に失敗しました。テキストを確認してもう一度お試しください。';
+    console.error(e);
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function confirmScheduleImport(){
+  const parsed = JSON.parse(document.getElementById('schedule-import-result').dataset.parsed||'[]');
+  const checked = parsed.filter((_,i)=>document.getElementById('ig'+i)?.checked);
+  if(!checked.length){ closeScheduleImport(); return; }
+  const status = document.getElementById('schedule-import-status');
+  status.textContent = `${checked.length}件を登録しています…`;
+  let done = 0;
+  for(const g of checked){
+    if(!g.match_date) continue;
+    try{
+      const { data, error } = await sb.rpc('upsert_trip',{
+        p_edit_token: EDIT_TOKEN,
+        p_sport: g.sport || '未設定',
+        p_team: g.team || '未設定',
+        p_opponent: g.opponent || null,
+        p_match_date: g.match_date,
+        p_start_time: g.start_time || null,
+        p_venue: g.venue || null,
+        p_estimated_cost: 0
+      });
+      if(!error){
+        const s={}, d2={};
+        CATS.forEach(c=>{ s[c.key]=false; d2[c.key]=c.bookable?{method:'',bookedDate:'',cost:0,memo:''}:{memo:''}; });
+        trips.push({ id:data, sport:g.sport||'未設定', team:g.team||'未設定', match:g.opponent||'', date:g.match_date, time:g.start_time||'', venue:g.venue||'', cost:0, status:s, detail:d2 });
+        done++;
+      }
+    }catch(e){ console.error(e); }
+  }
+  status.textContent = `${done}件を登録しました。`;
+  render();
+  setTimeout(()=>{ closeScheduleImport(); calMonth=new Date(checked[0].match_date).getMonth(); calYear=new Date(checked[0].match_date).getFullYear(); renderCalendar(); }, 1000);
+}
+
 function render(){
   renderHero();
   renderAlerts();
@@ -1458,16 +1704,17 @@ function normalizeTrip(raw){
   const status = {}, detail = {};
   CATS.forEach(c=>{
     const bd = (raw.booking_details||[]).find(x=>x.category===c.key) || {};
+    const isNotNeeded = (bd.memo||'').includes('__notNeeded__');
     status[c.key] = !!bd.is_booked;
     detail[c.key] = c.bookable
-      ? { method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0, memo: bd.memo || '' }
-      : { memo: bd.memo || '' };
+      ? { method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0, memo: (bd.memo||'').replace('__notNeeded__','').trim(), notNeeded: isNotNeeded }
+      : { memo: (bd.memo||'').replace('__notNeeded__','').trim(), notNeeded: isNotNeeded };
   });
   return {
     id: raw.id,
     sport: raw.sport,
     team: raw.team,
-    match: raw.opponent || '',           // 「vs 湘南ユナイテッド」等の対戦カード表記はopponentカラムに保存
+    match: raw.opponent || '',
     date: raw.match_date,
     time: raw.start_time ? String(raw.start_time).slice(0,5) : '',
     venue: raw.venue || '',
