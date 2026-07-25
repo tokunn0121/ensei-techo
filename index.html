@@ -234,24 +234,54 @@
   .modal .modal-sub{ font-size:12px; color:var(--text-dim); margin-bottom:16px; }
   .modal .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
   .modal .field{ display:flex; flex-direction:column; gap:5px; margin-bottom:11px; }
-  .modal .field label{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
-  .modal input, .modal select{ background: var(--surface-2); border:1.5px solid var(--line); color:var(--text); padding:11px 13px; border-radius:10px; font-size:13.5px; font-family:var(--font-body); width:100%; }
+  .modal .field label{ font-size:11.5px; color:var(--text-dim); font-weight:600; display:block; margin-bottom:5px; }
+  .modal input, .modal select{ background: var(--surface-2); border:1.5px solid var(--line); color:var(--text); padding:13px 14px; border-radius:10px; font-size:16px; font-family:var(--font-body); width:100%; }
   .modal input:focus, .modal select:focus{ outline:2px solid var(--rose); }
   .modal-actions{ display:flex; gap:10px; margin-top:16px; justify-content:flex-end; flex-wrap:wrap; }
-  .btn-secondary{ background:none; border:1.5px solid var(--line); color:var(--text-dim); padding:11px 20px; border-radius:999px; cursor:pointer; font-size:13px; font-family:var(--font-display); font-weight:700; }
-  .btn-tertiary{ background:var(--surface-2); border:1.5px solid var(--rose); color:var(--rose-deep); padding:11px 18px; border-radius:999px; cursor:pointer; font-size:13px; font-family:var(--font-display); font-weight:700; }
-  .btn-primary{ background: var(--rose); border:none; color:#fff; font-weight:700; font-family:var(--font-display); padding:11px 22px; border-radius:999px; cursor:pointer; font-size:13px; }
+  .btn-secondary{ background:none; border:1.5px solid var(--line); color:var(--text-dim); padding:13px 20px; border-radius:999px; cursor:pointer; font-size:14px; font-family:var(--font-display); font-weight:700; }
+  .btn-tertiary{ background:var(--surface-2); border:1.5px solid var(--rose); color:var(--rose-deep); padding:13px 18px; border-radius:999px; cursor:pointer; font-size:14px; font-family:var(--font-display); font-weight:700; }
+  .btn-primary{ background: var(--rose); border:none; color:#fff; font-weight:700; font-family:var(--font-display); padding:13px 22px; border-radius:999px; cursor:pointer; font-size:14px; }
   .save-msg{ font-size:12px; color:var(--sage); font-weight:700; text-align:right; margin-top:8px; min-height:16px; }
+  /* HOME/AWAYボタン */
+  .home-away-btns{ display:flex; gap:8px; margin-bottom:8px; }
+  .ha-btn{ flex:1; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:var(--surface-2); font-size:14px; font-family:var(--font-display); font-weight:700; cursor:pointer; color:var(--text-dim); }
+  .ha-btn.active{ border-color:var(--rose); background:var(--rose-wash); color:var(--rose-deep); }
+  /* スマホ最適化 */
+  @media (max-width: 640px){
+    .modal{ padding:20px 16px 24px; border-radius:20px 20px 0 0; position:fixed; bottom:0; left:0; right:0; max-width:100%; margin:0; max-height:90vh; overflow-y:auto; }
+    .overlay.open{ align-items:flex-end; }
+    .modal-actions{ flex-direction:column; }
+    .modal-actions button{ width:100%; padding:15px; font-size:15px; }
+    .add-btn{ padding:14px 20px; font-size:14px; }
+    .ticket{ border-radius:16px; }
+    .cat-header{ padding:13px 14px; }
+    .cat-header .label{ font-size:13.5px; }
+    .stub{ padding:16px; }
+    .head{ padding:16px; }
+    .card-share-btn{ padding:13px; font-size:13.5px; }
+  }
 
 
   footer{ padding: 22px 5vw; color:var(--text-faint); font-size:11.5px; text-align:center; }
 
-  .share-banner{ margin:16px 5vw 0; background:var(--sage-wash); border:1.5px solid var(--sage); border-radius:14px; padding:14px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-  .share-banner .sb-text{ flex:1; min-width:220px; font-size:12.5px; color:var(--text); }
-  .share-banner .sb-text b{ color:var(--sage); }
-  .share-banner .sb-link{ display:flex; gap:8px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 6px 6px 12px; font-family:var(--font-num); font-size:12px; color:var(--text-dim); max-width:100%; overflow:hidden; }
-  .share-banner .sb-link input{ border:none; background:transparent; font-family:var(--font-num); font-size:12px; color:var(--text-dim); width:160px; }
-  .share-banner .sb-copy{ background:var(--sage); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font-display); white-space:nowrap; }
+  /* 共有ポップアップ */
+  .share-icon-btn{
+    background:var(--surface-2); border:1.5px solid var(--line); border-radius:999px;
+    width:40px; height:40px; font-size:18px; cursor:pointer; display:flex; align-items:center;
+    justify-content:center; transition:border-color .15s;
+  }
+  .share-icon-btn:hover{ border-color:var(--rose); background:var(--rose-wash); }
+  .share-action-btn{
+    width:100%; padding:14px 16px; margin-bottom:8px; border-radius:12px;
+    border:1.5px solid var(--line); background:var(--surface-2);
+    font-family:var(--font-display); font-weight:700; font-size:14px;
+    cursor:pointer; text-align:left; color:var(--text); display:flex; align-items:center; gap:12px;
+  }
+  .share-action-btn:active{ background:var(--rose-wash); border-color:var(--rose); }
+  .share-action-btn .sab-icon{ font-size:20px; width:28px; text-align:center; }
+  .share-action-btn .sab-body .sab-title{ font-size:14px; }
+  .share-action-btn .sab-body .sab-sub{ font-size:11px; color:var(--text-dim); font-weight:400; margin-top:2px; }
+  .share-divider{ border:none; border-top:1px solid var(--line); margin:12px 0; }
 
   .past-toggle{ text-align:center; margin:6px 5vw 0; }
   .past-toggle button{ font-family:var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:9px 20px; cursor:pointer; }
@@ -281,11 +311,22 @@
     <p class="tag">推しチームを追いかける、すべての遠征をひとまとめに。</p>
   </div>
   <div class="btn-group" id="header-actions" style="display:none;">
+    <button class="share-icon-btn" id="header-share-btn" onclick="openSharePopup()" title="この手帳を共有">🔗</button>
     <button class="add-btn" onclick="openModal()">＋ 新しい遠征を追加</button>
   </div>
 </header>
 
-<div id="share-banner"></div>
+<!-- 共有ポップアップ -->
+<div id="share-popup-overlay" onclick="closeSharePopup()" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.3);"></div>
+<div id="share-popup" style="display:none; position:fixed; z-index:201; background:var(--surface); border-radius:20px; padding:22px 20px 18px; box-shadow:0 8px 40px rgba(0,0,0,0.18); width:min(340px, 90vw);">
+  <div style="font-family:var(--font-display); font-weight:900; font-size:16px; margin-bottom:4px;">この手帳を共有する</div>
+  <div id="share-popup-mode-label" style="font-size:12px; color:var(--text-dim); margin-bottom:16px;"></div>
+  <div id="share-popup-edit-section"></div>
+  <div id="share-popup-view-section"></div>
+  <div id="share-popup-readonly-msg"></div>
+  <button onclick="closeSharePopup()" style="width:100%; margin-top:14px; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:none; font-family:var(--font-display); font-weight:700; font-size:14px; cursor:pointer; color:var(--text-dim);">閉じる</button>
+</div>
+
 <div id="loading-screen" style="padding:60px 5vw; color:var(--text-dim); font-size:13.5px;">読み込んでいます…</div>
 
 <div id="landing-screen" style="display:none; padding:60px 5vw; max-width:520px; margin:0 auto; text-align:center;">
@@ -342,16 +383,31 @@
           <option>その他</option>
         </select>
       </div>
-      <div class="field"><label>応援チーム</label><input id="f-team" list="f-team-list" placeholder="例）東北イーグルス" oninput="handleTeamInput()"><datalist id="f-team-list"></datalist></div>
+      <div class="field">
+        <label>応援チーム
+          <button type="button" id="team-list-toggle" onclick="toggleTeamList()" style="margin-left:8px; font-size:11px; padding:3px 10px; border-radius:6px; border:1px solid var(--line); background:var(--surface-2); color:var(--text-dim); cursor:pointer; vertical-align:middle;">一覧から選ぶ</button>
+        </label>
+        <input id="f-team" list="f-team-list" placeholder="例）東北イーグルス" oninput="handleTeamInput()" autocomplete="off" style="font-size:16px;">
+        <datalist id="f-team-list"></datalist>
+        <div id="team-list-panel" style="display:none; max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; margin-top:6px; background:var(--surface);"></div>
+      </div>
     </div>
-    <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など"></div>
-    <div class="field"><label>対戦カード・イベント名</label><input id="f-match" placeholder="例）vs 湘南ユナイテッド"></div>
+    <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
+    <div class="field"><label>対戦カード・イベント名</label><input id="f-match" list="f-opponent-list" placeholder="例）vs 湘南ユナイテッド" oninput="handleOpponentInput()" style="font-size:16px;" autocomplete="off"><datalist id="f-opponent-list"></datalist></div>
     <div class="row">
-      <div class="field"><label>日付</label><input id="f-date" type="date"></div>
-      <div class="field"><label>試合開始時刻</label><input id="f-time" type="time"></div>
+      <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
+      <div class="field"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
     </div>
-    <div class="field"><label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label><input id="f-venue" list="f-venue-list" placeholder="例）盛岡タカヤアリーナ"><datalist id="f-venue-list"></datalist></div>
-    <div class="field"><label>想定予算（円）</label><input id="f-cost" type="number" placeholder="例）32000"></div>
+    <div class="field">
+      <label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label>
+      <div id="home-away-btns" style="display:none; gap:8px; margin-bottom:8px; display:none;">
+        <button type="button" class="ha-btn" id="btn-home" onclick="setHomeAway('HOME')">🏠 HOME</button>
+        <button type="button" class="ha-btn" id="btn-away" onclick="setHomeAway('AWAY')">✈️ AWAY</button>
+      </div>
+      <input id="f-venue" list="f-venue-list" placeholder="例）盛岡タカヤアリーナ" style="font-size:16px;">
+      <datalist id="f-venue-list"></datalist>
+    </div>
+    <div class="field"><label>想定予算（円）</label><input id="f-cost" type="number" inputmode="numeric" placeholder="例）32000" style="font-size:16px;"></div>
     <div class="save-msg" id="modal-save-msg"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">閉じる</button>
@@ -569,12 +625,99 @@ const TEAM_DATA = {
   ],
 };
 
+let homeAwayMode = null;
+
 function renderTeamDatalist(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
   document.getElementById('f-team-list').innerHTML = teams.map(t=>`<option value="${t.name}">`).join('');
   document.getElementById('venue-suggest-note').textContent = '';
+  homeAwayMode = null;
+  updateHomeAwayUI();
+  renderTeamListPanel();
 }
+
+function renderTeamListPanel(){
+  const sport = document.getElementById('f-sport').value;
+  const teams = TEAM_DATA[sport] || [];
+  const panel = document.getElementById('team-list-panel');
+  if(!panel || panel.style.display === 'none') return;
+  panel.innerHTML = teams.map((t,i)=>`
+    <div onclick="selectTeamFromList(this.dataset.n)" data-n="${t.name}"
+      style="padding:12px 14px; border-bottom:1px solid var(--line); font-size:15px; cursor:pointer;">
+      ${t.name}${t.arena ? `<br><span style="font-size:11px; color:var(--text-dim);">${t.arena}</span>` : ''}
+    </div>`).join('');
+}
+
+
+function toggleTeamList(){
+  const panel = document.getElementById('team-list-panel');
+  const btn = document.getElementById('team-list-toggle');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '一覧から選ぶ' : '閉じる';
+  if(!isOpen) renderTeamListPanel();
+}
+
+function selectTeamFromList(name){
+  document.getElementById('f-team').value = name;
+  document.getElementById('team-list-panel').style.display = 'none';
+  document.getElementById('team-list-toggle').textContent = '一覧から選ぶ';
+  handleTeamInput();
+  handleOpponentInput();
+}
+
+function updateHomeAwayUI(){
+  const teamVal = document.getElementById('f-team').value;
+  const sport = document.getElementById('f-sport').value;
+  const teams = TEAM_DATA[sport] || [];
+  const match = teams.find(t=>t.name===teamVal);
+  const btnWrap = document.getElementById('home-away-btns');
+  if(match && match.arena){
+    btnWrap.style.display = 'flex';
+  }else{
+    btnWrap.style.display = 'none';
+    homeAwayMode = null;
+  }
+  const btnHome = document.getElementById('btn-home');
+  const btnAway = document.getElementById('btn-away');
+  if(btnHome) btnHome.className = 'ha-btn' + (homeAwayMode==='HOME' ? ' active' : '');
+  if(btnAway) btnAway.className = 'ha-btn' + (homeAwayMode==='AWAY' ? ' active' : '');
+}
+
+function setHomeAway(mode){
+  homeAwayMode = mode;
+  updateHomeAwayUI();
+  const sport = document.getElementById('f-sport').value;
+  const teams = TEAM_DATA[sport] || [];
+  const myTeam = teams.find(t=>t.name===document.getElementById('f-team').value);
+  const note = document.getElementById('venue-suggest-note');
+  const venueInput = document.getElementById('f-venue');
+  const venueList = document.getElementById('f-venue-list');
+  if(mode === 'HOME' && myTeam && myTeam.arena){
+    venueInput.value = myTeam.arena;
+    venueList.innerHTML = `<option value="${myTeam.arena}">`;
+    note.textContent = '（自チームのホームアリーナをセット）';
+  } else if(mode === 'AWAY'){
+    const matchText = document.getElementById('f-match').value;
+    const arenas = getOpponentArenas(sport, matchText, teams);
+    if(arenas.length){
+      venueInput.value = arenas[0];
+      venueList.innerHTML = arenas.map(a=>`<option value="${a}">`).join('');
+      note.textContent = '（相手チームのホームアリーナをセット）';
+    }else{
+      venueInput.value = '';
+      venueList.innerHTML = '';
+      note.textContent = '（対戦カード欄に相手チーム名を入れると候補が出ます）';
+    }
+  }
+}
+
+function getOpponentArenas(sport, matchText, teams){
+  const myTeam = document.getElementById('f-team').value;
+  return teams.filter(t=>t.name!==myTeam && matchText.includes(t.name) && t.arena).map(t=>t.arena);
+}
+
 function handleTeamInput(){
   const sport = document.getElementById('f-sport').value;
   const teamVal = document.getElementById('f-team').value;
@@ -582,22 +725,46 @@ function handleTeamInput(){
   const match = teams.find(t=>t.name===teamVal);
   const note = document.getElementById('venue-suggest-note');
   const venueInput = document.getElementById('f-venue');
-  if(match && match.arena){
+  if(match && match.arena && homeAwayMode === null){
     venueInput.value = match.arena;
     document.getElementById('f-venue-list').innerHTML = `<option value="${match.arena}">`;
-    note.textContent = '（ホームアリーナを自動入力しました。変更もできます）';
-  }else{
+    note.textContent = '（ホームアリーナを仮セット。HOME/AWAYで切り替えられます）';
+  }else if(!match){
     note.textContent = '';
   }
+  updateHomeAwayUI();
+  handleOpponentInput();
+}
+
+function handleOpponentInput(){
+  if(homeAwayMode === 'AWAY') setHomeAway('AWAY');
+  const sport = document.getElementById('f-sport').value;
+  const teams = TEAM_DATA[sport] || [];
+  const myTeam = document.getElementById('f-team').value;
+  const oppList = document.getElementById('f-opponent-list');
+  if(oppList) oppList.innerHTML = teams.filter(t=>t.name!==myTeam).map(t=>`<option value="vs ${t.name}">`).join('');
 }
 
 const PR_LINKS = {
-  hotel: [{label:'ホテル予約', url:'https://travel.rakuten.co.jp/'}, {label:'じゃらんで探す', url:'https://www.jalan.net/'}],
-  transport: [{label:'新幹線予約', url:'https://travel.rakuten.co.jp/'}, {label:'航空券比較', url:'https://www.skyticket.jp/'}],
-  ticket: [{label:'チケット購入', url:'https://t.pia.jp/'}, {label:'イープラス', url:'https://eplus.jp/'}],
-  food: [{label:'お店を予約', url:'https://www.hotpepper.jp/'}],
+  hotel: [
+    {label:'楽天トラベルで探す【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713301&p_id=55&pc_id=55&pl_id=624'},
+    {label:'じゃらんで探す', url:'https://www.jalan.net/'},
+  ],
+  transport: [
+    {label:'格安航空券を比較【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B88SV+1HL182+3UZC+60WN5'},
+    {label:'新幹線予約(楽天トラベル)', url:'https://travel.rakuten.co.jp/'},
+  ],
+  ticket: [
+    {label:'チケット購入(ぴあ)', url:'https://t.pia.jp/'},
+    {label:'イープラス', url:'https://eplus.jp/'},
+  ],
+  food: [
+    {label:'お店を予約(ホットペッパー)', url:'https://www.hotpepper.jp/'},
+  ],
+  other: [
+    {label:'楽天市場で遠征グッズ【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713296&p_id=54&pc_id=54&pl_id=616'},
+  ],
 };
-// TODO: 実際にASP(A8.net等)の審査が通ったら、上記urlをアフィリエイトタグ付きのURLに差し替えてください。
 
 function fmtDate(iso){
   if(!iso) return {md:'--', dow:''};
@@ -1322,47 +1489,95 @@ async function fetchNotebook(token){
 }
 
 /* ---------- link-based persistence (no login) ---------- */
-function renderShareBanner(){
-  const box = document.getElementById('share-banner');
+function positionSharePopup(){
+  const btn = document.getElementById('header-share-btn');
+  const popup = document.getElementById('share-popup');
+  if(!btn || !popup) return;
+  const rect = btn.getBoundingClientRect();
+  const pw = popup.offsetWidth || 340;
+  let left = rect.right - pw;
+  if(left < 8) left = 8;
+  popup.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
+  popup.style.left = left + 'px';
+}
+
+function openSharePopup(){
+  const editUrl = location.href;
+  const shareUrl = SHARE_TOKEN ? (location.origin + location.pathname + '#book=' + SHARE_TOKEN) : null;
+  const modeLabel = document.getElementById('share-popup-mode-label');
+  const editSection = document.getElementById('share-popup-edit-section');
+  const viewSection = document.getElementById('share-popup-view-section');
+  const readonlyMsg = document.getElementById('share-popup-readonly-msg');
+
   if(IS_EDITABLE){
-    const editUrl = location.href;
-    const shareUrl = SHARE_TOKEN ? (location.origin + location.pathname + '#book=' + SHARE_TOKEN) : null;
-    box.innerHTML = `
-      <div class="share-banner">
-        <div class="sb-text">🔗 <b>この編集用リンクを知っている人は誰でも</b>、ログインなしでこの遠征手帳を編集できます。家族にはこちらのリンクを共有してください。</div>
-        <div class="sb-link">
-          <input id="share-url-input" value="${editUrl}" readonly onclick="this.select()">
-          <button class="sb-copy" onclick="copyShareLink(document.getElementById('share-url-input').value)">コピー</button>
-        </div>
-      </div>
-      ${shareUrl ? `
-      <div class="share-banner" style="background:var(--rose-wash); border-color:var(--rose); margin-top:10px;">
-        <div class="sb-text">👀 友達に見せるだけなら<b>閲覧専用リンク</b>が安心です（相手は編集できません）。</div>
-        <div class="sb-link">
-          <input id="view-url-input" value="${shareUrl}" readonly onclick="this.select()">
-          <button class="sb-copy" style="background:var(--rose);" onclick="copyShareLink(document.getElementById('view-url-input').value)">コピー</button>
-        </div>
-      </div>` : ''}
-    `;
+    modeLabel.textContent = '編集リンクまたは閲覧専用リンクをコピーできます';
+    editSection.innerHTML = `
+      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\'")}','edit')">
+        <span class="sab-icon">✏️</span>
+        <span class="sab-body">
+          <div class="sab-title">編集リンクをコピー</div>
+          <div class="sab-sub">家族・一緒に管理する人へ（編集できます）</div>
+        </span>
+      </button>`;
+    viewSection.innerHTML = shareUrl ? `
+      <button class="share-action-btn" onclick="popupCopy('${shareUrl.replace(/'/g,"\'")}','view')">
+        <span class="sab-icon">👀</span>
+        <span class="sab-body">
+          <div class="sab-title">閲覧専用リンクをコピー</div>
+          <div class="sab-sub">友達・SNS公開用（編集不可・安心）</div>
+        </span>
+      </button>` : '';
+    readonlyMsg.innerHTML = '';
   }else{
-    box.innerHTML = `
-      <div class="share-banner" style="background:var(--surface-2); border-color:var(--line);">
-        <div class="sb-text">👀 これは<b>閲覧専用リンク</b>です。予約状況の確認や、各カテゴリのリンクからの予約はできますが、内容の編集はできません。</div>
-      </div>`;
+    modeLabel.textContent = 'これは閲覧専用リンクです';
+    editSection.innerHTML = '';
+    viewSection.innerHTML = `
+      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\'")}','view')">
+        <span class="sab-icon">🔗</span>
+        <span class="sab-body">
+          <div class="sab-title">このリンクをコピー</div>
+          <div class="sab-sub">閲覧専用リンク（相手は編集できません）</div>
+        </span>
+      </button>`;
+    readonlyMsg.innerHTML = '<div style="font-size:12px; color:var(--text-dim); text-align:center; padding:4px 0;">編集リンクをお持ちの方からリンクをもらってください</div>';
+  }
+
+  document.getElementById('share-popup-overlay').style.display = 'block';
+  document.getElementById('share-popup').style.display = 'block';
+  requestAnimationFrame(positionSharePopup);
+}
+
+function closeSharePopup(){
+  document.getElementById('share-popup-overlay').style.display = 'none';
+  document.getElementById('share-popup').style.display = 'none';
+}
+
+async function popupCopy(url, type){
+  try{
+    await navigator.clipboard.writeText(url);
+    closeSharePopup();
+    showToast(type==='edit' ? '編集リンクをコピーしました。LINEなどで家族に送ってください' : '閲覧専用リンクをコピーしました');
+  }catch(e){
+    showToast('コピーに失敗しました。もう一度お試しください');
   }
 }
+
 async function copyShareLink(url){
   try{
     await navigator.clipboard.writeText(url);
     showToast('リンクをコピーしました');
   }catch(e){
-    showToast('コピーに失敗しました。URL欄を長押しして手動でコピーしてください');
+    showToast('コピーに失敗しました');
   }
 }
 
 function applyEditableUI(){
   document.getElementById('header-actions').style.display = IS_EDITABLE ? 'flex' : 'none';
+  const shareBtn = document.getElementById('header-share-btn');
+  if(shareBtn) shareBtn.style.display = 'flex';
 }
+
+function renderShareBanner(){ /* ポップアップ方式に移行したため空関数 */ }
 
 function showScreen(name){
   ['loading-screen','landing-screen','error-screen','app-main'].forEach(id=>{
