@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>遠征手帳 — アウェイ観戦管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{
+    --bg: #FBF6F0;
+    --surface: #FFFFFF;
+    --surface-2: #FDF1EA;
+    --line: #EEE1D7;
+    --rose: #D98B96;
+    --rose-deep: #C06B78;
+    --rose-wash: #FBEEEE;
+    --sage: #8FA88B;
+    --sage-wash: #EFF4ED;
+    --sky: #93B5C6;
+    --butter: #EFC078;
+    --text: #4A3F3A;
+    --text-dim: #9C8F87;
+    --text-faint: #CBBFB7;
+    --font-display: 'Zen Maru Gothic', sans-serif;
+    --font-body: 'Zen Maru Gothic', sans-serif;
+    --font-num: 'Quicksand', sans-serif;
+    --radius: 18px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height:100vh;
+    padding-bottom: 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background: var(--rose); color:#fff; }
+
+  header{
+    padding: 30px 5vw 18px;
+    display:flex; align-items:flex-end; justify-content:space-between;
+    flex-wrap:wrap; gap:16px;
+  }
+  .brand{ display:flex; flex-direction:column; gap:5px; }
+  .brand .eyebrow{
+    font-family: var(--font-num); font-size:12px; letter-spacing:0.16em;
+    color: var(--rose-deep); font-weight:700; text-transform:uppercase;
+  }
+  .brand h1{
+    font-family: var(--font-display); font-weight:900; font-size:clamp(26px,4vw,36px);
+    line-height:1.1; color:var(--text);
+  }
+  .brand .tag{ color: var(--text-dim); font-size:13.5px; margin-top:2px;}
+  .btn-group{ display:flex; gap:10px; flex-wrap:wrap; }
+  .add-btn{
+    font-family: var(--font-display); font-weight:700;
+    background: var(--rose); color:#fff; border:none; padding:14px 24px;
+    border-radius:999px; font-size:14px; cursor:pointer;
+    box-shadow: 0 6px 16px rgba(217,139,150,0.35);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .add-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 20px rgba(217,139,150,0.45);}
+  .add-btn:focus-visible{ outline:3px solid var(--butter); outline-offset:3px; }
+  .add-btn.ghost{ background: var(--surface); color: var(--rose-deep); border:1.5px solid var(--rose); box-shadow:none; }
+  .add-btn.ghost:hover{ background: var(--rose-wash); box-shadow:none; transform:none; }
+
+  /* ---------- tabs ---------- */
+  .tabs{ display:flex; gap:8px; padding: 4px 5vw 0; }
+  .tab{
+    font-family: var(--font-display); font-weight:700; font-size:13.5px;
+    padding:11px 20px; border-radius:999px 999px 0 0; cursor:pointer;
+    color: var(--text-dim); background:transparent; border:none;
+  }
+  .tab.active{ background: var(--surface); color: var(--rose-deep); }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+
+  /* ---------- hero: next trip ---------- */
+  .hero{
+    background: linear-gradient(135deg, var(--rose-wash), var(--surface));
+    border-radius: var(--radius); padding:20px 22px; margin:18px 5vw 0;
+    box-shadow:0 4px 14px rgba(74,63,58,0.06); display:flex; justify-content:space-between;
+    align-items:center; flex-wrap:wrap; gap:14px; cursor:pointer; border:1px solid var(--line);
+  }
+  .hero:hover{ border-color: var(--rose); }
+  .hero .htitle{ font-size:11.5px; font-weight:700; color:var(--rose-deep); letter-spacing:.06em; }
+  .hero .hmatch{ font-family:var(--font-display); font-weight:700; font-size:18.5px; margin-top:5px; }
+  .hero .hmeta{ font-size:12.5px; color:var(--text-dim); margin-top:4px; }
+  .hero .hpending{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .hero .hpending span{ font-size:11px; background:#fff; border:1px solid var(--rose); color:var(--rose-deep); padding:4px 10px; border-radius:999px; font-weight:600; }
+  .hero .hall-set{ font-size:11.5px; color:var(--sage); font-weight:700; margin-top:10px; }
+  .hero .hcountdown{ text-align:right; flex-shrink:0; }
+  .hero .hcountdown .num{ font-family:var(--font-num); font-size:32px; font-weight:700; color:var(--rose-deep); line-height:1; }
+  .hero .hcountdown .lbl{ font-size:11px; color:var(--text-dim); margin-top:3px; }
+
+  /* ---------- alerts ---------- */
+  .alerts{ margin:16px 5vw 0; background:var(--surface); border-radius:var(--radius); padding:16px 22px; box-shadow:0 4px 14px rgba(74,63,58,0.05); }
+  .alerts h3{ font-family:var(--font-display); font-size:14px; margin-bottom:6px; }
+  .alerts .sub{ font-size:11.5px; color:var(--text-dim); margin-bottom:10px; }
+  .alert-row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px dashed var(--line); font-size:13px; cursor:pointer; }
+  .alert-row:last-child{ border-bottom:none; }
+  .alert-row:hover .a-title{ color:var(--rose-deep); }
+  .alert-row .a-l{ display:flex; align-items:center; gap:9px; }
+  .alert-row .a-cat{ font-size:16px; }
+  .alert-row .a-days{ font-family:var(--font-num); font-weight:600; font-size:12px; color:var(--rose-deep); background:var(--rose-wash); padding:3px 9px; border-radius:999px; }
+  .alerts .all-clear{ color:var(--sage); font-size:13px; padding:6px 0; font-weight:600; }
+  .alerts .more{ font-size:11.5px; color:var(--text-faint); padding-top:6px; }
+
+  /* ---------- summary / recent ---------- */
+  .summary{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin: 16px 5vw 0; }
+  .summary .cell{ background: var(--surface); border-radius: var(--radius); padding:18px 20px; box-shadow: 0 4px 14px rgba(74,63,58,0.05); }
+  .summary .cell .n{ font-family:var(--font-num); font-size:26px; font-weight:700; color:var(--rose-deep); line-height:1; }
+  .summary .cell .l{ font-size:11.5px; color:var(--text-dim); margin-top:7px; letter-spacing:.02em; }
+
+  .recent{ margin: 16px 5vw 0; background: var(--surface); border-radius: var(--radius); padding: 18px 22px; box-shadow: 0 4px 14px rgba(74,63,58,0.05); }
+  .recent h3{ font-family:var(--font-display); font-size:14.5px; margin-bottom:12px; color:var(--text); display:flex; justify-content:space-between; align-items:center; }
+  .share-all-btn{ font-family:var(--font-num); font-size:11.5px; font-weight:600; color:var(--rose-deep); background:var(--rose-wash); border:1px solid var(--rose); border-radius:999px; padding:6px 14px; cursor:pointer; }
+  .recent .item{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:13px; }
+  .recent .item:last-child{ border-bottom:none; }
+  .recent .item .l .cat{ color:var(--rose-deep); font-weight:700; margin-right:6px; }
+  .recent .item .r{ color:var(--text-dim); font-family:var(--font-num); font-size:12.5px; }
+  .recent .empty{ color:var(--text-faint); font-size:13px; padding:6px 0; }
+
+  /* ---------- filters ---------- */
+  .filters{ display:flex; gap:8px; flex-wrap:wrap; padding: 20px 5vw 6px; }
+  .chip{ font-family: var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background: var(--surface); border:1px solid var(--line); padding:8px 16px; border-radius:999px; cursor:pointer; user-select:none; transition:.15s; }
+  .chip.active, .chip:hover{ color:#fff; border-color:var(--rose); background:var(--rose); }
+
+  /* ---------- grid ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:20px; padding: 16px 5vw 40px; }
+  .empty{ grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-faint); font-size:13.5px; border:1.5px dashed var(--line); border-radius: var(--radius); }
+
+  /* ---------- ticket card ---------- */
+  .ticket{ background: var(--surface); border-radius: var(--radius); box-shadow: 0 6px 20px rgba(74,63,58,0.06); position:relative; overflow:hidden; display:flex; flex-direction:column; scroll-margin-top:20px; }
+  .ticket.pulse{ animation: pulseGlow 1.6s ease; }
+  @keyframes pulseGlow{ 0%{ box-shadow:0 0 0 4px rgba(217,139,150,0.5);} 100%{ box-shadow:0 6px 20px rgba(74,63,58,0.06);} }
+  .ticket .head{ padding:18px 20px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .ticket .sport-tag{ font-family:var(--font-num); font-size:11px; font-weight:700; letter-spacing:.04em; color: var(--rose-deep); margin-bottom:6px; display:block; }
+  .ticket .matchup{ font-family: var(--font-display); font-weight:700; font-size:18px; line-height:1.3; }
+  .ticket .venue{ font-size:12.5px; color:var(--text-dim); margin-top:6px; }
+  .ticket .date-block{ text-align:right; flex-shrink:0; }
+  .ticket .date-block .d{ font-family:var(--font-num); font-size:22px; font-weight:700; line-height:1; color:var(--text); }
+  .ticket .date-block .dow{ font-size:11.5px; color:var(--text-dim); margin-top:4px; }
+  .ticket .date-block .t{ font-family:var(--font-num); font-size:12.5px; color:var(--rose-deep); margin-top:6px; font-weight:600; }
+  .card-actions{ display:flex; gap:4px; margin-top:9px; justify-content:flex-end; }
+  .icon-btn{ background:var(--surface-2); border:1px solid var(--line); border-radius:8px; width:28px; height:28px; font-size:12.5px; cursor:pointer; line-height:1; }
+  .icon-btn:hover{ border-color:var(--rose); background:var(--rose-wash); }
+
+  .perforation{ position:relative; height:1px; border-top: 2px dashed var(--line); }
+  .perforation::before, .perforation::after{ content:''; position:absolute; top:-9px; width:18px; height:18px; background: var(--bg); border-radius:50%; }
+  .perforation::before{ left:-9px; }
+  .perforation::after{ right:-9px; }
+
+  .stub{ padding:16px 20px 18px; display:flex; flex-direction:column; gap:12px; }
+
+  .progress-row{ display:flex; align-items:center; gap:10px; }
+  .progress-bar{ flex:1; height:7px; background:var(--surface-2); border-radius:6px; overflow:hidden; }
+  .progress-fill{ height:100%; background: linear-gradient(90deg, var(--rose), var(--sage)); border-radius:6px; }
+  .progress-label{ font-family:var(--font-num); font-weight:600; font-size:11.5px; color:var(--text-dim); white-space:nowrap; }
+
+  .cost-row{ display:flex; justify-content:space-between; align-items:baseline; }
+  .cost-row .label{ font-size:11.5px; color:var(--text-dim); }
+  .cost-row .val{ font-family:var(--font-num); font-size:17px; font-weight:700; color:var(--text); }
+
+  /* ---------- category accordion ---------- */
+  .status-row{ display:flex; flex-direction:column; gap:8px; }
+  .cat-item{ border-radius:14px; overflow:hidden; background:var(--surface-2); border:1.5px solid transparent; }
+  .cat-item.is-open{ border-color: var(--rose); }
+  .cat-header{ display:flex; align-items:center; gap:9px; padding:11px 13px; cursor:pointer; user-select:none; }
+  .cat-header .icon{ font-size:16px; }
+  .cat-header .label{ font-weight:700; font-size:12.5px; flex:1; }
+  .status-dot{ width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+  .status-dot.done{ background:var(--sage); }
+  .status-dot.pending{ background:var(--rose); }
+  .status-text{ font-size:11px; color:var(--text-dim); white-space:nowrap; }
+  .chevron{ font-size:10px; color:var(--text-faint); transition: transform .15s; }
+  .cat-item.is-open .chevron{ transform: rotate(180deg); }
+  .cat-panel{ display:none; padding:2px 13px 13px; flex-direction:column; gap:9px; }
+  .cat-item.is-open .cat-panel{ display:flex; }
+  .cat-panel .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .cat-panel .field{ display:flex; flex-direction:column; gap:3px; }
+  .cat-panel .field label{ font-size:10px; color:var(--text-faint); }
+  .cat-panel .field input{ width:100%; background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:12.5px; font-family:var(--font-body); }
+  .cat-panel .field input:focus{ outline:2px solid var(--rose); }
+  .done-toggle{ display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:700; color:var(--sage); background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:9px 12px; cursor:pointer; }
+  .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
+  .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; }
+  .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
+  .copy-btn:hover{ background: #eef4f7; }
+
+  .budget-box{ margin:16px 5vw 0; background:var(--surface); border-radius:var(--radius); padding:16px 22px; box-shadow:0 4px 14px rgba(74,63,58,0.05); }
+  .budget-row1{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .budget-label{ font-family:var(--font-display); font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px; }
+  .budget-label input{ width:130px; background:var(--surface-2); border:1.5px solid var(--line); border-radius:8px; padding:7px 10px; font-family:var(--font-num); font-size:13px; color:var(--text); }
+  .budget-track{ height:8px; background:var(--surface-2); border-radius:6px; overflow:hidden; margin-top:12px; }
+  .budget-fill{ height:100%; background: linear-gradient(90deg, var(--sage), var(--sky)); border-radius:6px; }
+  .budget-fill.over{ background: linear-gradient(90deg, var(--rose), #c0392b); }
+  .budget-status{ font-size:12px; color:var(--sage); font-weight:700; margin-top:8px; }
+  .budget-status.over{ color:#c0392b; }
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 22px; border-radius:999px; font-size:13px; z-index:200; box-shadow:0 8px 20px rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition:opacity .25s; }
+  .toast.show{ opacity:1; }
+  .pr-btn{ flex:1; min-width:100px; text-decoration:none; font-family:var(--font-body); font-size:11.5px; font-weight:500; color: var(--text); background: #fff; border:1.5px solid var(--line); padding:8px 8px; border-radius:10px; text-align:center; position:relative; transition:.15s; }
+  .pr-btn:hover{ border-color: var(--rose); color:var(--rose-deep); }
+  .pr-badge{ position:absolute; top:-7px; right:-6px; background:var(--butter); color:#5a4213; font-family:var(--font-num); font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:8px; }
+
+  /* ---------- history view ---------- */
+  .history-wrap{ padding: 18px 5vw 40px; }
+  .history-controls{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .history-list{ display:flex; flex-direction:column; gap:10px; }
+  .hrow{ background: var(--surface); border-radius:14px; padding:14px 18px; display:flex; align-items:center; gap:16px; box-shadow: 0 3px 10px rgba(74,63,58,0.05); flex-wrap:wrap; }
+  .hrow .hcat{ font-size:20px; width:38px; height:38px; border-radius:10px; background:var(--rose-wash); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .hrow .hmain{ flex:1; min-width:180px; }
+  .hrow .hmain .m1{ font-weight:700; font-size:13.5px; }
+  .hrow .hmain .m2{ font-size:12px; color:var(--text-dim); margin-top:3px; }
+  .hrow .hbooked{ text-align:right; }
+  .hrow .hbooked .bd{ font-family:var(--font-num); font-weight:700; font-size:13px; color:var(--rose-deep); }
+  .hrow .hbooked .bc{ font-family:var(--font-num); font-size:12px; color:var(--text-dim); margin-top:2px; }
+  .history-empty{ text-align:center; padding:50px 20px; color:var(--text-faint); font-size:13.5px; }
+
+  /* ---------- modal ---------- */
+  .overlay{ position:fixed; inset:0; background:rgba(74,63,58,0.35); backdrop-filter: blur(2px); display:none; align-items:flex-start; justify-content:center; z-index:100; padding:40px 16px; overflow-y:auto; }
+  .overlay.open{ display:flex; }
+  .modal{ background: var(--surface); border-radius: 22px; width:100%; max-width:520px; padding:28px 28px 26px; box-shadow: 0 20px 50px rgba(74,63,58,0.25); }
+  .modal h2{ font-family:var(--font-display); font-size:21px; margin-bottom:6px; font-weight:700; color:var(--text); }
+  .modal .modal-sub{ font-size:12px; color:var(--text-dim); margin-bottom:16px; }
+  .modal .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+  .modal .field{ display:flex; flex-direction:column; gap:5px; margin-bottom:11px; }
+  .modal .field label{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
+  .modal input, .modal select{ background: var(--surface-2); border:1.5px solid var(--line); color:var(--text); padding:11px 13px; border-radius:10px; font-size:13.5px; font-family:var(--font-body); width:100%; }
+  .modal input:focus, .modal select:focus{ outline:2px solid var(--rose); }
+  .modal-actions{ display:flex; gap:10px; margin-top:16px; justify-content:flex-end; flex-wrap:wrap; }
+  .btn-secondary{ background:none; border:1.5px solid var(--line); color:var(--text-dim); padding:11px 20px; border-radius:999px; cursor:pointer; font-size:13px; font-family:var(--font-display); font-weight:700; }
+  .btn-tertiary{ background:var(--surface-2); border:1.5px solid var(--rose); color:var(--rose-deep); padding:11px 18px; border-radius:999px; cursor:pointer; font-size:13px; font-family:var(--font-display); font-weight:700; }
+  .btn-primary{ background: var(--rose); border:none; color:#fff; font-weight:700; font-family:var(--font-display); padding:11px 22px; border-radius:999px; cursor:pointer; font-size:13px; }
+  .save-msg{ font-size:12px; color:var(--sage); font-weight:700; text-align:right; margin-top:8px; min-height:16px; }
+
+
+  footer{ padding: 22px 5vw; color:var(--text-faint); font-size:11.5px; text-align:center; }
+
+  .share-banner{ margin:16px 5vw 0; background:var(--sage-wash); border:1.5px solid var(--sage); border-radius:14px; padding:14px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .share-banner .sb-text{ flex:1; min-width:220px; font-size:12.5px; color:var(--text); }
+  .share-banner .sb-text b{ color:var(--sage); }
+  .share-banner .sb-link{ display:flex; gap:8px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 6px 6px 12px; font-family:var(--font-num); font-size:12px; color:var(--text-dim); max-width:100%; overflow:hidden; }
+  .share-banner .sb-link input{ border:none; background:transparent; font-family:var(--font-num); font-size:12px; color:var(--text-dim); width:160px; }
+  .share-banner .sb-copy{ background:var(--sage); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font-display); white-space:nowrap; }
+
+  .past-toggle{ text-align:center; margin:6px 5vw 0; }
+  .past-toggle button{ font-family:var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:9px 20px; cursor:pointer; }
+  .past-toggle button:hover{ border-color:var(--rose); color:var(--rose-deep); }
+  .past-grid{ opacity:0.72; }
+  .past-badge{ display:inline-block; font-size:10px; font-weight:700; color:#fff; background:var(--text-faint); padding:2px 8px; border-radius:999px; margin-top:8px; }
+
+  @media (max-width: 480px){
+    .grid{ grid-template-columns: 1fr; }
+    header{ padding: 22px 5vw 14px; }
+    .btn-group{ width:100%; }
+    .btn-group .add-btn{ flex:1; padding:13px 10px; font-size:12.5px; }
+    .hero{ flex-direction:column; align-items:flex-start; }
+    .hero .hcountdown{ align-self:flex-end; }
+    .modal{ padding:22px 18px 20px; }
+    .modal .row{ grid-template-columns:1fr; }
+    .cat-panel .field-row{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="eyebrow">Away-Game Travel Tracker</span>
+    <h1>遠征手帳</h1>
+    <p class="tag">推しチームを追いかける、すべての遠征をひとまとめに。</p>
+  </div>
+  <div class="btn-group" id="header-actions" style="display:none;">
+    <button class="add-btn" onclick="openModal()">＋ 新しい遠征を追加</button>
+  </div>
+</header>
+
+<div id="share-banner"></div>
+<div id="loading-screen" style="padding:60px 5vw; color:var(--text-dim); font-size:13.5px;">読み込んでいます…</div>
+
+<div id="landing-screen" style="display:none; padding:60px 5vw; max-width:520px; margin:0 auto; text-align:center;">
+  <h2 style="font-family:var(--font-display); font-size:22px; margin-bottom:10px;">遠征手帳へようこそ</h2>
+  <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:22px; line-height:1.7;">ログイン不要。ボタンひとつで手帳を作成し、発行されたリンクを家族に共有するだけで、みんなで遠征の予約状況を管理できます。</p>
+  <button class="add-btn" id="landing-create-btn" onclick="createNewNotebook()">新しい遠征手帳を作る</button>
+</div>
+
+<div id="error-screen" style="display:none; padding:60px 5vw; max-width:520px; margin:0 auto; text-align:center;">
+  <h2 style="font-family:var(--font-display); font-size:20px; margin-bottom:10px; color:var(--rose-deep);">手帳が見つかりませんでした</h2>
+  <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:22px;">リンクが正しいかご確認ください。リンクが壊れている場合は、新しく手帳を作成できます。</p>
+  <button class="add-btn" onclick="createNewNotebook()">新しい遠征手帳を作る</button>
+</div>
+
+<div id="app-main" style="display:none;">
+<div class="tabs">
+  <button class="tab active" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
+  <button class="tab" id="tab-history" onclick="switchTab('history')">予約履歴</button>
+</div>
+
+<div class="panel active" id="panel-cards">
+  <div id="hero"></div>
+  <div class="alerts" id="alerts"></div>
+  <div class="summary" id="summary"></div>
+  <div id="budget-box"></div>
+  <div class="recent" id="recent"></div>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="panel" id="panel-history">
+  <div class="history-wrap">
+    <div class="history-controls" id="history-filters"></div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>遠征手帳 — 記事内のリンクには広告(アフィリエイトリンク)を含みます【PR】</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modal-title">新しい遠征を登録</h2>
+    <p class="modal-sub" id="modal-sub">日程が決まったらまとめて登録できます。同じチームの試合は「登録して続けて追加」が便利です。</p>
+    <div class="row">
+      <div class="field"><label>競技</label>
+        <select id="f-sport" onchange="toggleCustomSport()">
+          <option>バスケットボール</option>
+          <option>サッカー</option>
+          <option>野球</option>
+          <option>バレーボール</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="field"><label>応援チーム</label><input id="f-team" placeholder="例）東北イーグルス"></div>
+    </div>
+    <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など"></div>
+    <div class="field"><label>対戦カード・イベント名</label><input id="f-match" placeholder="例）vs 湘南ユナイテッド"></div>
+    <div class="row">
+      <div class="field"><label>日付</label><input id="f-date" type="date"></div>
+      <div class="field"><label>試合開始時刻</label><input id="f-time" type="time"></div>
+    </div>
+    <div class="field"><label>会場・遠征先</label><input id="f-venue" placeholder="例）盛岡タカヤアリーナ"></div>
+    <div class="field"><label>想定予算（円）</label><input id="f-cost" type="number" placeholder="例）32000"></div>
+    <div class="save-msg" id="modal-save-msg"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">閉じる</button>
+      <button class="btn-tertiary" id="modal-keepopen-btn" onclick="submitTrip(true)">登録して続けて追加</button>
+      <button class="btn-primary" id="modal-submit-btn" onclick="submitTrip(false)">登録する</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="copy-overlay">
+  <div class="modal">
+    <h2 id="copy-title">情報をコピー</h2>
+    <p class="modal-sub" id="copy-sub">コピー先の遠征を選んでください（複数選択できます）。</p>
+    <div id="copy-list" style="display:flex; flex-direction:column; gap:8px; max-height:320px; overflow-y:auto; margin-bottom:6px;"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeCopyModal()">閉じる</button>
+      <button class="btn-primary" onclick="confirmCopy()">コピーする</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =========================================================
+// ★★★ 設定 ★★★
+// Supabaseプロジェクトの「Project Settings → API」から取得して書き換えてください。
+// ANON KEYは公開されて問題ないキーです（RLSを全面拒否しRPC経由のみ許可しているため安全）。
+// =========================================================
+const SUPABASE_URL = 'https://btaryktxvqtggesfpgwc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_pvzoVo9cRmQrzILzaOjeBg_Ym269KXb';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// このブラウザタブでの一時的なセッションID（アフィリエイトクリックの計測用。localStorageは使わずページ読み込みごとに発行）
+const SESSION_ID = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+
+// ---------- state ----------
+let notebook = null;      // { id, title, budget_cap, is_editable, share_token }
+let trips = [];
+let sportFilter = 'ALL';
+let historyCatFilter = 'ALL';
+let catOpen = new Set(); // `${tripId}:${catKey}` currently expanded
+let budgetCap = 0;
+let copySource = { tripId:null, key:null };
+let showPast = false;
+
+let TOKEN = null;          // URLに載っているトークン（閲覧用・編集用どちらか）
+let EDIT_TOKEN = null;     // 編集可能な場合のみセットされる
+let SHARE_TOKEN = null;    // 編集可能な場合のみ、サーバーから追加で返される閲覧専用トークン
+let IS_EDITABLE = false;
+
+function today(){ return new Date().toISOString().slice(0,10); }
+const TODAY = today();
+
+const CATS = [
+  {key:'transport', label:'交通', icon:'🚄', bookable:true},
+  {key:'ticket', label:'チケット', icon:'🎫', bookable:true},
+  {key:'hotel', label:'宿泊', icon:'🏨', bookable:true},
+  {key:'food', label:'飲食', icon:'🍜', bookable:false},
+  {key:'other', label:'その他', icon:'📌', bookable:false},
+];
+const BOOKABLE_CATS = CATS.filter(c=>c.bookable).map(c=>c.key);
+
+const PR_LINKS = {
+  hotel: [{label:'ホテル予約', url:'https://travel.rakuten.co.jp/'}, {label:'じゃらんで探す', url:'https://www.jalan.net/'}],
+  transport: [{label:'新幹線予約', url:'https://travel.rakuten.co.jp/'}, {label:'航空券比較', url:'https://www.skyticket.jp/'}],
+  ticket: [{label:'チケット購入', url:'https://t.pia.jp/'}, {label:'イープラス', url:'https://eplus.jp/'}],
+  food: [{label:'お店を予約', url:'https://www.hotpepper.jp/'}],
+};
+// TODO: 実際にASP(A8.net等)の審査が通ったら、上記urlをアフィリエイトタグ付きのURLに差し替えてください。
+
+function fmtDate(iso){
+  if(!iso) return {md:'--', dow:''};
+  const d = new Date(iso);
+  const dow = ['日','月','火','水','木','金','土'][d.getDay()];
+  return { md: `${d.getMonth()+1}/${d.getDate()}`, dow };
+}
+function fmtShort(iso){
+  if(!iso) return '未予約';
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} に予約`;
+}
+function daysUntil(iso){
+  const ms = new Date(iso) - new Date(TODAY);
+  return Math.ceil(ms / (1000*60*60*24));
+}
+function completion(t){
+  const vals = Object.values(t.status);
+  return Math.round(vals.filter(Boolean).length / vals.length * 100);
+}
+
+function switchTab(name){
+  document.getElementById('tab-cards').classList.toggle('active', name==='cards');
+  document.getElementById('tab-history').classList.toggle('active', name==='history');
+  document.getElementById('panel-cards').classList.toggle('active', name==='cards');
+  document.getElementById('panel-history').classList.toggle('active', name==='history');
+  if(name==='history') renderHistory();
+}
+
+/* ---------- hero: next upcoming trip ---------- */
+function renderHero(){
+  const upcoming = trips.filter(t=>new Date(t.date) >= new Date(TODAY)).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const box = document.getElementById('hero');
+  if(!upcoming.length){ box.innerHTML=''; return; }
+  const t = upcoming[0];
+  const d = daysUntil(t.date);
+  const pending = BOOKABLE_CATS.filter(k=>!t.status[k]);
+  const catInfo = k => CATS.find(c=>c.key===k);
+  box.innerHTML = `
+    <div class="hero" onclick="focusTrip('${t.id}')">
+      <div>
+        <div class="htitle">次の遠征</div>
+        <div class="hmatch">${t.team} ${t.match}</div>
+        <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
+        ${pending.length
+          ? `<div class="hpending">${pending.map(k=>`<span>${catInfo(k).icon} ${catInfo(k).label}が未予約</span>`).join('')}</div>`
+          : `<div class="hall-set">✓ 交通・チケット・宿泊はすべて予約済みです</div>`}
+      </div>
+      <div class="hcountdown">
+        <div class="num">${d===0?'当日':d}</div>
+        <div class="lbl">${d===0?'':'日後'}</div>
+      </div>
+    </div>`;
+}
+
+/* ---------- forgotten-item alerts ---------- */
+function renderAlerts(){
+  const catInfo = k => CATS.find(c=>c.key===k);
+  const items = [];
+  trips.filter(t=>new Date(t.date) >= new Date(TODAY)).forEach(t=>{
+    BOOKABLE_CATS.forEach(key=>{
+      if(!t.status[key]) items.push({trip:t, key});
+    });
+  });
+  items.sort((a,b)=> new Date(a.trip.date) - new Date(b.trip.date));
+  const box = document.getElementById('alerts');
+  if(!items.length){
+    box.innerHTML = `<h3>⚠️ 確認が必要な項目</h3><div class="all-clear">✓ 今のところ未予約の項目はありません</div>`;
+    return;
+  }
+  const shown = items.slice(0,6);
+  box.innerHTML = `
+    <h3>⚠️ 確認が必要な項目（${items.length}件）</h3>
+    <div class="sub">タップするとその遠征カードにジャンプします</div>
+    ${shown.map(it=>{
+      const c = catInfo(it.key);
+      const d = daysUntil(it.trip.date);
+      return `<div class="alert-row" onclick="focusTrip('${it.trip.id}','${it.key}')">
+        <div class="a-l"><span class="a-cat">${c.icon}</span><span class="a-title">${it.trip.match} の${c.label}が未予約</span></div>
+        <span class="a-days">あと${d}日</span>
+      </div>`;
+    }).join('')}
+    ${items.length>6 ? `<div class="more">ほか${items.length-6}件あります</div>` : ''}
+  `;
+}
+
+function focusTrip(tripId, key){
+  if(key) catOpen.add(`${tripId}:${key}`);
+  render();
+  setTimeout(()=>{
+    const el = document.getElementById('trip-'+tripId);
+    if(el){
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      el.classList.add('pulse');
+      setTimeout(()=>el.classList.remove('pulse'), 1600);
+    }
+  }, 60);
+}
+
+function renderSummary(){
+  const upcoming = trips.filter(t => new Date(t.date) >= new Date(TODAY)).length;
+  const totalCost = trips.reduce((s,t)=>s+(t.cost||0),0);
+  const avgProg = trips.length ? Math.round(trips.reduce((s,t)=>s+completion(t),0)/trips.length) : 0;
+  const teams = new Set(trips.map(t=>t.team)).size;
+  document.getElementById('summary').innerHTML = `
+    <div class="cell"><div class="n">${upcoming}</div><div class="l">予定中の遠征</div></div>
+    <div class="cell"><div class="n">¥${totalCost.toLocaleString()}</div><div class="l">合計予算</div></div>
+    <div class="cell"><div class="n">${avgProg}%</div><div class="l">平均準備進捗</div></div>
+    <div class="cell"><div class="n">${teams}</div><div class="l">応援中のチーム</div></div>
+  `;
+}
+
+function allBookingEntries(){
+  const entries = [];
+  trips.forEach(t=>{
+    BOOKABLE_CATS.forEach(key=>{
+      const d = t.detail[key];
+      if(t.status[key] && d && d.bookedDate){
+        entries.push({trip:t, key, ...d});
+      }
+    });
+  });
+  return entries.sort((a,b)=> new Date(b.bookedDate) - new Date(a.bookedDate));
+}
+
+function renderRecent(){
+  const entries = allBookingEntries().slice(0,4);
+  const catInfo = k => CATS.find(c=>c.key===k);
+  const html = entries.length ? entries.map(e=>{
+    const c = catInfo(e.key);
+    return `<div class="item">
+      <div class="l"><span class="cat">${c.icon} ${c.label}</span>${e.trip.match}（${fmtDate(e.trip.date).md}）— ${e.method||'方法未記入'}</div>
+      <div class="r">${fmtShort(e.bookedDate)}</div>
+    </div>`;
+  }).join('') : `<div class="empty">まだ予約記録がありません。カードのカテゴリをタップして予約先と予約日を記録しましょう。</div>`;
+  document.getElementById('recent').innerHTML = `<h3>最近予約したもの<button class="share-all-btn" onclick="shareAll()">📤 まとめて共有</button></h3>${html}`;
+}
+
+function renderFilters(){
+  const sports = ['ALL', ...new Set(trips.map(t=>t.sport))];
+  document.getElementById('filters').innerHTML = sports.map(s=>
+    `<div class="chip ${sportFilter===s?'active':''}" onclick="setFilter('${s}')">${s==='ALL'?'すべて':s}</div>`
+  ).join('');
+}
+function setFilter(s){ sportFilter = s; render(); }
+
+function catPanelContent(t, c){
+  const d = t.detail[c.key];
+  if(!c.bookable){
+    // food / other: simple memo + done toggle
+    return `
+      <div class="cat-panel">
+        <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="お店の名前など"></div>
+        ${IS_EDITABLE ? `<label class="done-toggle"><input type="checkbox" ${t.status[c.key]?'checked':''} onchange="setStatus('${t.id}','${c.key}',this.checked)"> 予定を決めた（完了）</label>` : ''}
+        ${c.key==='food' ? `<div class="pr-row">${PR_LINKS.food.map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
+      </div>`;
+  }
+  return `
+    <div class="cat-panel">
+      <div class="field-row">
+        <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="例）楽天トラベル"></div>
+        <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>金額</label><input type="number" value="${d.cost||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
+        <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','memo',this.value)"`:'disabled'} placeholder="座席・便名など"></div>
+      </div>
+      ${IS_EDITABLE ? `<label class="done-toggle"><input type="checkbox" ${t.status[c.key]?'checked':''} onchange="setStatus('${t.id}','${c.key}',this.checked)"> 予約完了としてマークする</label>` : ''}
+      ${(IS_EDITABLE && (d.method || d.bookedDate || d.memo)) ? `<button class="copy-btn" onclick="openCopyModal('${t.id}','${c.key}')">📋 この${c.label}情報を他の遠征にもコピー（連泊・同じ移動手段など）</button>` : ''}
+      <div class="pr-row">${(PR_LINKS[c.key]||[]).map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>
+    </div>`;
+}
+
+function renderTicketCard(t, isPast){
+  const {md, dow} = fmtDate(t.date);
+  const pct = completion(t);
+  return `
+    <div class="ticket" id="trip-${t.id}">
+      <div class="head">
+        <div>
+          <span class="sport-tag">${t.sport} / ${t.team}</span>
+          <div class="matchup">${t.match}</div>
+          <div class="venue">${t.venue}</div>
+          ${isPast ? `<span class="past-badge">終了</span>` : ''}
+        </div>
+        <div class="date-block">
+          <div class="d">${md}</div>
+          <div class="dow">${dow}曜日</div>
+          <div class="t">${t.time || ''}</div>
+          <div class="card-actions">
+            <button class="icon-btn" title="家族に共有" onclick="shareTrip('${t.id}')">📤</button>
+            ${IS_EDITABLE ? `
+            <button class="icon-btn" title="編集" onclick="openModal('${t.id}')">✏️</button>
+            <button class="icon-btn" title="複製して次を作る" onclick="duplicateTrip('${t.id}')">📋</button>
+            <button class="icon-btn" title="削除" onclick="deleteTrip('${t.id}')">🗑</button>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="perforation"></div>
+      <div class="stub">
+        <div class="progress-row">
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <div class="progress-label">${pct}% 準備完了</div>
+        </div>
+        <div class="cost-row">
+          <span class="label">想定予算</span>
+          <span class="val">¥${(t.cost||0).toLocaleString()}</span>
+        </div>
+        <div class="status-row">
+          ${CATS.map(c=>{
+            const open = catOpen.has(`${t.id}:${c.key}`);
+            const done = t.status[c.key];
+            return `
+            <div class="cat-item ${open?'is-open':''}">
+              <div class="cat-header" onclick="toggleCat('${t.id}','${c.key}')">
+                <span class="icon">${c.icon}</span>
+                <span class="label">${c.label}</span>
+                <span class="status-dot ${done?'done':'pending'}"></span>
+                <span class="status-text">${done?'予約済み':'未予約'}</span>
+                <span class="chevron">▾</span>
+              </div>
+              ${catPanelContent(t,c)}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderGrid(){
+  const filtered = trips.filter(t => sportFilter==='ALL' || t.sport===sportFilter);
+  const upcoming = filtered.filter(t=>t.date >= TODAY).sort((a,b)=> new Date(a.date) - new Date(b.date));
+  const past = filtered.filter(t=>t.date < TODAY).sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+  const grid = document.getElementById('grid');
+  let html = '';
+
+  if(!upcoming.length && !past.length){
+    grid.innerHTML = IS_EDITABLE
+      ? `<div class="empty">まだ遠征が登録されていません。「＋ 新しい遠征を追加」から最初の一件を登録しましょう。</div>`
+      : `<div class="empty">まだ遠征が登録されていません。</div>`;
+    renderPastToggle(0);
+    return;
+  }
+
+  html += upcoming.length
+    ? upcoming.map(t=>renderTicketCard(t,false)).join('')
+    : `<div class="empty">今後の遠征はまだ登録されていません。</div>`;
+
+  grid.innerHTML = html;
+  renderPastToggle(past.length, past);
+}
+
+function renderPastToggle(count, past){
+  let holder = document.getElementById('past-section');
+  if(holder) holder.remove();
+  const grid = document.getElementById('grid');
+  const wrap = document.createElement('div');
+  wrap.id = 'past-section';
+  wrap.style.gridColumn = '1/-1';
+  if(count === 0){
+    wrap.innerHTML = '';
+  }else if(!showPast){
+    wrap.innerHTML = `<div class="past-toggle"><button onclick="togglePast()">▸ 過去の遠征を表示（${count}件）</button></div>`;
+  }else{
+    wrap.innerHTML = `
+      <div class="past-toggle"><button onclick="togglePast()">▾ 過去の遠征を隠す（${count}件）</button></div>
+      <div class="grid past-grid" style="padding:16px 0 0;">${past.map(t=>renderTicketCard(t,true)).join('')}</div>
+    `;
+  }
+  grid.after(wrap);
+}
+function togglePast(){ showPast = !showPast; renderGrid(); }
+
+function toggleCat(tripId, key){
+  const k = `${tripId}:${key}`;
+  if(catOpen.has(k)) catOpen.delete(k); else catOpen.add(k);
+  render();
+}
+function renderBudgetBox(){
+  const totalCost = trips.reduce((s,t)=>s+(t.cost||0),0);
+  const box = document.getElementById('budget-box');
+  const pct = budgetCap>0 ? Math.min(100, Math.round(totalCost/budgetCap*100)) : 0;
+  const over = budgetCap>0 && totalCost>budgetCap;
+  box.innerHTML = `
+    <div class="budget-box">
+      <div class="budget-row1">
+        <div class="budget-label">💰 シーズン予算上限
+          <input type="number" id="budget-cap-input" value="${budgetCap||''}" placeholder="未設定" ${IS_EDITABLE?`onchange="setBudgetCap(this.value)"`:'disabled'}>円
+        </div>
+        <div style="font-family:var(--font-num); font-weight:700; color:${over?'#c0392b':'var(--text-dim)'};">現在 ¥${totalCost.toLocaleString()}</div>
+      </div>
+      ${budgetCap>0 ? `
+        <div class="budget-track"><div class="budget-fill ${over?'over':''}" style="width:${pct}%"></div></div>
+        <div class="budget-status ${over?'over':''}">${over ? `⚠️ 上限を¥${(totalCost-budgetCap).toLocaleString()}超えています` : `残り¥${(budgetCap-totalCost).toLocaleString()}（${pct}%使用）`}</div>
+      ` : `<div class="budget-status" style="color:var(--text-faint); font-weight:400;">上限を設定すると使いすぎをお知らせします</div>`}
+    </div>`;
+}
+
+/* ---------- mutations (Supabase RPC) ---------- */
+async function setBudgetCap(val){
+  if(!IS_EDITABLE) return;
+  budgetCap = parseInt(val)||0;
+  render();
+  try{
+    const { error } = await sb.rpc('set_budget_cap', { p_edit_token: EDIT_TOKEN, p_budget_cap: budgetCap });
+    if(error) throw error;
+  }catch(e){
+    console.error(e);
+    showToast('予算の保存に失敗しました。通信環境をご確認ください');
+  }
+}
+
+async function saveBookingDetail(tripId, key, patch){
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const merged = { ...t.detail[key], ...patch };
+  if(patch.is_booked !== undefined) t.status[key] = patch.is_booked;
+  t.detail[key] = merged;
+  catOpen.add(`${tripId}:${key}`);
+  render();
+  try{
+    const { error } = await sb.rpc('upsert_booking_detail', {
+      p_edit_token: EDIT_TOKEN,
+      p_trip_id: tripId,
+      p_category: key,
+      p_is_booked: !!t.status[key],
+      p_method: merged.method || null,
+      p_booked_at: merged.bookedDate || null,
+      p_cost: (merged.cost !== undefined && merged.cost !== null && merged.cost !== '') ? (parseInt(merged.cost)||0) : null,
+      p_memo: merged.memo || null
+    });
+    if(error) throw error;
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認ください');
+  }
+}
+
+function setStatus(tripId, key, val){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const c = CATS.find(x=>x.key===key);
+  const patch = { is_booked: val };
+  if(val && c.bookable && !t.detail[key].bookedDate) patch.bookedDate = TODAY;
+  saveBookingDetail(tripId, key, patch);
+}
+function updateDetail(tripId, key, field, val){
+  if(!IS_EDITABLE) return;
+  const patch = { [field]: field==='cost' ? (parseInt(val)||0) : val };
+  saveBookingDetail(tripId, key, patch);
+}
+function updateSimple(tripId, key, val){
+  if(!IS_EDITABLE) return;
+  saveBookingDetail(tripId, key, { memo: val });
+}
+
+async function deleteTrip(tripId){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  if(!confirm(`「${t.match}」を削除します。よろしいですか？`)) return;
+  try{
+    const { error } = await sb.rpc('delete_trip', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId });
+    if(error) throw error;
+    trips = trips.filter(x=>x.id!==tripId);
+    [...catOpen].forEach(k=>{ if(k.startsWith(`${tripId}:`)) catOpen.delete(k); });
+    render();
+  }catch(e){
+    console.error(e);
+    showToast('削除に失敗しました。通信環境をご確認ください');
+  }
+}
+
+let duplicateTemplateDetail = null;
+function duplicateTrip(tripId){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  duplicateTemplateDetail = JSON.parse(JSON.stringify(t.detail));
+  BOOKABLE_CATS.forEach(k=>{ duplicateTemplateDetail[k].bookedDate = ''; });
+  openModal();
+  const isKnown = KNOWN_SPORTS.includes(t.sport);
+  document.getElementById('f-sport').value = isKnown ? t.sport : 'その他';
+  toggleCustomSport();
+  if(!isKnown) document.getElementById('f-sport-custom').value = t.sport;
+  document.getElementById('f-team').value = t.team;
+  document.getElementById('f-venue').value = t.venue;
+  document.getElementById('f-cost').value = t.cost || '';
+  document.getElementById('modal-save-msg').style.color = '';
+  document.getElementById('modal-save-msg').textContent = `「${t.match}」の情報を引き継ぎました。日付と対戦カードを入力してください。`;
+}
+
+function renderHistoryFilters(){
+  const cats = ['ALL', ...BOOKABLE_CATS];
+  const label = k => k==='ALL' ? 'すべて' : CATS.find(c=>c.key===k).label;
+  document.getElementById('history-filters').innerHTML = cats.map(k=>
+    `<div class="chip ${historyCatFilter===k?'active':''}" onclick="setHistoryFilter('${k}')">${label(k)}</div>`
+  ).join('');
+}
+function setHistoryFilter(k){ historyCatFilter = k; renderHistory(); }
+
+function renderHistory(){
+  renderHistoryFilters();
+  let entries = allBookingEntries();
+  if(historyCatFilter!=='ALL') entries = entries.filter(e=>e.key===historyCatFilter);
+  const list = document.getElementById('history-list');
+  if(!entries.length){
+    list.innerHTML = `<div class="history-empty">予約履歴がまだありません。遠征カードのカテゴリから予約先と予約日を記録すると、ここに新しい順で並びます。</div>`;
+    return;
+  }
+  const catInfo = k => CATS.find(c=>c.key===k);
+  list.innerHTML = entries.map(e=>{
+    const c = catInfo(e.key);
+    const g = fmtDate(e.trip.date);
+    return `
+    <div class="hrow">
+      <div class="hcat">${c.icon}</div>
+      <div class="hmain">
+        <div class="m1">${e.trip.match}<span style="color:var(--text-dim); font-weight:400;"> ／ ${c.label}</span></div>
+        <div class="m2">${e.method || '予約先未記入'}${e.memo? ' ・ '+e.memo : ''} ・ 試合日 ${g.md}</div>
+      </div>
+      <div class="hbooked">
+        <div class="bd">${fmtShort(e.bookedDate)}</div>
+        <div class="bc">¥${(e.cost||0).toLocaleString()}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- add / edit trip modal ---------- */
+let editingTripId = null;
+const KNOWN_SPORTS = ['バスケットボール','サッカー','野球','バレーボール'];
+
+function toggleCustomSport(){
+  const isOther = document.getElementById('f-sport').value === 'その他';
+  document.getElementById('f-sport-custom-wrap').style.display = isOther ? 'block' : 'none';
+}
+
+function fillModalFields(t){
+  const sportSel = document.getElementById('f-sport');
+  if(KNOWN_SPORTS.includes(t.sport)){
+    sportSel.value = t.sport;
+    document.getElementById('f-sport-custom-wrap').style.display = 'none';
+    document.getElementById('f-sport-custom').value = '';
+  }else{
+    sportSel.value = 'その他';
+    document.getElementById('f-sport-custom-wrap').style.display = 'block';
+    document.getElementById('f-sport-custom').value = t.sport || '';
+  }
+  document.getElementById('f-team').value = t.team || '';
+  document.getElementById('f-match').value = t.match || '';
+  document.getElementById('f-date').value = t.date || '';
+  document.getElementById('f-time').value = t.time || '';
+  document.getElementById('f-venue').value = t.venue || '';
+  document.getElementById('f-cost').value = t.cost || '';
+}
+
+function openModal(tripId){
+  if(!IS_EDITABLE) return;
+  editingTripId = tripId || null;
+  const t = editingTripId ? trips.find(x=>x.id===editingTripId) : null;
+  if(t){
+    document.getElementById('modal-title').textContent = '遠征を編集';
+    document.getElementById('modal-sub').textContent = '日程や会場に間違いがあれば、ここで直接修正できます。';
+    document.getElementById('modal-keepopen-btn').style.display = 'none';
+    document.getElementById('modal-submit-btn').textContent = '更新する';
+    fillModalFields(t);
+  }else{
+    document.getElementById('modal-title').textContent = '新しい遠征を登録';
+    document.getElementById('modal-sub').textContent = '日程が決まったらまとめて登録できます。同じチームの試合は「登録して続けて追加」が便利です。';
+    document.getElementById('modal-keepopen-btn').style.display = 'inline-block';
+    document.getElementById('modal-submit-btn').textContent = '登録する';
+    ['f-team','f-match','f-venue','f-cost','f-date','f-time'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-sport').value = 'バスケットボール';
+    document.getElementById('f-sport-custom-wrap').style.display = 'none';
+  }
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('modal-save-msg').textContent='';
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); editingTripId = null; duplicateTemplateDetail = null; }
+
+function readSportValue(){
+  const v = document.getElementById('f-sport').value;
+  if(v === 'その他') return document.getElementById('f-sport-custom').value || 'その他';
+  return v;
+}
+
+async function submitTrip(keepOpen){
+  if(!IS_EDITABLE) return;
+  const sport = readSportValue();
+  const team = document.getElementById('f-team').value || '未設定チーム';
+  const match = document.getElementById('f-match').value || '未定の対戦';
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const venue = document.getElementById('f-venue').value;
+  const cost = parseInt(document.getElementById('f-cost').value) || 0;
+
+  if(!date){
+    document.getElementById('modal-save-msg').style.color = '#c0392b';
+    document.getElementById('modal-save-msg').textContent = '日付を入力してください。';
+    return;
+  }
+  document.getElementById('modal-save-msg').style.color = '';
+
+  const submitBtn = document.getElementById('modal-submit-btn');
+  submitBtn.disabled = true;
+
+  try{
+    const { data, error } = await sb.rpc('upsert_trip', {
+      p_edit_token: EDIT_TOKEN,
+      p_trip_id: editingTripId || null,
+      p_sport: sport,
+      p_team: team,
+      p_opponent: match,
+      p_match_date: date,
+      p_start_time: time || null,
+      p_venue: venue || null,
+      p_estimated_cost: cost
+    });
+    if(error) throw error;
+
+    if(editingTripId){
+      const t = trips.find(x=>x.id===editingTripId);
+      Object.assign(t, {sport, team, match, date, time, venue, cost});
+      closeModal();
+      render();
+      focusTrip(editingTripId);
+    }else{
+      const newId = data;
+      const detailTemplate = duplicateTemplateDetail;
+      duplicateTemplateDetail = null;
+
+      const status = {}, detail = {};
+      CATS.forEach(c=>{
+        status[c.key] = false;
+        detail[c.key] = c.bookable ? {method:'',bookedDate:'',cost:0,memo:''} : {memo:''};
+      });
+      trips.push({ id:newId, sport, team, match, date, time, venue, cost, status, detail });
+
+      if(detailTemplate){
+        for(const c of CATS){
+          const d = detailTemplate[c.key];
+          const hasContent = c.bookable ? (d.method || d.memo || d.cost) : d.memo;
+          if(hasContent){
+            await saveBookingDetail(newId, c.key, c.bookable
+              ? { method:d.method||'', bookedDate:'', cost:d.cost||0, memo:d.memo||'', is_booked:false }
+              : { memo:d.memo||'' });
+          }
+        }
+      }
+
+      if(keepOpen){
+        ['f-match','f-date','f-time','f-venue','f-cost'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('modal-save-msg').textContent = `「${match}」を登録しました。続けて次の試合を入力できます。`;
+        document.getElementById('f-match').focus();
+      }else{
+        closeModal();
+      }
+      render();
+    }
+  }catch(e){
+    console.error(e);
+    document.getElementById('modal-save-msg').style.color = '#c0392b';
+    document.getElementById('modal-save-msg').textContent = '保存に失敗しました。通信環境をご確認のうえもう一度お試しください。';
+  }finally{
+    submitBtn.disabled = false;
+  }
+}
+
+/* ---------- copy category info across trips (multi-night stays, shared transport) ---------- */
+function openCopyModal(tripId, key){
+  if(!IS_EDITABLE) return;
+  copySource = { tripId, key };
+  const c = CATS.find(x=>x.key===key);
+  document.getElementById('copy-title').textContent = `${c.icon} ${c.label}情報をコピー`;
+  document.getElementById('copy-sub').textContent = `この試合の${c.label}情報を、選んだ遠征にもそのままコピーします（連泊で同じホテル・同じ交通手段を使う場合などに便利です）。`;
+  const others = trips.filter(t=>t.id!==tripId && t.date>=TODAY).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const list = document.getElementById('copy-list');
+  if(!others.length){
+    list.innerHTML = `<div style="color:var(--text-faint); font-size:13px;">コピー先にできる他の遠征がまだありません。</div>`;
+  }else{
+    list.innerHTML = others.map(t=>`
+      <label style="display:flex; align-items:center; gap:10px; background:var(--surface-2); border-radius:10px; padding:10px 12px; font-size:13px; cursor:pointer;">
+        <input type="checkbox" value="${t.id}" style="width:16px; height:16px; accent-color:var(--rose);">
+        <span>${fmtDate(t.date).md}（${fmtDate(t.date).dow}）　${t.team} ${t.match}</span>
+      </label>`).join('');
+  }
+  document.getElementById('copy-overlay').classList.add('open');
+}
+function closeCopyModal(){ document.getElementById('copy-overlay').classList.remove('open'); }
+async function confirmCopy(){
+  if(!IS_EDITABLE) return;
+  const { tripId, key } = copySource;
+  const checked = [...document.querySelectorAll('#copy-list input[type=checkbox]:checked')].map(el=>el.value);
+  closeCopyModal();
+  if(!checked.length) return;
+  try{
+    const { error } = await sb.rpc('copy_booking_detail', {
+      p_edit_token: EDIT_TOKEN,
+      p_source_trip_id: tripId,
+      p_category: key,
+      p_target_trip_ids: checked
+    });
+    if(error) throw error;
+    await fetchNotebook(TOKEN); // 複数試合にまたがる更新なのでサーバーの最新状態を取り直す
+    render();
+    showToast(`${checked.length}件の遠征に${CATS.find(c=>c.key===key).label}情報をコピーしました`);
+  }catch(e){
+    console.error(e);
+    showToast('コピーに失敗しました。通信環境をご確認ください');
+  }
+}
+
+/* ---------- family sharing ---------- */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function buildTripShareText(t){
+  const catInfo = k => CATS.find(c=>c.key===k);
+  const lines = [`【${t.team}】${t.match}`, `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time||''}　@${t.venue||'会場未定'}`, ''];
+  CATS.forEach(c=>{
+    const done = t.status[c.key];
+    const d = t.detail[c.key];
+    let line = `${done?'✅':'⬜️'} ${c.icon} ${c.label}`;
+    if(done && c.bookable && d.method) line += `：${d.method}`;
+    if(done && !c.bookable && d.memo) line += `：${d.memo}`;
+    lines.push(line);
+  });
+  lines.push('', `準備進捗：${completion(t)}%　想定予算：¥${(t.cost||0).toLocaleString()}`);
+  lines.push('', '― 遠征手帳より');
+  return lines.join('\n');
+}
+async function shareTextOrCopy(text, title){
+  if(navigator.share){
+    try{ await navigator.share({ title, text }); return; }catch(e){ /* user cancelled or unsupported, fall through to copy */ }
+  }
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast('コピーしました。LINEなどに貼り付けて共有してください');
+  }catch(e){
+    showToast('共有用テキストの作成に失敗しました');
+  }
+}
+function shareTrip(tripId){
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  shareTextOrCopy(buildTripShareText(t), `${t.team} ${t.match} の遠征準備`);
+}
+function shareAll(){
+  const upcoming = trips.filter(t=>new Date(t.date) >= new Date(TODAY)).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!upcoming.length){ showToast('共有できる今後の遠征がありません'); return; }
+  const lines = ['📋 今後の遠征一覧', ''];
+  upcoming.forEach(t=>{
+    const pending = BOOKABLE_CATS.filter(k=>!t.status[k]).map(k=>CATS.find(c=>c.key===k).label);
+    lines.push(`・${fmtDate(t.date).md} ${t.team} ${t.match}（準備${completion(t)}%）${pending.length? '　未予約:'+pending.join('・') : '　準備OK'}`);
+  });
+  lines.push('', '― 遠征手帳より');
+  shareTextOrCopy(lines.join('\n'), '今後の遠征一覧');
+}
+
+/* ---------- affiliate click logging ---------- */
+function logClick(tripId, category, partner){
+  // ベストエフォート（失敗してもユーザー体験は止めない）
+  try{
+    sb.rpc('log_affiliate_click', {
+      p_token: TOKEN, p_trip_id: tripId, p_category: category, p_partner: partner, p_session_id: SESSION_ID
+    }).then(({error})=>{ if(error) console.error(error); });
+  }catch(e){ console.error(e); }
+}
+
+function render(){
+  renderHero();
+  renderAlerts();
+  renderSummary();
+  renderBudgetBox();
+  renderRecent();
+  renderFilters();
+  renderGrid();
+}
+
+/* ---------- data model mapping: DB row <-> UI shape ---------- */
+function normalizeTrip(raw){
+  const status = {}, detail = {};
+  CATS.forEach(c=>{
+    const bd = (raw.booking_details||[]).find(x=>x.category===c.key) || {};
+    status[c.key] = !!bd.is_booked;
+    detail[c.key] = c.bookable
+      ? { method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0, memo: bd.memo || '' }
+      : { memo: bd.memo || '' };
+  });
+  return {
+    id: raw.id,
+    sport: raw.sport,
+    team: raw.team,
+    match: raw.opponent || '',           // 「vs 湘南ユナイテッド」等の対戦カード表記はopponentカラムに保存
+    date: raw.match_date,
+    time: raw.start_time ? String(raw.start_time).slice(0,5) : '',
+    venue: raw.venue || '',
+    cost: raw.estimated_cost || 0,
+    status, detail
+  };
+}
+
+async function fetchNotebook(token){
+  const { data, error } = await sb.rpc('get_notebook', { p_token: token });
+  if(error) throw error;
+  TOKEN = token;
+  notebook = data.notebook;
+  IS_EDITABLE = !!notebook.is_editable;
+  EDIT_TOKEN = IS_EDITABLE ? token : null;
+  SHARE_TOKEN = IS_EDITABLE ? (notebook.share_token || null) : null;
+  budgetCap = notebook.budget_cap || 0;
+  trips = (data.trips || []).map(normalizeTrip);
+}
+
+/* ---------- link-based persistence (no login) ---------- */
+function renderShareBanner(){
+  const box = document.getElementById('share-banner');
+  if(IS_EDITABLE){
+    const editUrl = location.href;
+    const shareUrl = SHARE_TOKEN ? (location.origin + location.pathname + '#book=' + SHARE_TOKEN) : null;
+    box.innerHTML = `
+      <div class="share-banner">
+        <div class="sb-text">🔗 <b>この編集用リンクを知っている人は誰でも</b>、ログインなしでこの遠征手帳を編集できます。家族にはこちらのリンクを共有してください。</div>
+        <div class="sb-link">
+          <input id="share-url-input" value="${editUrl}" readonly onclick="this.select()">
+          <button class="sb-copy" onclick="copyShareLink(document.getElementById('share-url-input').value)">コピー</button>
+        </div>
+      </div>
+      ${shareUrl ? `
+      <div class="share-banner" style="background:var(--rose-wash); border-color:var(--rose); margin-top:10px;">
+        <div class="sb-text">👀 友達に見せるだけなら<b>閲覧専用リンク</b>が安心です（相手は編集できません）。</div>
+        <div class="sb-link">
+          <input id="view-url-input" value="${shareUrl}" readonly onclick="this.select()">
+          <button class="sb-copy" style="background:var(--rose);" onclick="copyShareLink(document.getElementById('view-url-input').value)">コピー</button>
+        </div>
+      </div>` : ''}
+    `;
+  }else{
+    box.innerHTML = `
+      <div class="share-banner" style="background:var(--surface-2); border-color:var(--line);">
+        <div class="sb-text">👀 これは<b>閲覧専用リンク</b>です。予約状況の確認や、各カテゴリのリンクからの予約はできますが、内容の編集はできません。</div>
+      </div>`;
+  }
+}
+async function copyShareLink(url){
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast('リンクをコピーしました');
+  }catch(e){
+    showToast('コピーに失敗しました。URL欄を長押しして手動でコピーしてください');
+  }
+}
+
+function applyEditableUI(){
+  document.getElementById('header-actions').style.display = IS_EDITABLE ? 'flex' : 'none';
+}
+
+function showScreen(name){
+  ['loading-screen','landing-screen','error-screen','app-main'].forEach(id=>{
+    document.getElementById(id).style.display = (id===name) ? (name==='app-main' ? 'block' : 'block') : 'none';
+  });
+}
+
+async function createNewNotebook(){
+  const btns = document.querySelectorAll('#landing-create-btn, #error-screen .add-btn');
+  btns.forEach(b=>{ b.disabled = true; });
+  try{
+    const { data, error } = await sb.rpc('create_notebook', { p_title: '遠征手帳', p_budget_cap: 300000 });
+    if(error) throw error;
+    const row = Array.isArray(data) ? data[0] : data;
+    location.hash = `book=${row.edit_token}`;
+    showScreen('loading-screen');
+    await fetchNotebook(row.edit_token);
+    startApp();
+  }catch(e){
+    console.error(e);
+    btns.forEach(b=>{ b.disabled = false; });
+    showToast('作成に失敗しました。通信環境をご確認ください');
+  }
+}
+
+function startApp(){
+  showScreen('app-main');
+  renderShareBanner();
+  applyEditableUI();
+  render();
+}
+
+async function initApp(){
+  const hashMatch = location.hash.match(/book=([a-zA-Z0-9_-]+)/);
+  if(!hashMatch){
+    showScreen('landing-screen');
+    return;
+  }
+  try{
+    await fetchNotebook(hashMatch[1]);
+    startApp();
+  }catch(e){
+    console.error(e);
+    showScreen('error-screen');
+  }
+}
+initApp();
+</script>
+</body>
+</html>
