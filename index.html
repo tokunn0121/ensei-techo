@@ -29,6 +29,7 @@
     --radius: 18px;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
+  img{ max-width:100%; }
   body{
     background: var(--bg);
     color: var(--text);
@@ -68,11 +69,12 @@
   .add-btn.ghost:hover{ background: var(--rose-wash); box-shadow:none; transform:none; }
 
   /* ---------- tabs ---------- */
-  .tabs{ display:flex; gap:8px; padding: 4px 5vw 0; }
+  .tabs{ display:flex; gap:6px; padding: 4px 5vw 0; }
   .tab{
-    font-family: var(--font-display); font-weight:700; font-size:13.5px;
-    padding:11px 20px; border-radius:999px 999px 0 0; cursor:pointer;
-    color: var(--text-dim); background:transparent; border:none;
+    font-family: var(--font-display); font-weight:700; font-size:13px;
+    padding:11px 14px; border-radius:999px 999px 0 0; cursor:pointer;
+    color: var(--text-dim); background:transparent; border:none; flex:1; white-space:nowrap;
+    min-height:44px;
   }
   .tab.active{ background: var(--surface); color: var(--rose-deep); }
   .panel{ display:none; }
@@ -125,8 +127,9 @@
   .recent .empty{ color:var(--text-faint); font-size:13px; padding:6px 0; }
 
   /* ---------- filters ---------- */
-  .filters{ display:flex; gap:8px; flex-wrap:wrap; padding: 20px 5vw 6px; }
-  .chip{ font-family: var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background: var(--surface); border:1px solid var(--line); padding:8px 16px; border-radius:999px; cursor:pointer; user-select:none; transition:.15s; }
+  .filters{ display:flex; gap:8px; padding: 20px 5vw 6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .filters::-webkit-scrollbar{ display:none; }
+  .chip{ font-family: var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background: var(--surface); border:1px solid var(--line); padding:9px 16px; border-radius:999px; cursor:pointer; user-select:none; transition:.15s; flex-shrink:0; min-height:38px; display:flex; align-items:center; }
   .chip.active, .chip:hover{ color:#fff; border-color:var(--rose); background:var(--rose); }
 
   /* ---------- grid ---------- */
@@ -154,6 +157,33 @@
     font-size:12.5px; cursor:pointer;
   }
   .card-share-btn:hover{ border-color:var(--rose); background:var(--rose-wash); color:var(--rose-deep); }
+  /* カレンダー */
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-dow{ font-size:10px; font-weight:700; padding:4px 0; text-align:center; }
+  .cal-cell{ min-height:58px; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:2px 3px; cursor:pointer; transition:.1s; position:relative; }
+  .cal-cell:active{ background:var(--surface-2); }
+  .cal-cell.today{ background:var(--rose-wash); border-color:var(--rose); }
+  .cal-cell.has-event{ cursor:pointer; }
+  .cal-cell.other-month{ opacity:0.35; }
+  .cal-date{ font-size:11px; font-weight:700; margin-bottom:1px; }
+  .cal-evt{ font-size:8.5px; color:#fff; border-radius:3px; padding:1px 2px; margin-bottom:1px; line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+  .cal-evt.done{ background:var(--sage); }
+  .cal-evt.pending{ background:var(--rose); }
+  /* ポップアップ内 */
+  .cpop-date{ font-family:var(--font-display); font-weight:900; font-size:18px; margin-bottom:14px; }
+  .cpop-trip{ background:var(--surface-2); border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  .cpop-team{ font-weight:700; font-size:14px; margin-bottom:3px; }
+  .cpop-meta{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+  .cpop-prog{ height:6px; background:var(--line); border-radius:3px; overflow:hidden; margin-bottom:10px; }
+  .cpop-prog-fill{ height:100%; border-radius:3px; }
+  .cpop-btns{ display:flex; gap:8px; }
+  .cpop-btn{ flex:1; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:none; font-family:var(--font-display); font-weight:700; font-size:13px; cursor:pointer; color:var(--text); text-align:center; min-height:44px; }
+  .cpop-btn.primary{ background:var(--rose); border-color:var(--rose); color:#fff; }
+  /* フィルターチップ：スマホは横スクロール */
+  .cal-chip-row{ display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px; scrollbar-width:none; }
+  .cal-chip-row::-webkit-scrollbar{ display:none; }
+  .cal-chip{ padding:7px 13px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface-2); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; color:var(--text-dim); flex-shrink:0; min-height:32px; display:flex; align-items:center; }
+  .cal-chip.active{ background:var(--rose); border-color:var(--rose); color:#fff; }
 
   .perforation{ position:relative; height:1px; border-top: 2px dashed var(--line); }
   .perforation::before, .perforation::after{ content:''; position:absolute; top:-9px; width:18px; height:18px; background: var(--bg); border-radius:50%; }
@@ -175,13 +205,15 @@
   .status-row{ display:flex; flex-direction:column; gap:8px; }
   .cat-item{ border-radius:14px; overflow:hidden; background:var(--surface-2); border:1.5px solid transparent; }
   .cat-item.is-open{ border-color: var(--rose); }
-  .cat-header{ display:flex; align-items:center; gap:9px; padding:11px 13px; cursor:pointer; user-select:none; }
+  .cat-header{ display:flex; align-items:center; gap:9px; padding:13px; cursor:pointer; user-select:none; min-height:44px; }
   .cat-header .icon{ font-size:16px; }
   .cat-header .label{ font-weight:700; font-size:12.5px; flex:1; }
   .status-dot{ width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
   .status-dot.done{ background:var(--sage); }
   .status-dot.pending{ background:var(--rose); }
+  .status-dot.not-needed{ background:var(--line); border:1.5px solid var(--text-faint); width:7px; height:7px; }
   .status-text{ font-size:11px; color:var(--text-dim); white-space:nowrap; }
+  .status-text.not-needed{ color:var(--text-faint); }
   .chevron{ font-size:10px; color:var(--text-faint); transition: transform .15s; }
   .cat-item.is-open .chevron{ transform: rotate(180deg); }
   .cat-panel{ display:none; padding:2px 13px 13px; flex-direction:column; gap:9px; }
@@ -254,11 +286,22 @@
     .modal-actions button{ width:100%; padding:15px; font-size:15px; }
     .add-btn{ padding:14px 20px; font-size:14px; }
     .ticket{ border-radius:16px; }
-    .cat-header{ padding:13px 14px; }
+    .cat-header{ padding:14px 13px; }
     .cat-header .label{ font-size:13.5px; }
     .stub{ padding:16px; }
     .head{ padding:16px; }
-    .card-share-btn{ padding:13px; font-size:13.5px; }
+    .card-share-btn{ padding:14px; font-size:13.5px; min-height:44px; }
+    .icon-btn{ width:38px; height:38px; font-size:14px; }
+    .card-actions{ gap:6px; }
+    .done-toggle{ min-height:32px; }
+    .done-toggle input[type="checkbox"]{ width:20px; height:20px; }
+    .cat-panel .field input{ min-height:44px; font-size:16px; }
+    .pr-btn{ min-height:44px; display:flex; align-items:center; justify-content:center; }
+    .share-icon-btn{ width:44px; height:44px; }
+    #header-share-btn{ width:44px; height:44px; }
+    .tab{ font-size:12px; padding:11px 8px; }
+    .btn-group{ gap:6px; }
+    #header-actions .add-btn{ padding:12px 14px; font-size:12.5px; }
   }
 
 
@@ -343,12 +386,12 @@
 
 <div id="app-main" style="display:none;">
 <div class="tabs">
-  <button class="tab active" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
-  <button class="tab" id="tab-calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
+  <button class="tab" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
+  <button class="tab active" id="tab-calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
   <button class="tab" id="tab-history" onclick="switchTab('history')">予約履歴</button>
 </div>
 
-<div class="panel active" id="panel-cards">
+<div class="panel" id="panel-cards">
   <div id="hero"></div>
   <div class="alerts" id="alerts"></div>
   <div class="summary" id="summary"></div>
@@ -365,9 +408,16 @@
   </div>
 </div>
 
-<div class="panel" id="panel-calendar">
+<div class="panel active" id="panel-calendar">
+  <div style="padding:0 5vw 8px;">
+    <div id="cal-filter-chips" style="display:flex; gap:6px; flex-wrap:wrap; padding:10px 0 6px;"></div>
+  </div>
   <div id="calendar-wrap" style="padding:0 5vw 40px;"></div>
 </div>
+
+<!-- カレンダー日付ポップアップ -->
+<div id="cal-popup-overlay" onclick="closeCalPopup()" style="display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.25);"></div>
+<div id="cal-popup" style="display:none; position:fixed; z-index:301; background:var(--surface); border-radius:20px; padding:20px; box-shadow:0 8px 40px rgba(0,0,0,0.2); width:min(360px,92vw); max-height:70vh; overflow-y:auto;"></div>
 
 <!-- スケジュールまとめ入力モーダル -->
 <div class="overlay" id="schedule-import-overlay">
@@ -391,6 +441,11 @@
 
 <div class="toast" id="toast"></div>
 
+<div id="page-banners" style="padding:20px 5vw 4px;">
+  <div style="font-size:10px; color:var(--text-faint); text-align:center; margin-bottom:6px;">広告 【PR】</div>
+  <div id="banner-rotator" style="position:relative; min-height:70px; display:flex; align-items:center; justify-content:center; overflow:hidden; max-width:100%;"></div>
+  <div id="banner-dots" style="display:flex; gap:5px; justify-content:center; margin-top:8px;"></div>
+</div>
 <footer>遠征手帳 — 記事内のリンクには広告(アフィリエイトリンク)を含みます【PR】　<a href="/about.html" style="color:inherit;">サイトについて</a>　<a href="/privacy.html" style="color:inherit;">プライバシーポリシー</a></footer>
 
 <div class="overlay" id="overlay">
@@ -408,16 +463,23 @@
         </select>
       </div>
       <div class="field">
-        <label>応援チーム
-          <button type="button" id="team-list-toggle" onclick="toggleTeamList()" style="margin-left:8px; font-size:11px; padding:3px 10px; border-radius:6px; border:1px solid var(--line); background:var(--surface-2); color:var(--text-dim); cursor:pointer; vertical-align:middle;">一覧から選ぶ</button>
-        </label>
-        <input id="f-team" list="f-team-list" placeholder="例）千葉ジェッツ" oninput="handleTeamInput()" autocomplete="off" style="font-size:16px;">
-        <datalist id="f-team-list"></datalist>
-        <div id="team-list-panel" style="display:none; max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; margin-top:6px; background:var(--surface);"></div>
+        <label>応援チーム</label>
+        <select id="f-team-select" onchange="handleTeamSelectChange()" style="font-size:16px; display:block;">
+          <option value="">チームを選択してください</option>
+        </select>
+        <input id="f-team" placeholder="チーム名を入力" oninput="handleTeamInput()" autocomplete="off" style="font-size:16px; display:none; margin-top:6px;">
+        <button type="button" id="team-manual-toggle" onclick="toggleTeamManual()" style="margin-top:6px; font-size:12px; padding:4px 10px; border-radius:6px; border:1px solid var(--line); background:none; color:var(--text-dim); cursor:pointer;">✏️ 手入力に切り替え</button>
       </div>
     </div>
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
-    <div class="field"><label>対戦相手</label><input id="f-match" list="f-opponent-list" placeholder="例）川崎ブレイブサンダース" oninput="handleOpponentInput()" style="font-size:16px;" autocomplete="off"><datalist id="f-opponent-list"></datalist></div>
+    <div class="field">
+      <label>対戦相手</label>
+      <select id="f-match-select" onchange="handleOpponentSelectChange()" style="font-size:16px; display:block;">
+        <option value="">相手チームを選択してください</option>
+      </select>
+      <input id="f-match" placeholder="相手チーム名を入力" oninput="handleOpponentInput()" autocomplete="off" style="font-size:16px; display:none; margin-top:6px;">
+      <button type="button" id="match-manual-toggle" onclick="toggleMatchManual()" style="margin-top:6px; font-size:12px; padding:4px 10px; border-radius:6px; border:1px solid var(--line); background:none; color:var(--text-dim); cursor:pointer;">✏️ 手入力に切り替え</button>
+    </div>
     <div class="row">
       <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
       <div class="field"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
@@ -651,49 +713,85 @@ const TEAM_DATA = {
 
 let homeAwayMode = null;
 
+function getTeamValue(){
+  const sel = document.getElementById('f-team-select');
+  const inp = document.getElementById('f-team');
+  return sel.style.display!=='none' ? sel.value : inp.value;
+}
+function getMatchValue(){
+  const sel = document.getElementById('f-match-select');
+  const inp = document.getElementById('f-match');
+  return sel.style.display!=='none' ? sel.value : inp.value;
+}
+
 function renderTeamDatalist(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
-  document.getElementById('f-team-list').innerHTML = teams.map(t=>`<option value="${t.name}">`).join('');
+  // selectを再構築
+  const tSel = document.getElementById('f-team-select');
+  tSel.innerHTML = '<option value="">チームを選択してください</option>' +
+    teams.map(t=>`<option value="${t.name}">${t.name}${t.arena?' ('+t.arena+')':''}</option>`).join('');
+  tSel.style.display = 'block';
+  document.getElementById('f-team').style.display = 'none';
+  document.getElementById('f-team').value = '';
+  document.getElementById('team-manual-toggle').textContent = '✏️ 手入力に切り替え';
+  // 対戦相手selectも初期化
+  const mSel = document.getElementById('f-match-select');
+  mSel.innerHTML = '<option value="">相手チームを選択してください</option>' +
+    teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+  mSel.style.display = 'block';
+  document.getElementById('f-match').style.display = 'none';
+  document.getElementById('f-match').value = '';
+  document.getElementById('match-manual-toggle').textContent = '✏️ 手入力に切り替え';
   document.getElementById('venue-suggest-note').textContent = '';
   homeAwayMode = null;
   updateHomeAwayUI();
-  renderTeamListPanel();
   applyPlaceholders(sport);
 }
 
-function renderTeamListPanel(){
+function toggleTeamManual(){
+  const sel = document.getElementById('f-team-select');
+  const inp = document.getElementById('f-team');
+  const btn = document.getElementById('team-manual-toggle');
+  const isManual = inp.style.display !== 'none';
+  if(isManual){
+    sel.style.display = 'block'; inp.style.display = 'none';
+    btn.textContent = '✏️ 手入力に切り替え';
+  }else{
+    sel.style.display = 'none'; inp.style.display = 'block';
+    inp.focus(); btn.textContent = '← リストに戻る';
+  }
+}
+function toggleMatchManual(){
+  const sel = document.getElementById('f-match-select');
+  const inp = document.getElementById('f-match');
+  const btn = document.getElementById('match-manual-toggle');
+  const isManual = inp.style.display !== 'none';
+  if(isManual){
+    sel.style.display = 'block'; inp.style.display = 'none';
+    btn.textContent = '✏️ 手入力に切り替え';
+  }else{
+    sel.style.display = 'none'; inp.style.display = 'block';
+    inp.focus(); btn.textContent = '← リストに戻る';
+  }
+}
+
+function handleTeamSelectChange(){
+  // 対戦相手のselectから自チームを除外して更新
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
-  const panel = document.getElementById('team-list-panel');
-  if(!panel || panel.style.display === 'none') return;
-  panel.innerHTML = teams.map((t,i)=>`
-    <div onclick="selectTeamFromList(this.dataset.n)" data-n="${t.name}"
-      style="padding:12px 14px; border-bottom:1px solid var(--line); font-size:15px; cursor:pointer;">
-      ${t.name}${t.arena ? `<br><span style="font-size:11px; color:var(--text-dim);">${t.arena}</span>` : ''}
-    </div>`).join('');
-}
-
-
-function toggleTeamList(){
-  const panel = document.getElementById('team-list-panel');
-  const btn = document.getElementById('team-list-toggle');
-  const isOpen = panel.style.display !== 'none';
-  panel.style.display = isOpen ? 'none' : 'block';
-  btn.textContent = isOpen ? '一覧から選ぶ' : '閉じる';
-  if(!isOpen) renderTeamListPanel();
-}
-
-function selectTeamFromList(name){
-  document.getElementById('f-team').value = name;
-  document.getElementById('team-list-panel').style.display = 'none';
-  document.getElementById('team-list-toggle').textContent = '一覧から選ぶ';
+  const myTeam = getTeamValue();
+  const mSel = document.getElementById('f-match-select');
+  mSel.innerHTML = '<option value="">相手チームを選択してください</option>' +
+    teams.filter(t=>t.name!==myTeam).map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
   handleTeamInput();
-  handleOpponentInput();
+}
+function handleOpponentSelectChange(){
+  if(homeAwayMode === 'AWAY') setHomeAway('AWAY');
 }
 
 function updateHomeAwayUI(){
-  const teamVal = document.getElementById('f-team').value;
+  const teamVal = getTeamValue();
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
   const match = teams.find(t=>t.name===teamVal);
@@ -715,7 +813,7 @@ function setHomeAway(mode){
   updateHomeAwayUI();
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
-  const myTeam = teams.find(t=>t.name===document.getElementById('f-team').value);
+  const myTeam = teams.find(t=>t.name===getTeamValue());
   const note = document.getElementById('venue-suggest-note');
   const venueInput = document.getElementById('f-venue');
   const venueList = document.getElementById('f-venue-list');
@@ -724,7 +822,7 @@ function setHomeAway(mode){
     venueList.innerHTML = `<option value="${myTeam.arena}">`;
     note.textContent = '（自チームのホームアリーナをセット）';
   } else if(mode === 'AWAY'){
-    const matchText = document.getElementById('f-match').value;
+    const matchText = getMatchValue();
     const arenas = getOpponentArenas(sport, matchText, teams);
     if(arenas.length){
       venueInput.value = arenas[0];
@@ -739,13 +837,13 @@ function setHomeAway(mode){
 }
 
 function getOpponentArenas(sport, matchText, teams){
-  const myTeam = document.getElementById('f-team').value;
+  const myTeam = getTeamValue();
   return teams.filter(t=>t.name!==myTeam && matchText.includes(t.name) && t.arena).map(t=>t.arena);
 }
 
 function handleTeamInput(){
   const sport = document.getElementById('f-sport').value;
-  const teamVal = document.getElementById('f-team').value;
+  const teamVal = getTeamValue();
   const teams = TEAM_DATA[sport] || [];
   const match = teams.find(t=>t.name===teamVal);
   const note = document.getElementById('venue-suggest-note');
@@ -758,25 +856,24 @@ function handleTeamInput(){
     note.textContent = '';
   }
   updateHomeAwayUI();
-  handleOpponentInput();
 }
 
 function handleOpponentInput(){
   if(homeAwayMode === 'AWAY') setHomeAway('AWAY');
-  const sport = document.getElementById('f-sport').value;
-  const teams = TEAM_DATA[sport] || [];
-  const myTeam = document.getElementById('f-team').value;
-  const oppList = document.getElementById('f-opponent-list');
-  if(oppList) oppList.innerHTML = teams.filter(t=>t.name!==myTeam).map(t=>`<option value="${t.name}">`).join('');
 }
 
 const PR_LINKS = {
   hotel: [
     {label:'楽天トラベルで探す【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713301&p_id=55&pc_id=55&pl_id=624'},
+    {label:'JTBで宿・ツアーを探す【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDSJJAQ%2B15A4%2B1TIR4H'},
+    {label:'イオントラベルで探す【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KU%2BLFMK2%2B5RZ8%2B5YJRM'},
     {label:'じゃらんで探す', url:'https://www.jalan.net/'},
   ],
   transport: [
     {label:'格安航空券を比較【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B88SV%2B1HL182%2B3UZC%2B60WN5'},
+    {label:'たびらい レンタカー比較【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE2NWKY%2B1EQO%2BTV3PD'},
+    {label:'夜行・高速バス エアトリ【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE0VLRM%2BAD2%2B3H18R6'},
+    {label:'カーシェア EARTHCAR【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDZOQK2%2B43U8%2BHV7V6'},
     {label:'新幹線予約(楽天トラベル)', url:'https://travel.rakuten.co.jp/'},
   ],
   ticket: [
@@ -790,6 +887,32 @@ const PR_LINKS = {
     {label:'楽天市場で遠征グッズ【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713296&p_id=54&pc_id=54&pl_id=616'},
   ],
 };
+
+// ページ下部バナー広告（グループ別に表示）
+const BANNER_AD_GROUPS = [
+  {
+    group: 'スポーツ・フィットネス',
+    note: 'スポーツ観戦のあとはカラダも鍛えよう！',
+    ads: [
+      `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BEEKKOI%2BCW6%2BBEYVQP" rel="nofollow" target="_blank"><img border="0" width="728" height="90" alt="ライザップゴルフ" src="https://www23.a8.net/svt/bgt?aid=260726140871&wid=001&eno=01&mid=s00000001671069027000&mc=1" style="max-width:100%; height:auto;"></a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B89KS%2BEEKKOI%2BCW6%2BBEYVQP" alt="">`,
+      `<a href="//af.moshimo.com/af/c/click?a_id=5714366&p_id=3409&pc_id=8121&pl_id=48345" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc><img src="//image.moshimo.com/af-img/2135/000000048345.jpg" width="468" height="60" style="border:none; max-width:100%; height:auto;" alt="ブレず"></a><img src="//i.moshimo.com/af/i/impression?a_id=5714366&p_id=3409&pc_id=8121&pl_id=48345" width="1" height="1" style="border:none;" loading="lazy">`,
+      `<a href="//af.moshimo.com/af/c/click?a_id=5714358&p_id=1854&pc_id=3598&pl_id=88751" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc><img src="//image.moshimo.com/af-img/1209/000000088751.jpg" width="468" height="60" style="border:none; max-width:100%; height:auto;" alt="ホットヨガLAVA"></a><img src="//i.moshimo.com/af/i/impression?a_id=5714358&p_id=1854&pc_id=3598&pl_id=88751" width="1" height="1" style="border:none;" loading="lazy">`,
+      `<a href="//af.moshimo.com/af/c/click?a_id=5714361&p_id=2526&pc_id=5585&pl_id=32885" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc><img src="//image.moshimo.com/af-img/1953/000000032885.jpg" width="320" height="100" style="border:none; max-width:100%; height:auto;" alt="ヨガ資格"></a><img src="//i.moshimo.com/af/i/impression?a_id=5714361&p_id=2526&pc_id=5585&pl_id=32885" width="1" height="1" style="border:none;" loading="lazy">`,
+      `<a href="//af.moshimo.com/af/c/click?a_id=5714362&p_id=2527&pc_id=5591&pl_id=32883" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc><img src="//image.moshimo.com/af-img/1953/000000032883.jpg" width="320" height="100" style="border:none; max-width:100%; height:auto;" alt="ピラティス資格"></a><img src="//i.moshimo.com/af/i/impression?a_id=5714362&p_id=2527&pc_id=5591&pl_id=32883" width="1" height="1" style="border:none;" loading="lazy">`,
+      `<a href="//af.moshimo.com/af/c/click?a_id=5714363&p_id=2537&pc_id=5622&pl_id=32683" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc><img src="//image.moshimo.com/af-img/1988/000000032683.jpg" width="234" height="60" style="border:none; max-width:100%; height:auto;" alt="パーソナルジムLastyle"></a><img src="//i.moshimo.com/af/i/impression?a_id=5714363&p_id=2537&pc_id=5622&pl_id=32683" width="1" height="1" style="border:none;" loading="lazy">`,
+    ]
+  },
+  {
+    group: 'お出かけ・おしゃれ',
+    note: '遠征を楽しむための準備もここで',
+    ads: [
+      `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KU%2BBB99U%2B34VM%2B25GA35" rel="nofollow" target="_blank"><img border="0" width="320" height="50" alt="ネイルチップ専門店michi" src="https://www27.a8.net/svt/bgt?aid=260726142019&wid=001&eno=01&mid=s00000014629013009000&mc=1" style="max-width:100%; height:auto;"></a><img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4B89KU%2BBB99U%2B34VM%2B25GA35" alt="">`,
+    ]
+  },
+];
+
+// 後方互換性のためBanner_ADSも残す
+const BANNER_ADS = BANNER_AD_GROUPS.flatMap(g=>g.ads.map(html=>({html, label:g.group})));
 
 function fmtDate(iso){
   if(!iso) return {md:'--', dow:''};
@@ -822,6 +945,7 @@ function switchTab(name){
   });
   if(name==='history') renderHistory();
   if(name==='calendar') renderCalendar();
+  document.getElementById('tab-'+name)?.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 /* ---------- hero: next upcoming trip ---------- */
@@ -947,6 +1071,17 @@ function catPanelContent(t, c){
   const notNeededChk = IS_EDITABLE
     ? `<label class="done-toggle" style="color:var(--text-faint); margin-top:4px;"><input type="checkbox" ${notNeeded?'checked':''} onchange="setNotNeeded('${t.id}','${c.key}',this.checked)"> このカテゴリは不要（進捗から除外）</label>`
     : '';
+  const saleInfo = c.key==='ticket' ? parseSaleInfo(d.memo) : null;
+  const saleBlock = c.key==='ticket' ? `
+    <div style="background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:2px;">
+      <div style="font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px;">🔔 チケット発売日リマインダー</div>
+      <div class="field-row">
+        <div class="field"><label>発売日</label><input type="date" value="${saleInfo.date||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',this.value,null,null)"`:'disabled'}></div>
+        <div class="field"><label>発売時刻</label><input type="time" value="${saleInfo.time||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',null,this.value,null)"`:'disabled'}></div>
+      </div>
+      ${IS_EDITABLE ? `<label class="done-toggle" style="margin-top:6px;"><input type="checkbox" ${saleInfo.notify?'checked':''} onchange="handleNotifyToggle('${t.id}',this)" ${(!saleInfo.date||!saleInfo.time)?'disabled':''}> この時間に通知する（このブラウザを開いている間）</label>` : ''}
+      ${saleInfo.date && saleInfo.time ? `<div style="font-size:10.5px; color:#8a6d1f; margin-top:4px;">${saleInfo.notify ? '✅ 通知予約済み' : '通知はオフです'}</div>` : ''}
+    </div>` : '';
   if(!c.bookable){
     return `
       <div class="cat-panel">
@@ -959,13 +1094,14 @@ function catPanelContent(t, c){
   }
   return `
     <div class="cat-panel">
+      ${saleBlock}
       <div class="field-row">
         <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="例）楽天トラベル"></div>
         <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
       <div class="field-row">
         <div class="field"><label>金額</label><input type="number" value="${d.cost||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
-        <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','memo',this.value)"`:'disabled'} placeholder="座席・便名など"></div>
+        <div class="field"><label>詳細メモ</label><input value="${(saleInfo?saleInfo.rest:(d.memo||'')).replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="座席・便名など"></div>
       </div>
       ${IS_EDITABLE ? `<label class="done-toggle"><input type="checkbox" ${t.status[c.key]?'checked':''} onchange="setStatus('${t.id}','${c.key}',this.checked)"> 予約完了としてマークする</label>` : ''}
       ${notNeededChk}
@@ -1012,13 +1148,14 @@ function renderTicketCard(t, isPast){
           ${CATS.map(c=>{
             const open = catOpen.has(`${t.id}:${c.key}`);
             const done = t.status[c.key];
+            const notNeeded = !!t.detail[c.key]?.notNeeded;
             return `
-            <div class="cat-item ${open?'is-open':''}">
+            <div class="cat-item ${open?'is-open':''} ${notNeeded?'cat-not-needed':''}">
               <div class="cat-header" onclick="toggleCat('${t.id}','${c.key}')">
-                <span class="icon">${c.icon}</span>
-                <span class="label">${c.label}</span>
-                <span class="status-dot ${done?'done':'pending'}"></span>
-                <span class="status-text">${done?'予約済み':'未予約'}</span>
+                <span class="icon" style="${notNeeded?'opacity:0.4;':''}">${c.icon}</span>
+                <span class="label" style="${notNeeded?'opacity:0.4;':''}">${c.label}</span>
+                <span class="status-dot ${notNeeded?'not-needed':done?'done':'pending'}"></span>
+                <span class="status-text ${notNeeded?'not-needed':''}">${notNeeded?'対象外':done?'予約済み':'未予約'}</span>
                 <span class="chevron">▾</span>
               </div>
               ${catPanelContent(t,c)}
@@ -1140,6 +1277,79 @@ async function saveBookingDetail(tripId, key, patch){
   }
 }
 
+/* ---------- チケット発売日リマインダー ---------- */
+// memoフィールドに軽量マーカー [[SALE:YYYY-MM-DD|HH:MM|1]] を埋め込んで保存（notNeededと同じ手法）
+function parseSaleInfo(memo){
+  const m = (memo||'').match(/\[\[SALE:([^|]*)\|([^|]*)\|([01])\]\]/);
+  const rest = (memo||'').replace(/\[\[SALE:[^\]]*\]\]\s*/, '');
+  if(!m) return { date:'', time:'', notify:false, rest };
+  return { date:m[1], time:m[2], notify:m[3]==='1', rest };
+}
+function buildMemoWithSale(rest, date, time, notify){
+  if(!date && !time) return rest;
+  return `[[SALE:${date||''}|${time||''}|${notify?'1':'0'}]] ${rest||''}`.trim();
+}
+
+async function updateSaleInfo(tripId, newDate, newTime, newNotify){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const cur = parseSaleInfo(t.detail.ticket.memo);
+  const date = newDate!==null ? newDate : cur.date;
+  const time = newTime!==null ? newTime : cur.time;
+  const notify = newNotify!==null ? newNotify : cur.notify;
+  const newMemo = buildMemoWithSale(cur.rest, date, time, notify && date && time);
+  await saveBookingDetail(tripId, 'ticket', { memo: newMemo });
+  if(notify && date && time) scheduleTicketNotification(t, date, time);
+}
+async function updateTicketMemo(tripId, restText){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const cur = parseSaleInfo(t.detail.ticket.memo);
+  const newMemo = buildMemoWithSale(restText, cur.date, cur.time, cur.notify);
+  await saveBookingDetail(tripId, 'ticket', { memo: newMemo });
+}
+
+// ブラウザを開いている間だけ有効なリマインダー（真のプッシュ通知にはservice worker+サーバー側配信が別途必要）
+const scheduledNotifications = new Set();
+function scheduleTicketNotification(t, date, time){
+  const key = `${t.id}-${date}-${time}`;
+  if(scheduledNotifications.has(key)) return;
+  const target = new Date(`${date}T${time}:00`);
+  const ms = target - new Date();
+  if(ms <= 0 || ms > 1000*60*60*24*14) return; // 過去 or 14日以上先は今回はスキップ（タブが持たないため）
+  scheduledNotifications.add(key);
+  setTimeout(()=>{
+    if(Notification.permission === 'granted'){
+      new Notification('🎫 チケット発売時刻です', { body: `${t.team} ${t.match} のチケットが発売開始です`, tag: key });
+    }
+    showToast(`🔔 「${t.team} ${t.match}」のチケット発売時刻です！`);
+  }, ms);
+}
+function scanAndScheduleAllNotifications(){
+  if(!('Notification' in window)) return;
+  trips.forEach(t=>{
+    const info = parseSaleInfo(t.detail?.ticket?.memo);
+    if(info.notify && info.date && info.time){
+      scheduleTicketNotification(t, info.date, info.time);
+    }
+  });
+}
+async function requestNotifyPermission(){
+  if(!('Notification' in window)){ showToast('このブラウザは通知に対応していません'); return false; }
+  if(Notification.permission === 'granted') return true;
+  const perm = await Notification.requestPermission();
+  return perm === 'granted';
+}
+async function handleNotifyToggle(tripId, checkbox){
+  if(checkbox.checked){
+    const ok = await requestNotifyPermission();
+    if(!ok){ checkbox.checked = false; showToast('通知を許可すると発売時刻にお知らせできます'); return; }
+  }
+  updateSaleInfo(tripId, null, null, checkbox.checked);
+}
+
 function setNotNeeded(tripId, key, val){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
@@ -1199,7 +1409,11 @@ function duplicateTrip(tripId){
   document.getElementById('f-sport').value = isKnown ? t.sport : 'その他';
   toggleCustomSport();
   if(!isKnown) document.getElementById('f-sport-custom').value = t.sport;
-  document.getElementById('f-team').value = t.team;
+  // select/input両方に値をセット
+  const tSel2=document.getElementById('f-team-select'); const tInp2=document.getElementById('f-team');
+  const tOpt=[...tSel2.options].find(o=>o.value===t.team);
+  if(tOpt){tSel2.value=t.team; tSel2.style.display='block'; tInp2.style.display='none';}
+  else{tSel2.style.display='none'; tInp2.style.display='block'; tInp2.value=t.team||'';}
   document.getElementById('f-venue').value = t.venue;
   document.getElementById('f-cost').value = t.cost || '';
   document.getElementById('modal-save-msg').style.color = '';
@@ -1307,8 +1521,15 @@ function fillModalFields(t){
     document.getElementById('f-sport-custom').value = t.sport || '';
   }
   renderTeamDatalist();
-  document.getElementById('f-team').value = t.team || '';
-  document.getElementById('f-match').value = t.match || '';
+  const tSel3=document.getElementById('f-team-select'); const tInp3=document.getElementById('f-team');
+  const tOpt3=[...tSel3.options].find(o=>o.value===t.team);
+  if(tOpt3){tSel3.value=t.team; tSel3.style.display='block'; tInp3.style.display='none';}
+  else{tSel3.style.display='none'; tInp3.style.display='block'; tInp3.value=t.team||'';}
+  const mSel3=document.getElementById('f-match-select'); const mInp3=document.getElementById('f-match');
+  const mOpt3=[...mSel3.options].find(o=>o.value===t.match);
+  if(mOpt3){mSel3.value=t.match; mSel3.style.display='block'; mInp3.style.display='none';}
+  else{mSel3.style.display='none'; mInp3.style.display='block'; mInp3.value=t.match||'';}
+
   document.getElementById('f-date').value = t.date || '';
   document.getElementById('f-time').value = t.time || '';
   document.getElementById('f-venue').value = t.venue || '';
@@ -1330,7 +1551,11 @@ function openModal(tripId){
     document.getElementById('modal-sub').textContent = '日程が決まったらまとめて登録できます。同じチームの試合は「登録して続けて追加」が便利です。';
     document.getElementById('modal-keepopen-btn').style.display = 'inline-block';
     document.getElementById('modal-submit-btn').textContent = '登録する';
-    ['f-team','f-match','f-venue','f-cost','f-date','f-time'].forEach(id=>document.getElementById(id).value='');
+    ['f-venue','f-cost','f-date','f-time'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-team-select').value=''; document.getElementById('f-match-select').value='';
+    document.getElementById('f-team').value=''; document.getElementById('f-match').value='';
+    document.getElementById('f-team').style.display='none'; document.getElementById('f-team-select').style.display='block';
+    document.getElementById('f-match').style.display='none'; document.getElementById('f-match-select').style.display='block';
     document.getElementById('f-sport').value = 'バスケットボール';
     document.getElementById('f-sport-custom-wrap').style.display = 'none';
     renderTeamDatalist();
@@ -1349,8 +1574,8 @@ function readSportValue(){
 async function submitTrip(keepOpen){
   if(!IS_EDITABLE) return;
   const sport = readSportValue();
-  const team = document.getElementById('f-team').value || '未設定チーム';
-  const match = document.getElementById('f-match').value || '未定の対戦';
+  const team = getTeamValue() || '未設定チーム';
+  const match = getMatchValue() || '未定の対戦';
   const date = document.getElementById('f-date').value;
   const time = document.getElementById('f-time').value;
   const venue = document.getElementById('f-venue').value;
@@ -1411,7 +1636,8 @@ async function submitTrip(keepOpen){
       }
 
       if(keepOpen){
-        ['f-match','f-date','f-time','f-venue','f-cost'].forEach(id=>document.getElementById(id).value='');
+        ['f-date','f-time','f-venue','f-cost'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('f-match-select').value=''; document.getElementById('f-match').value='';
         document.getElementById('modal-save-msg').textContent = `「${match}」を登録しました。続けて次の試合を入力できます。`;
         document.getElementById('f-match').focus();
       }else{
@@ -1539,14 +1765,16 @@ let calMonth = new Date().getMonth(); // 0-indexed
 function renderCalendar(){
   const wrap = document.getElementById('calendar-wrap');
   if(!wrap) return;
+  renderCalFilterChips();
   const y = calYear, m = calMonth;
-  const firstDay = new Date(y, m, 1).getDay(); // 0=日
+  const firstDay = new Date(y, m, 1).getDay();
   const daysInMonth = new Date(y, m+1, 0).getDate();
+  const prevDaysInMonth = new Date(y, m, 0).getDate();
   const monthLabel = `${y}年${m+1}月`;
 
-  // 試合を日付ごとにインデックス化
+  const filtered = getFilteredTrips();
   const byDate = {};
-  trips.forEach(t=>{
+  filtered.forEach(t=>{
     if(!t.date) return;
     const [ty,tm,td] = t.date.split('-').map(Number);
     if(ty===y && tm-1===m){
@@ -1555,42 +1783,47 @@ function renderCalendar(){
     }
   });
 
+  // 前月末・翌月頭のダミー日も表示（Googleカレンダー風に隙間なく埋める）
   const cells = [];
-  for(let i=0;i<firstDay;i++) cells.push(null); // 空白セル
-  for(let d=1;d<=daysInMonth;d++) cells.push(d);
-  while(cells.length%7!==0) cells.push(null);
+  for(let i=firstDay-1;i>=0;i--) cells.push({d: prevDaysInMonth-i, other:true});
+  for(let d=1;d<=daysInMonth;d++) cells.push({d, other:false});
+  let nextD = 1;
+  while(cells.length%7!==0) cells.push({d: nextD++, other:true});
 
   const todayDate = new Date();
   const isToday = (d)=> d && todayDate.getFullYear()===y && todayDate.getMonth()===m && todayDate.getDate()===d;
 
   wrap.innerHTML = `
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 0 10px;">
-      <button onclick="calNav(-1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px;">‹</button>
-      <div style="font-family:var(--font-display); font-weight:700; font-size:18px;">${monthLabel}</div>
-      <button onclick="calNav(1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px;">›</button>
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0 10px;">
+      <button onclick="calNav(-1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px; color:var(--text-dim);">‹</button>
+      <div style="font-family:var(--font-display); font-weight:900; font-size:17px;">${monthLabel}</div>
+      <button onclick="calNav(1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px; color:var(--text-dim);">›</button>
     </div>
-    ${IS_EDITABLE ? `<div style="text-align:right; margin-bottom:10px;">
-      <button onclick="openScheduleImport()" style="font-size:12px; padding:7px 14px; border-radius:999px; border:1.5px solid var(--rose); background:var(--rose-wash); color:var(--rose-deep); font-family:var(--font-display); font-weight:700; cursor:pointer;">📋 スケジュールをまとめて入力</button>
+    ${IS_EDITABLE ? `<div style="text-align:right; margin-bottom:10px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+      <button onclick="openScheduleImport()" style="font-size:11.5px; padding:7px 12px; border-radius:999px; border:1.5px solid var(--rose); background:var(--rose-wash); color:var(--rose-deep); font-family:var(--font-display); font-weight:700; cursor:pointer;">📋 スケジュール一括入力</button>
+      <button onclick="openModal()" style="font-size:11.5px; padding:7px 12px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface-2); color:var(--text-dim); font-family:var(--font-display); font-weight:700; cursor:pointer;">✏️ 編集する</button>
     </div>` : ''}
-    <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center;">
-      ${['日','月','火','水','木','金','土'].map((d,i)=>`<div style="font-size:11px; font-weight:700; color:${i===0?'var(--rose-deep)':i===6?'#4a7dc9':'var(--text-dim)'}; padding:4px 0;">${d}</div>`).join('')}
-      ${cells.map((d,i)=>{
-        if(!d) return `<div></div>`;
-        const events = byDate[d]||[];
-        const dow = (firstDay+d-1)%7;
-        const color = dow===0?'var(--rose-deep)':dow===6?'#4a7dc9':'var(--text)';
-        const bg = isToday(d) ? 'var(--rose-wash)' : 'var(--surface)';
-        const border = isToday(d) ? '1.5px solid var(--rose)' : '1px solid var(--line)';
-        return `<div style="min-height:64px; background:${bg}; border:${border}; border-radius:8px; padding:4px; text-align:left; cursor:${events.length?'pointer':'default'};" onclick="${events.length?`focusTrip('${events[0].id}'); switchTab('cards');`:''}">
-          <div style="font-size:12px; font-weight:700; color:${color}; margin-bottom:2px;">${d}</div>
-          ${events.map(t=>{
+    <div class="cal-grid">
+      ${['日','月','火','水','木','金','土'].map((d,i)=>`<div class="cal-dow" style="color:${i===0?'var(--rose-deep)':i===6?'#4a7dc9':'var(--text-dim)'};">${d}</div>`).join('')}
+      ${cells.map(c=>{
+        const events = c.other ? [] : (byDate[c.d]||[]);
+        const dow = ['日','月','火','水','木','金','土'];
+        const cellDate = c.other ? null : new Date(y,m,c.d).getDay();
+        const color = c.other ? 'var(--text-faint)' : (cellDate===0?'var(--rose-deep)':cellDate===6?'#4a7dc9':'var(--text)');
+        const todayCls = (!c.other && isToday(c.d)) ? 'today' : '';
+        const otherCls = c.other ? 'other-month' : '';
+        const clickable = !c.other;
+        return `<div class="cal-cell ${todayCls} ${otherCls} ${events.length?'has-event':''}" ${clickable?`onclick="openCalPopup(${y},${m},${c.d})"`:''}>
+          <div class="cal-date" style="color:${color};">${c.d}</div>
+          ${events.slice(0,3).map(t=>{
             const pct = completion(t);
-            return `<div style="font-size:9.5px; background:${pct===100?'var(--sage)':'var(--rose)'}; color:#fff; border-radius:4px; padding:1px 4px; margin-bottom:2px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.team}</div>`;
+            return `<span class="cal-evt ${pct===100?'done':'pending'}">${t.team}</span>`;
           }).join('')}
+          ${events.length>3 ? `<span style="font-size:8.5px; color:var(--text-faint);">+${events.length-3}件</span>` : ''}
         </div>`;
       }).join('')}
     </div>
-    ${Object.keys(byDate).length===0 ? `<div style="text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;">この月の遠征はまだ登録されていません</div>` : ''}
+    ${filtered.length===0 ? `<div style="text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;">${trips.length===0?'まだ遠征が登録されていません':'このフィルター条件の遠征はありません'}</div>` : ''}
     <div style="margin-top:14px; display:flex; gap:10px; font-size:11px; color:var(--text-dim);">
       <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--rose); border-radius:3px; display:inline-block;"></span>準備中</span>
       <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--sage); border-radius:3px; display:inline-block;"></span>準備完了</span>
@@ -1598,6 +1831,75 @@ function renderCalendar(){
   `;
 }
 
+/* ---------- カレンダーのカテゴリ・チームフィルター ---------- */
+let calFilterSport = 'ALL';
+let calFilterTeam = 'ALL';
+
+function getFilteredTrips(){
+  return trips.filter(t=>{
+    if(calFilterSport!=='ALL' && t.sport!==calFilterSport) return false;
+    if(calFilterTeam!=='ALL' && t.team!==calFilterTeam) return false;
+    return true;
+  });
+}
+
+function renderCalFilterChips(){
+  const box = document.getElementById('cal-filter-chips');
+  if(!box) return;
+  const sports = ['ALL', ...new Set(trips.map(t=>t.sport))];
+  const teamsInSport = calFilterSport==='ALL' ? trips : trips.filter(t=>t.sport===calFilterSport);
+  const teams = ['ALL', ...new Set(teamsInSport.map(t=>t.team))];
+  box.innerHTML = `
+    <div class="cal-chip-row">
+      ${sports.map(s=>`<div class="cal-chip ${calFilterSport===s?'active':''}" onclick="setCalSportFilter('${s.replace(/'/g,"\\'")}')">${s==='ALL'?'すべての競技':s}</div>`).join('')}
+    </div>
+    ${teams.length>2 ? `<div class="cal-chip-row" style="margin-top:6px;">
+      ${teams.map(t=>`<div class="cal-chip ${calFilterTeam===t?'active':''}" style="border-style:dashed;" onclick="setCalTeamFilter('${t.replace(/'/g,"\\'")}')">${t==='ALL'?'すべてのチーム':t}</div>`).join('')}
+    </div>` : ''}
+  `;
+}
+function setCalSportFilter(s){ calFilterSport=s; calFilterTeam='ALL'; renderCalendar(); }
+function setCalTeamFilter(t){ calFilterTeam=t; renderCalendar(); }
+
+/* ---------- 日付タップ時のポップアップ（Googleカレンダー風） ---------- */
+function openCalPopup(y,m,d){
+  const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const events = getFilteredTrips().filter(t=>t.date===dateStr);
+  const popup = document.getElementById('cal-popup');
+  const dow = ['日','月','火','水','木','金','土'][new Date(y,m,d).getDay()];
+
+  popup.innerHTML = `
+    <div class="cpop-date">${m+1}月${d}日（${dow}）</div>
+    ${events.length===0 ? `
+      <div style="text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;">この日の遠征はありません</div>
+      ${IS_EDITABLE ? `<button class="cpop-btn primary" style="width:100%;" onclick="closeCalPopup(); openModal(); document.getElementById('f-date').value='${dateStr}';">＋ この日に遠征を追加</button>` : ''}
+    ` : events.map(t=>{
+      const pct = completion(t);
+      return `
+      <div class="cpop-trip">
+        <div class="cpop-team">${t.sport} / ${t.team}</div>
+        <div class="cpop-meta">${t.match||''}　${t.time||''}　${t.venue?'@ '+t.venue:''}</div>
+        <div class="cpop-prog"><div class="cpop-prog-fill" style="width:${pct}%; background:${pct===100?'var(--sage)':'var(--rose)'};"></div></div>
+        <div class="cpop-btns">
+          <button class="cpop-btn" onclick="closeCalPopup(); switchTab('cards'); focusTrip('${t.id}');">詳細を見る</button>
+          ${IS_EDITABLE ? `<button class="cpop-btn primary" onclick="closeCalPopup(); switchTab('cards'); openModal('${t.id}');">編集する</button>` : ''}
+        </div>
+      </div>`;
+    }).join('')}
+    <button onclick="closeCalPopup()" style="width:100%; margin-top:4px; padding:10px; border-radius:10px; border:none; background:none; color:var(--text-faint); font-size:12px; cursor:pointer;">閉じる</button>
+  `;
+
+  document.getElementById('cal-popup-overlay').style.display = 'block';
+  popup.style.display = 'block';
+  // 画面中央寄せ
+  popup.style.top = '50%';
+  popup.style.left = '50%';
+  popup.style.transform = 'translate(-50%,-50%)';
+}
+function closeCalPopup(){
+  document.getElementById('cal-popup-overlay').style.display = 'none';
+  document.getElementById('cal-popup').style.display = 'none';
+}
 function calNav(dir){
   calMonth += dir;
   if(calMonth < 0){ calMonth = 11; calYear--; }
@@ -1740,6 +2042,14 @@ function positionSharePopup(){
   const btn = document.getElementById('header-share-btn');
   const popup = document.getElementById('share-popup');
   if(!btn || !popup) return;
+  if(window.innerWidth <= 640){
+    // スマホ幅ではボタン位置計算せず画面中央に固定（誤差でボタンが画面外にはみ出すのを防ぐ）
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%,-50%)';
+    return;
+  }
+  popup.style.transform = 'none';
   const rect = btn.getBoundingClientRect();
   const pw = popup.offsetWidth || 340;
   let left = rect.right - pw;
@@ -1850,11 +2160,45 @@ async function createNewNotebook(){
   }
 }
 
+/* ---------- 広告ローテーター（1枠で複数広告を順番に表示） ---------- */
+let bannerRotateTimer = null;
+let bannerIdx = 0;
+function initBannerRotator(){
+  const rotator = document.getElementById('banner-rotator');
+  const dotsBox = document.getElementById('banner-dots');
+  if(!rotator) return;
+  const allAds = BANNER_AD_GROUPS.flatMap(g=>g.ads.map(html=>({html, group:g.group})));
+  if(!allAds.length) return;
+
+  dotsBox.innerHTML = allAds.map((_,i)=>`<span class="banner-dot" onclick="gotoBanner(${i})" data-i="${i}" style="width:6px; height:6px; border-radius:50%; background:${i===0?'var(--rose)':'var(--line)'}; cursor:pointer; display:inline-block;"></span>`).join('');
+
+  function show(i){
+    bannerIdx = (i+allAds.length)%allAds.length;
+    rotator.style.opacity = '0';
+    setTimeout(()=>{
+      rotator.innerHTML = `<div style="text-align:center; max-width:100%;">${allAds[bannerIdx].html}</div>`;
+      rotator.style.opacity = '1';
+      [...dotsBox.children].forEach((el,i)=>{ el.style.background = i===bannerIdx ? 'var(--rose)' : 'var(--line)'; });
+    }, 200);
+  }
+  rotator.style.transition = 'opacity .2s';
+  window.gotoBanner = function(i){ show(i); resetBannerTimer(allAds.length); };
+  function resetBannerTimer(len){
+    clearInterval(bannerRotateTimer);
+    if(len<=1) return;
+    bannerRotateTimer = setInterval(()=> show(bannerIdx+1), 6000);
+  }
+  show(0);
+  resetBannerTimer(allAds.length);
+}
+
 function startApp(){
   showScreen('app-main');
   renderShareBanner();
   applyEditableUI();
   render();
+  scanAndScheduleAllNotifications();
+  initBannerRotator();
 }
 
 async function initApp(){
