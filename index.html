@@ -2,8 +2,17 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>遠征手帳 — アウェイ観戦管理</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/icon-192.png" type="image/png">
+<meta name="theme-color" content="#D98B96">
+<!-- iOSでホーム画面に追加した際、Safariのアドレスバー無しで全画面アプリのように起動させるための設定 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="遠征手帳">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -135,6 +144,12 @@
   /* ---------- grid ---------- */
   .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:20px; padding: 16px 5vw 40px; }
   .empty{ grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-faint); font-size:13.5px; border:1.5px dashed var(--line); border-radius: var(--radius); }
+  .empty-state{ grid-column:1/-1; text-align:center; padding:50px 24px; border:1.5px dashed var(--line); border-radius: var(--radius); }
+  .empty-icon{ font-size:40px; margin-bottom:10px; }
+  .empty-title{ font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--text); margin-bottom:8px; }
+  .empty-desc{ font-size:12.5px; color:var(--text-faint); line-height:1.8; }
+  /* 予算オーバー警告バナー */
+  .budget-alert{ background:#FBEAEA; border:1.5px solid #E08585; border-radius:14px; padding:12px 16px; margin:0 5vw 14px; display:flex; align-items:center; gap:10px; font-size:12.5px; color:#A93F3F; font-weight:700; }
 
   /* ---------- ticket card ---------- */
   .ticket{ background: var(--surface); border-radius: var(--radius); box-shadow: 0 6px 20px rgba(74,63,58,0.06); position:relative; overflow:hidden; display:flex; flex-direction:column; scroll-margin-top:20px; }
@@ -224,6 +239,13 @@
   .cat-panel .field input{ width:100%; background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:12.5px; font-family:var(--font-body); }
   .cat-panel .field input:focus{ outline:2px solid var(--rose); }
   .done-toggle{ display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:700; color:var(--sage); background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:9px 12px; cursor:pointer; }
+  /* 予約状態の3択セグメントコントロール（未予約／予約済み／不要） */
+  .status-segment{ display:flex; gap:4px; background:var(--surface-2); border-radius:10px; padding:4px; }
+  .seg-btn{ flex:1; border:none; background:none; padding:9px 6px; border-radius:8px; font-family:var(--font-body); font-weight:700; font-size:12px; color:var(--text-faint); cursor:pointer; min-height:38px; transition:.15s; }
+  .seg-btn.active{ background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); color:var(--rose-deep); }
+  .seg-btn.seg-done.active{ color:var(--sage); }
+  .seg-btn.seg-skip.active{ color:var(--text-dim); }
+  .cat-banner-box{ margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
   .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
   .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
   .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
@@ -366,6 +388,7 @@
   <div id="share-popup-mode-label" style="font-size:12px; color:var(--text-dim); margin-bottom:16px;"></div>
   <div id="share-popup-edit-section"></div>
   <div id="share-popup-view-section"></div>
+  <div id="share-popup-line-section"></div>
   <div id="share-popup-readonly-msg"></div>
   <button onclick="closeSharePopup()" style="width:100%; margin-top:14px; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:none; font-family:var(--font-display); font-weight:700; font-size:14px; cursor:pointer; color:var(--text-dim);">閉じる</button>
 </div>
@@ -385,6 +408,7 @@
 </div>
 
 <div id="app-main" style="display:none;">
+<div id="a2hs-banner" style="display:none;"></div>
 <div class="tabs">
   <button class="tab" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
   <button class="tab active" id="tab-calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
@@ -392,6 +416,7 @@
 </div>
 
 <div class="panel" id="panel-cards">
+  <div id="budget-alert-banner"></div>
   <div id="hero"></div>
   <div class="alerts" id="alerts"></div>
   <div class="summary" id="summary"></div>
@@ -420,7 +445,7 @@
 <div id="cal-popup" style="display:none; position:fixed; z-index:301; background:var(--surface); border-radius:20px; padding:20px; box-shadow:0 8px 40px rgba(0,0,0,0.2); width:min(360px,92vw); max-height:70vh; overflow-y:auto;"></div>
 
 <!-- スケジュールまとめ入力モーダル -->
-<div class="overlay" id="schedule-import-overlay">
+<div class="overlay" id="schedule-import-overlay" onclick="if(event.target===this) closeScheduleImport();">
   <div class="modal">
     <div class="modal-title" id="modal-title-si">スケジュールをまとめて入力</div>
     <div class="modal-sub">公式サイトやLINEメモなどからコピーしたスケジュールテキストを貼り付けると、AIが試合を自動検出して登録します。</div>
@@ -448,7 +473,7 @@
 </div>
 <footer>遠征手帳 — 記事内のリンクには広告(アフィリエイトリンク)を含みます【PR】　<a href="/about.html" style="color:inherit;">サイトについて</a>　<a href="/privacy.html" style="color:inherit;">プライバシーポリシー</a></footer>
 
-<div class="overlay" id="overlay">
+<div class="overlay" id="overlay" onclick="if(event.target===this) closeModal();">
   <div class="modal">
     <h2 id="modal-title">新しい遠征を登録</h2>
     <p class="modal-sub" id="modal-sub">日程が決まったらまとめて登録できます。同じチームの試合は「登録して続けて追加」が便利です。</p>
@@ -503,7 +528,7 @@
   </div>
 </div>
 
-<div class="overlay" id="copy-overlay">
+<div class="overlay" id="copy-overlay" onclick="if(event.target===this) closeCopyModal();">
   <div class="modal">
     <h2 id="copy-title">情報をコピー</h2>
     <p class="modal-sub" id="copy-sub">コピー先の遠征を選んでください（複数選択できます）。</p>
@@ -547,7 +572,8 @@ function today(){ return new Date().toISOString().slice(0,10); }
 const TODAY = today();
 
 const CATS = [
-  {key:'transport', label:'交通', icon:'🚄', bookable:true},
+  {key:'transport_outbound', label:'交通(往路)', icon:'🚄', bookable:true},
+  {key:'transport_return', label:'交通(復路)', icon:'🚅', bookable:true},
   {key:'ticket', label:'チケット', icon:'🎫', bookable:true},
   {key:'hotel', label:'宿泊', icon:'🏨', bookable:true},
   {key:'food', label:'飲食', icon:'🍜', bookable:false},
@@ -727,22 +753,36 @@ function getMatchValue(){
 function renderTeamDatalist(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
+  const noTeamData = teams.length === 0; // 「その他」競技などチーム候補が無い場合
   // selectを再構築
   const tSel = document.getElementById('f-team-select');
   tSel.innerHTML = '<option value="">チームを選択してください</option>' +
-    teams.map(t=>`<option value="${t.name}">${t.name}${t.arena?' ('+t.arena+')':''}</option>`).join('');
-  tSel.style.display = 'block';
-  document.getElementById('f-team').style.display = 'none';
+    teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
   document.getElementById('f-team').value = '';
-  document.getElementById('team-manual-toggle').textContent = '✏️ 手入力に切り替え';
   // 対戦相手selectも初期化
   const mSel = document.getElementById('f-match-select');
   mSel.innerHTML = '<option value="">相手チームを選択してください</option>' +
     teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
-  mSel.style.display = 'block';
-  document.getElementById('f-match').style.display = 'none';
   document.getElementById('f-match').value = '';
-  document.getElementById('match-manual-toggle').textContent = '✏️ 手入力に切り替え';
+
+  if(noTeamData){
+    // チーム候補が無い競技は、プルダウンを出さず最初から手入力欄を表示する
+    tSel.style.display = 'none';
+    document.getElementById('f-team').style.display = 'block';
+    document.getElementById('team-manual-toggle').style.display = 'none';
+    mSel.style.display = 'none';
+    document.getElementById('f-match').style.display = 'block';
+    document.getElementById('match-manual-toggle').style.display = 'none';
+  }else{
+    tSel.style.display = 'block';
+    document.getElementById('f-team').style.display = 'none';
+    document.getElementById('team-manual-toggle').style.display = 'inline-block';
+    document.getElementById('team-manual-toggle').textContent = '✏️ 手入力に切り替え';
+    mSel.style.display = 'block';
+    document.getElementById('f-match').style.display = 'none';
+    document.getElementById('match-manual-toggle').style.display = 'inline-block';
+    document.getElementById('match-manual-toggle').textContent = '✏️ 手入力に切り替え';
+  }
   document.getElementById('venue-suggest-note').textContent = '';
   homeAwayMode = null;
   updateHomeAwayUI();
@@ -862,29 +902,41 @@ function handleOpponentInput(){
   if(homeAwayMode === 'AWAY') setHomeAway('AWAY');
 }
 
+// テキストリンク形式で表示するPR（各カテゴリの主要リンクのみ）
 const PR_LINKS = {
   hotel: [
     {label:'楽天トラベルで探す【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713301&p_id=55&pc_id=55&pl_id=624'},
     {label:'JTBで宿・ツアーを探す【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDSJJAQ%2B15A4%2B1TIR4H'},
-    {label:'イオントラベルで探す【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KU%2BLFMK2%2B5RZ8%2B5YJRM'},
-    {label:'じゃらんで探す', url:'https://www.jalan.net/'},
   ],
-  transport: [
-    {label:'格安航空券を比較【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B88SV%2B1HL182%2B3UZC%2B60WN5'},
-    {label:'たびらい レンタカー比較【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE2NWKY%2B1EQO%2BTV3PD'},
-    {label:'夜行・高速バス エアトリ【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE0VLRM%2BAD2%2B3H18R6'},
-    {label:'カーシェア EARTHCAR【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDZOQK2%2B43U8%2BHV7V6'},
-    {label:'新幹線予約(楽天トラベル)', url:'https://travel.rakuten.co.jp/'},
-  ],
-  ticket: [
-    {label:'チケット購入(ぴあ)', url:'https://t.pia.jp/'},
-    {label:'イープラス', url:'https://eplus.jp/'},
-  ],
+  transport_outbound: [],
+  transport_return: [],
+  ticket: [],
   food: [
     {label:'お店を予約(ホットペッパー)', url:'https://www.hotpepper.jp/'},
+    {label:'食べログで探す', url:'https://tabelog.com/'},
   ],
   other: [
     {label:'楽天市場で遠征グッズ【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713296&p_id=54&pc_id=54&pl_id=616'},
+  ],
+};
+
+// カテゴリ内に埋め込むバナー形式の広告（トップ下と同じローテーター表示。複数あれば自動で切り替わる）
+const CAT_BANNER_ADS = {
+  hotel: [
+    `<a href="https://www.jalan.net/" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">じゃらんで宿・ツアーを探す</a>`,
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KU%2BLFMK2%2B5RZ8%2B5YJRM" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">WAON POINTがたまる！【イオンコンパストラベルモール】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
+  ],
+  transport_outbound: [
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B88SV%2B1HL182%2B3UZC%2B60WN5" rel="nofollow" target="_blank"><img border="0" width="728" height="90" alt="格安航空券モール" src="https://www23.a8.net/svt/bgt?aid=260725135090&wid=001&eno=01&mid=s00000018012001012000&mc=1" style="max-width:100%; height:auto;"></a>`,
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE2NWKY%2B1EQO%2BTV3PD" rel="nofollow" target="_blank"><img border="0" width="234" height="60" alt="たびらい レンタカー比較" src="https://www25.a8.net/svt/bgt?aid=260726140851&wid=001&eno=01&mid=s00000006576005016000&mc=1" style="max-width:100%; height:auto;"></a>`,
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE0VLRM%2BAD2%2B3H18R6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">夜行・高速バスの予約なら【エアトリ】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDZOQK2%2B43U8%2BHV7V6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">月額無料の超おトクなカーシェア「EARTHCAR」<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
+  ],
+  transport_return: [
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B88SV%2B1HL182%2B3UZC%2B60WN5" rel="nofollow" target="_blank"><img border="0" width="728" height="90" alt="格安航空券モール" src="https://www23.a8.net/svt/bgt?aid=260725135090&wid=001&eno=01&mid=s00000018012001012000&mc=1" style="max-width:100%; height:auto;"></a>`,
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE2NWKY%2B1EQO%2BTV3PD" rel="nofollow" target="_blank"><img border="0" width="234" height="60" alt="たびらい レンタカー比較" src="https://www25.a8.net/svt/bgt?aid=260726140851&wid=001&eno=01&mid=s00000006576005016000&mc=1" style="max-width:100%; height:auto;"></a>`,
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE0VLRM%2BAD2%2B3H18R6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">夜行・高速バスの予約なら【エアトリ】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
+    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDZOQK2%2B43U8%2BHV7V6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">月額無料の超おトクなカーシェア「EARTHCAR」<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
   ],
 };
 
@@ -913,6 +965,11 @@ const BANNER_AD_GROUPS = [
 
 // 後方互換性のためBanner_ADSも残す
 const BANNER_ADS = BANNER_AD_GROUPS.flatMap(g=>g.ads.map(html=>({html, label:g.group})));
+
+// 会場名からGoogleマップの検索URLを組み立てる（APIキー不要）
+function mapUrl(venueName){
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueName)}`;
+}
 
 function fmtDate(iso){
   if(!iso) return {md:'--', dow:''};
@@ -955,7 +1012,7 @@ function renderHero(){
   if(!upcoming.length){ box.innerHTML=''; return; }
   const t = upcoming[0];
   const d = daysUntil(t.date);
-  const pending = BOOKABLE_CATS.filter(k=>!t.status[k]);
+  const pending = BOOKABLE_CATS.filter(k=>!t.status[k] && !t.detail[k]?.notNeeded);
   const catInfo = k => CATS.find(c=>c.key===k);
   box.innerHTML = `
     <div class="hero" onclick="focusTrip('${t.id}')">
@@ -980,7 +1037,7 @@ function renderAlerts(){
   const items = [];
   trips.filter(t=>new Date(t.date) >= new Date(TODAY)).forEach(t=>{
     BOOKABLE_CATS.forEach(key=>{
-      if(!t.status[key]) items.push({trip:t, key});
+      if(!t.status[key] && !t.detail[key]?.notNeeded) items.push({trip:t, key});
     });
   });
   items.sort((a,b)=> new Date(a.trip.date) - new Date(b.trip.date));
@@ -1065,29 +1122,50 @@ function renderFilters(){
 }
 function setFilter(s){ sportFilter = s; render(); }
 
+function statusSegment(t, c){
+  if(!IS_EDITABLE){
+    const notNeeded = !!t.detail[c.key]?.notNeeded;
+    const label = notNeeded ? '対象外' : (t.status[c.key] ? '予約済み' : '未予約');
+    return `<div style="font-size:12px; color:var(--text-dim); font-weight:700;">${label}</div>`;
+  }
+  const notNeeded = !!t.detail[c.key]?.notNeeded;
+  const done = t.status[c.key];
+  const state = notNeeded ? 'skip' : (done ? 'done' : 'pending');
+  return `
+    <div class="status-segment">
+      <button type="button" class="seg-btn ${state==='pending'?'active':''}" onclick="setCatState('${t.id}','${c.key}','pending')">未予約</button>
+      <button type="button" class="seg-btn seg-done ${state==='done'?'active':''}" onclick="setCatState('${t.id}','${c.key}','done')">予約済み</button>
+      <button type="button" class="seg-btn seg-skip ${state==='skip'?'active':''}" onclick="setCatState('${t.id}','${c.key}','skip')">不要</button>
+    </div>`;
+}
+
 function catPanelContent(t, c){
   const d = t.detail[c.key];
-  const notNeeded = !!d?.notNeeded;
-  const notNeededChk = IS_EDITABLE
-    ? `<label class="done-toggle" style="color:var(--text-faint); margin-top:4px;"><input type="checkbox" ${notNeeded?'checked':''} onchange="setNotNeeded('${t.id}','${c.key}',this.checked)"> このカテゴリは不要（進捗から除外）</label>`
-    : '';
-  const saleInfo = c.key==='ticket' ? parseSaleInfo(d.memo) : null;
+  const segment = statusSegment(t, c);
   const saleBlock = c.key==='ticket' ? `
     <div style="background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:2px;">
       <div style="font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px;">🔔 チケット発売日リマインダー</div>
       <div class="field-row">
-        <div class="field"><label>発売日</label><input type="date" value="${saleInfo.date||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',this.value,null,null)"`:'disabled'}></div>
-        <div class="field"><label>発売時刻</label><input type="time" value="${saleInfo.time||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',null,this.value,null)"`:'disabled'}></div>
+        <div class="field"><label>発売日</label><input type="date" value="${d.saleDate||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',this.value,null,null)"`:'disabled'}></div>
+        <div class="field"><label>発売時刻</label><input type="time" value="${d.saleTime||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',null,this.value,null)"`:'disabled'}></div>
       </div>
-      ${IS_EDITABLE ? `<label class="done-toggle" style="margin-top:6px;"><input type="checkbox" ${saleInfo.notify?'checked':''} onchange="handleNotifyToggle('${t.id}',this)" ${(!saleInfo.date||!saleInfo.time)?'disabled':''}> この時間に通知する（このブラウザを開いている間）</label>` : ''}
-      ${saleInfo.date && saleInfo.time ? `<div style="font-size:10.5px; color:#8a6d1f; margin-top:4px;">${saleInfo.notify ? '✅ 通知予約済み' : '通知はオフです'}</div>` : ''}
+      ${IS_EDITABLE ? `<label class="done-toggle" style="margin-top:6px;"><input type="checkbox" ${d.notifyOnSale?'checked':''} onchange="handleNotifyToggle('${t.id}',this)" ${(!d.saleDate||!d.saleTime)?'disabled':''}> この時間に通知する（このブラウザを開いている間）</label>` : ''}
+      ${d.saleDate && d.saleTime ? `<div style="font-size:10.5px; color:#8a6d1f; margin-top:4px;">${d.notifyOnSale ? '✅ 通知予約済み' : '通知はオフです'}</div>` : ''}
     </div>` : '';
+
+  const catBannerBlock = CAT_BANNER_ADS[c.key] ? (()=>{
+    const rotId = `catban-${t.id}-${c.key}`;
+    return `<div class="cat-banner-box">
+      <div id="${rotId}" data-cat-banner="${c.key}" style="min-height:50px; display:flex; align-items:center; justify-content:center;"></div>
+      <div id="${rotId}-dots" style="display:flex; gap:5px; justify-content:center; margin-top:6px;"></div>
+    </div>`;
+  })() : '';
+
   if(!c.bookable){
     return `
       <div class="cat-panel">
         <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="お店の名前など"></div>
-        ${IS_EDITABLE ? `<label class="done-toggle"><input type="checkbox" ${t.status[c.key]?'checked':''} onchange="setStatus('${t.id}','${c.key}',this.checked)"> 予定を決めた（完了）</label>` : ''}
-        ${notNeededChk}
+        ${segment}
         ${c.key==='food' ? `<div class="pr-row">${PR_LINKS.food.map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
         ${c.key==='other' ? `<div class="pr-row">${(PR_LINKS.other||[]).map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
       </div>`;
@@ -1103,12 +1181,13 @@ function catPanelContent(t, c){
         <div class="field"><label>金額</label><input type="number" value="${d.cost||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
         <div class="field"><label>詳細メモ</label><input value="${(saleInfo?saleInfo.rest:(d.memo||'')).replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="座席・便名など"></div>
       </div>
-      ${IS_EDITABLE ? `<label class="done-toggle"><input type="checkbox" ${t.status[c.key]?'checked':''} onchange="setStatus('${t.id}','${c.key}',this.checked)"> 予約完了としてマークする</label>` : ''}
-      ${notNeededChk}
+      ${segment}
       ${(IS_EDITABLE && (d.method || d.bookedDate || d.memo)) ? `<button class="copy-btn" onclick="openCopyModal('${t.id}','${c.key}')">📋 この${c.label}情報を他の遠征にもコピー（連泊・同じ移動手段など）</button>` : ''}
-      <div class="pr-row">${(PR_LINKS[c.key]||[]).map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>
+      ${(PR_LINKS[c.key]||[]).length ? `<div class="pr-row">${(PR_LINKS[c.key]||[]).map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
+      ${catBannerBlock}
     </div>`;
 }
+
 
 function renderTicketCard(t, isPast){
   const {md, dow} = fmtDate(t.date);
@@ -1119,7 +1198,7 @@ function renderTicketCard(t, isPast){
         <div>
           <span class="sport-tag">${t.sport} / ${t.team}</span>
           <div class="matchup">${t.match}</div>
-          <div class="venue">${t.venue}</div>
+          <div class="venue">${t.venue}${t.venue ? ` <a href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--rose-deep); text-decoration:none; font-size:11px; font-weight:700;">🗺️ 地図</a>` : ''}</div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
         </div>
         <div class="date-block">
@@ -1177,8 +1256,13 @@ function renderGrid(){
 
   if(!upcoming.length && !past.length){
     grid.innerHTML = IS_EDITABLE
-      ? `<div class="empty">まだ遠征が登録されていません。「＋ 新しい遠征を追加」から最初の一件を登録しましょう。</div>`
-      : `<div class="empty">まだ遠征が登録されていません。</div>`;
+      ? `<div class="empty-state">
+          <div class="empty-icon">🎟️</div>
+          <div class="empty-title">まだ遠征が登録されていません</div>
+          <div class="empty-desc">下の「＋ 新しい遠征を追加」から、最初の1件を登録してみましょう。<br>試合日・会場・予約状況をまとめて管理できます。</div>
+          <button class="add-btn" onclick="openModal()" style="margin-top:14px;">＋ 最初の遠征を追加する</button>
+        </div>`
+      : `<div class="empty-state"><div class="empty-icon">🎟️</div><div class="empty-title">まだ遠征が登録されていません</div></div>`;
     renderPastToggle(0);
     return;
   }
@@ -1216,12 +1300,22 @@ function toggleCat(tripId, key){
   const k = `${tripId}:${key}`;
   if(catOpen.has(k)) catOpen.delete(k); else catOpen.add(k);
   render();
+  setTimeout(initCategoryBannerRotators, 50);
 }
 function renderBudgetBox(){
   const totalCost = trips.reduce((s,t)=>s+(t.cost||0),0);
   const box = document.getElementById('budget-box');
   const pct = budgetCap>0 ? Math.min(100, Math.round(totalCost/budgetCap*100)) : 0;
   const over = budgetCap>0 && totalCost>budgetCap;
+
+  // カード一覧の一番上に出す、より目立つ予算超過バナー
+  const alertBox = document.getElementById('budget-alert-banner');
+  if(alertBox){
+    alertBox.innerHTML = over
+      ? `<div class="budget-alert">⚠️ シーズン予算の上限（¥${budgetCap.toLocaleString()}）を ¥${(totalCost-budgetCap).toLocaleString()} 超えています</div>`
+      : '';
+  }
+
   box.innerHTML = `
     <div class="budget-box">
       <div class="budget-row1">
@@ -1268,7 +1362,11 @@ async function saveBookingDetail(tripId, key, patch){
       p_method: merged.method || null,
       p_booked_at: merged.bookedDate || null,
       p_cost: (merged.cost !== undefined && merged.cost !== null && merged.cost !== '') ? (parseInt(merged.cost)||0) : null,
-      p_memo: merged.memo || null
+      p_memo: merged.memo || null,
+      p_is_not_needed: !!merged.notNeeded,
+      p_sale_date: merged.saleDate || null,
+      p_sale_time: merged.saleTime || null,
+      p_notify_on_sale: !!merged.notifyOnSale
     });
     if(error) throw error;
   }catch(e){
@@ -1278,37 +1376,21 @@ async function saveBookingDetail(tripId, key, patch){
 }
 
 /* ---------- チケット発売日リマインダー ---------- */
-// memoフィールドに軽量マーカー [[SALE:YYYY-MM-DD|HH:MM|1]] を埋め込んで保存（notNeededと同じ手法）
-function parseSaleInfo(memo){
-  const m = (memo||'').match(/\[\[SALE:([^|]*)\|([^|]*)\|([01])\]\]/);
-  const rest = (memo||'').replace(/\[\[SALE:[^\]]*\]\]\s*/, '');
-  if(!m) return { date:'', time:'', notify:false, rest };
-  return { date:m[1], time:m[2], notify:m[3]==='1', rest };
-}
-function buildMemoWithSale(rest, date, time, notify){
-  if(!date && !time) return rest;
-  return `[[SALE:${date||''}|${time||''}|${notify?'1':'0'}]] ${rest||''}`.trim();
-}
-
+// sale_date / sale_time / notify_on_sale は正式カラム（003マイグレーション以降）
 async function updateSaleInfo(tripId, newDate, newTime, newNotify){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
-  const cur = parseSaleInfo(t.detail.ticket.memo);
-  const date = newDate!==null ? newDate : cur.date;
-  const time = newTime!==null ? newTime : cur.time;
-  const notify = newNotify!==null ? newNotify : cur.notify;
-  const newMemo = buildMemoWithSale(cur.rest, date, time, notify && date && time);
-  await saveBookingDetail(tripId, 'ticket', { memo: newMemo });
-  if(notify && date && time) scheduleTicketNotification(t, date, time);
+  const cur = t.detail.ticket;
+  const saleDate = newDate!==null ? newDate : cur.saleDate;
+  const saleTime = newTime!==null ? newTime : cur.saleTime;
+  const notifyOnSale = newNotify!==null ? newNotify : cur.notifyOnSale;
+  await saveBookingDetail(tripId, 'ticket', { saleDate, saleTime, notifyOnSale: !!(notifyOnSale && saleDate && saleTime) });
+  if(notifyOnSale && saleDate && saleTime) scheduleTicketNotification(t, saleDate, saleTime);
 }
-async function updateTicketMemo(tripId, restText){
+async function updateTicketMemo(tripId, memoText){
   if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  if(!t) return;
-  const cur = parseSaleInfo(t.detail.ticket.memo);
-  const newMemo = buildMemoWithSale(restText, cur.date, cur.time, cur.notify);
-  await saveBookingDetail(tripId, 'ticket', { memo: newMemo });
+  await saveBookingDetail(tripId, 'ticket', { memo: memoText });
 }
 
 // ブラウザを開いている間だけ有効なリマインダー（真のプッシュ通知にはservice worker+サーバー側配信が別途必要）
@@ -1330,9 +1412,9 @@ function scheduleTicketNotification(t, date, time){
 function scanAndScheduleAllNotifications(){
   if(!('Notification' in window)) return;
   trips.forEach(t=>{
-    const info = parseSaleInfo(t.detail?.ticket?.memo);
-    if(info.notify && info.date && info.time){
-      scheduleTicketNotification(t, info.date, info.time);
+    const d = t.detail?.ticket;
+    if(d && d.notifyOnSale && d.saleDate && d.saleTime){
+      scheduleTicketNotification(t, d.saleDate, d.saleTime);
     }
   });
 }
@@ -1350,16 +1432,20 @@ async function handleNotifyToggle(tripId, checkbox){
   updateSaleInfo(tripId, null, null, checkbox.checked);
 }
 
-function setNotNeeded(tripId, key, val){
+// 「未予約／予約済み／不要」の3択をまとめて扱う統合関数（保存は1回のリクエストで完結させる）
+function setCatState(tripId, key, state){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
-  t.detail[key] = { ...t.detail[key], notNeeded: val };
-  if(val) t.status[key] = false;
-  // DB側: memoフィールドに"__notNeeded__"フラグを付与して保存（シンプルな暫定実装）
-  saveBookingDetail(tripId, key, { memo: val ? '__notNeeded__' : (t.detail[key].memo||'').replace('__notNeeded__',''), is_booked: false });
-  render();
+  const c = CATS.find(x=>x.key===key);
+  const notNeeded = state==='skip';
+  const isBooked = state==='done';
+  const patch = { notNeeded, is_booked: isBooked };
+  if(isBooked && c.bookable && !t.detail[key].bookedDate) patch.bookedDate = TODAY;
+  t.detail[key] = { ...t.detail[key], notNeeded };
+  saveBookingDetail(tripId, key, patch);
 }
+
 
 function setStatus(tripId, key, val){
   if(!IS_EDITABLE) return;
@@ -1523,12 +1609,14 @@ function fillModalFields(t){
   renderTeamDatalist();
   const tSel3=document.getElementById('f-team-select'); const tInp3=document.getElementById('f-team');
   const tOpt3=[...tSel3.options].find(o=>o.value===t.team);
-  if(tOpt3){tSel3.value=t.team; tSel3.style.display='block'; tInp3.style.display='none';}
-  else{tSel3.style.display='none'; tInp3.style.display='block'; tInp3.value=t.team||'';}
+  const teamToggleBtn = document.getElementById('team-manual-toggle');
+  if(tOpt3){tSel3.value=t.team; tSel3.style.display='block'; tInp3.style.display='none'; if(teamToggleBtn) teamToggleBtn.textContent='✏️ 手入力に切り替え';}
+  else{tSel3.style.display='none'; tInp3.style.display='block'; tInp3.value=t.team||''; if(teamToggleBtn) teamToggleBtn.textContent='← リストに戻る';}
   const mSel3=document.getElementById('f-match-select'); const mInp3=document.getElementById('f-match');
   const mOpt3=[...mSel3.options].find(o=>o.value===t.match);
-  if(mOpt3){mSel3.value=t.match; mSel3.style.display='block'; mInp3.style.display='none';}
-  else{mSel3.style.display='none'; mInp3.style.display='block'; mInp3.value=t.match||'';}
+  const matchToggleBtn = document.getElementById('match-manual-toggle');
+  if(mOpt3){mSel3.value=t.match; mSel3.style.display='block'; mInp3.style.display='none'; if(matchToggleBtn) matchToggleBtn.textContent='✏️ 手入力に切り替え';}
+  else{mSel3.style.display='none'; mInp3.style.display='block'; mInp3.value=t.match||''; if(matchToggleBtn) matchToggleBtn.textContent='← リストに戻る';}
 
   document.getElementById('f-date').value = t.date || '';
   document.getElementById('f-time').value = t.time || '';
@@ -1707,10 +1795,13 @@ function showToast(msg){
 }
 function buildTripShareText(t){
   const catInfo = k => CATS.find(c=>c.key===k);
-  const lines = [`【${t.team}】${t.match}`, `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time||''}　@${t.venue||'会場未定'}`, ''];
+  const lines = [`【${t.team}】${t.match}`, `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time||''}　@${t.venue||'会場未定'}`];
+  if(t.venue) lines.push(`🗺️ ${mapUrl(t.venue)}`);
+  lines.push('');
   CATS.forEach(c=>{
-    const done = t.status[c.key];
     const d = t.detail[c.key];
+    if(d && d.notNeeded) return; // 不要マークされたカテゴリは共有テキストから省略
+    const done = t.status[c.key];
     let line = `${done?'✅':'⬜️'} ${c.icon} ${c.label}`;
     if(done && c.bookable && d.method) line += `：${d.method}`;
     if(done && !c.bookable && d.memo) line += `：${d.memo}`;
@@ -1741,7 +1832,7 @@ function shareAll(){
   if(!upcoming.length){ showToast('共有できる今後の遠征がありません'); return; }
   const lines = ['📋 今後の遠征一覧', ''];
   upcoming.forEach(t=>{
-    const pending = BOOKABLE_CATS.filter(k=>!t.status[k]).map(k=>CATS.find(c=>c.key===k).label);
+    const pending = BOOKABLE_CATS.filter(k=>!t.status[k] && !t.detail[k]?.notNeeded).map(k=>CATS.find(c=>c.key===k).label);
     lines.push(`・${fmtDate(t.date).md} ${t.team} ${t.match}（準備${completion(t)}%）${pending.length? '　未予約:'+pending.join('・') : '　準備OK'}`);
   });
   lines.push('', '― 遠征手帳より');
@@ -1774,12 +1865,22 @@ function renderCalendar(){
 
   const filtered = getFilteredTrips();
   const byDate = {};
+  const saleByDate = {}; // チケット発売日（sale_date）を別途マッピング
   filtered.forEach(t=>{
-    if(!t.date) return;
-    const [ty,tm,td] = t.date.split('-').map(Number);
-    if(ty===y && tm-1===m){
-      if(!byDate[td]) byDate[td] = [];
-      byDate[td].push(t);
+    if(t.date){
+      const [ty,tm,td] = t.date.split('-').map(Number);
+      if(ty===y && tm-1===m){
+        if(!byDate[td]) byDate[td] = [];
+        byDate[td].push(t);
+      }
+    }
+    const saleDate = t.detail?.ticket?.saleDate;
+    if(saleDate){
+      const [sy,sm,sd] = saleDate.split('-').map(Number);
+      if(sy===y && sm-1===m){
+        if(!saleByDate[sd]) saleByDate[sd] = [];
+        saleByDate[sd].push(t);
+      }
     }
   });
 
@@ -1813,20 +1914,23 @@ function renderCalendar(){
         const todayCls = (!c.other && isToday(c.d)) ? 'today' : '';
         const otherCls = c.other ? 'other-month' : '';
         const clickable = !c.other;
-        return `<div class="cal-cell ${todayCls} ${otherCls} ${events.length?'has-event':''}" ${clickable?`onclick="openCalPopup(${y},${m},${c.d})"`:''}>
-          <div class="cal-date" style="color:${color};">${c.d}</div>
+        const saleEvents = c.other ? [] : (saleByDate[c.d]||[]);
+        return `<div class="cal-cell ${todayCls} ${otherCls} ${(events.length||saleEvents.length)?'has-event':''}" ${clickable?`onclick="openCalPopup(${y},${m},${c.d})"`:''}>
+          <div class="cal-date" style="color:${color}; display:flex; align-items:center; gap:3px;">${c.d}${saleEvents.length?'<span title="チケット発売日" style="font-size:9px;">🔔</span>':''}</div>
           ${events.slice(0,3).map(t=>{
             const pct = completion(t);
             return `<span class="cal-evt ${pct===100?'done':'pending'}">${t.team}</span>`;
           }).join('')}
           ${events.length>3 ? `<span style="font-size:8.5px; color:var(--text-faint);">+${events.length-3}件</span>` : ''}
+          ${(!events.length && saleEvents.length) ? saleEvents.slice(0,2).map(t=>`<span class="cal-evt" style="background:var(--butter,#E0B84A); color:#5a4213;">🎫 ${t.team}</span>`).join('') : ''}
         </div>`;
       }).join('')}
     </div>
     ${filtered.length===0 ? `<div style="text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;">${trips.length===0?'まだ遠征が登録されていません':'このフィルター条件の遠征はありません'}</div>` : ''}
-    <div style="margin-top:14px; display:flex; gap:10px; font-size:11px; color:var(--text-dim);">
+    <div style="margin-top:14px; display:flex; gap:10px; font-size:11px; color:var(--text-dim); flex-wrap:wrap;">
       <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--rose); border-radius:3px; display:inline-block;"></span>準備中</span>
       <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--sage); border-radius:3px; display:inline-block;"></span>準備完了</span>
+      <span style="display:flex; align-items:center; gap:4px;">🔔 チケット発売日</span>
     </div>
   `;
 }
@@ -1865,13 +1969,21 @@ function setCalTeamFilter(t){ calFilterTeam=t; renderCalendar(); }
 function openCalPopup(y,m,d){
   const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
   const events = getFilteredTrips().filter(t=>t.date===dateStr);
+  const saleEvents = getFilteredTrips().filter(t=>t.detail?.ticket?.saleDate===dateStr);
   const popup = document.getElementById('cal-popup');
   const dow = ['日','月','火','水','木','金','土'][new Date(y,m,d).getDay()];
 
+  const saleBlock = saleEvents.length ? `
+    <div style="background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-bottom:10px;">
+      <div style="font-size:12px; font-weight:700; color:#8a6d1f; margin-bottom:4px;">🔔 この日はチケット発売日です</div>
+      ${saleEvents.map(t=>`<div style="font-size:12px; color:#8a6d1f;">${t.team} ${t.match||''}　${t.detail.ticket.saleTime||''}〜</div>`).join('')}
+    </div>` : '';
+
   popup.innerHTML = `
     <div class="cpop-date">${m+1}月${d}日（${dow}）</div>
+    ${saleBlock}
     ${events.length===0 ? `
-      <div style="text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;">この日の遠征はありません</div>
+      <div style="text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;">${saleEvents.length ? '' : 'この日の遠征はありません'}</div>
       ${IS_EDITABLE ? `<button class="cpop-btn primary" style="width:100%;" onclick="closeCalPopup(); openModal(); document.getElementById('f-date').value='${dateStr}';">＋ この日に遠征を追加</button>` : ''}
     ` : events.map(t=>{
       const pct = completion(t);
@@ -2006,11 +2118,12 @@ function normalizeTrip(raw){
   const status = {}, detail = {};
   CATS.forEach(c=>{
     const bd = (raw.booking_details||[]).find(x=>x.category===c.key) || {};
-    const isNotNeeded = (bd.memo||'').includes('__notNeeded__');
     status[c.key] = !!bd.is_booked;
+    const base = { memo: bd.memo || '', notNeeded: !!bd.is_not_needed };
     detail[c.key] = c.bookable
-      ? { method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0, memo: (bd.memo||'').replace('__notNeeded__','').trim(), notNeeded: isNotNeeded }
-      : { memo: (bd.memo||'').replace('__notNeeded__','').trim(), notNeeded: isNotNeeded };
+      ? { ...base, method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0,
+          saleDate: bd.sale_date || '', saleTime: bd.sale_time ? String(bd.sale_time).slice(0,5) : '', notifyOnSale: !!bd.notify_on_sale }
+      : base;
   });
   return {
     id: raw.id,
@@ -2035,6 +2148,8 @@ async function fetchNotebook(token){
   SHARE_TOKEN = IS_EDITABLE ? (notebook.share_token || null) : null;
   budgetCap = notebook.budget_cap || 0;
   trips = (data.trips || []).map(normalizeTrip);
+  // ホーム画面アイコンなど、URLのハッシュが失われるケースに備えてローカルに最終アクセストークンを保存
+  try{ localStorage.setItem('ensei_last_token', token); }catch(e){ /* private browsing等で保存できない場合は無視 */ }
 }
 
 /* ---------- link-based persistence (no login) ---------- */
@@ -2065,11 +2180,12 @@ function openSharePopup(){
   const editSection = document.getElementById('share-popup-edit-section');
   const viewSection = document.getElementById('share-popup-view-section');
   const readonlyMsg = document.getElementById('share-popup-readonly-msg');
+  const lineSection = document.getElementById('share-popup-line-section');
 
   if(IS_EDITABLE){
     modeLabel.textContent = '編集リンクまたは閲覧専用リンクをコピーできます';
     editSection.innerHTML = `
-      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\'")}','edit')">
+      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\\'")}','edit')">
         <span class="sab-icon">✏️</span>
         <span class="sab-body">
           <div class="sab-title">編集リンクをコピー</div>
@@ -2077,7 +2193,7 @@ function openSharePopup(){
         </span>
       </button>`;
     viewSection.innerHTML = shareUrl ? `
-      <button class="share-action-btn" onclick="popupCopy('${shareUrl.replace(/'/g,"\'")}','view')">
+      <button class="share-action-btn" onclick="popupCopy('${shareUrl.replace(/'/g,"\\'")}','view')">
         <span class="sab-icon">👀</span>
         <span class="sab-body">
           <div class="sab-title">閲覧専用リンクをコピー</div>
@@ -2089,7 +2205,7 @@ function openSharePopup(){
     modeLabel.textContent = 'これは閲覧専用リンクです';
     editSection.innerHTML = '';
     viewSection.innerHTML = `
-      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\'")}','view')">
+      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\\'")}','view')">
         <span class="sab-icon">🔗</span>
         <span class="sab-body">
           <div class="sab-title">このリンクをコピー</div>
@@ -2097,6 +2213,18 @@ function openSharePopup(){
         </span>
       </button>`;
     readonlyMsg.innerHTML = '<div style="font-size:12px; color:var(--text-dim); text-align:center; padding:4px 0;">編集リンクをお持ちの方からリンクをもらってください</div>';
+  }
+
+  // LINEでの直接共有（今開いているリンクをそのまま送る）
+  if(lineSection){
+    lineSection.innerHTML = `
+      <button class="share-action-btn" onclick="shareViaLine('${editUrl.replace(/'/g,"\\'")}')">
+        <span class="sab-icon">💬</span>
+        <span class="sab-body">
+          <div class="sab-title">LINEで送る</div>
+          <div class="sab-sub">このリンクをLINEで直接共有します</div>
+        </span>
+      </button>`;
   }
 
   document.getElementById('share-popup-overlay').style.display = 'block';
@@ -2117,6 +2245,14 @@ async function popupCopy(url, type){
   }catch(e){
     showToast('コピーに失敗しました。もう一度お試しください');
   }
+}
+
+// LINEの公式共有スキームを使って、そのままLINEアプリ（またはLINE Web）にリンクを渡す
+function shareViaLine(url){
+  const text = notebook?.title ? `${notebook.title}（遠征手帳）` : '遠征手帳';
+  const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text + '\n' + url)}`;
+  window.open(lineUrl, '_blank');
+  closeSharePopup();
 }
 
 async function copyShareLink(url){
@@ -2142,6 +2278,42 @@ function showScreen(name){
   });
 }
 
+/* ---------- ホーム画面に追加のサジェスト ---------- */
+function detectPlatform(){
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isAndroid = /Android/.test(ua);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  return { isIOS, isAndroid, isStandalone };
+}
+function showAddToHomeScreenSuggestion(){
+  const { isIOS, isAndroid, isStandalone } = detectPlatform();
+  if(isStandalone) return; // すでにホーム画面から起動している場合は不要
+  let dismissed = false;
+  try{ dismissed = localStorage.getItem('ensei_a2hs_dismissed') === '1'; }catch(e){}
+  if(dismissed) return;
+
+  const box = document.getElementById('a2hs-banner');
+  if(!box) return;
+  const steps = isIOS
+    ? '画面下の <b>共有ボタン(□に↑)</b> をタップ →「<b>ホーム画面に追加</b>」を選択'
+    : isAndroid
+    ? '右上の <b>⋮メニュー</b> をタップ →「<b>ホーム画面に追加</b>」または「<b>アプリをインストール</b>」を選択'
+    : 'お使いのブラウザのメニューから「ホーム画面に追加」または「インストール」を選択';
+  box.innerHTML = `
+    <div style="background:var(--rose-wash); border:1.5px solid var(--rose); border-radius:14px; padding:16px 18px; margin:0 5vw 16px; position:relative;">
+      <button onclick="dismissA2HS()" style="position:absolute; top:8px; right:10px; background:none; border:none; font-size:16px; color:var(--text-faint); cursor:pointer; padding:6px;">✕</button>
+      <div style="font-family:var(--font-display); font-weight:900; font-size:14px; margin-bottom:6px; color:var(--rose-deep);">📱 ホーム画面に追加しませんか？</div>
+      <div style="font-size:12.5px; line-height:1.8; color:var(--text);">${steps}すると、アプリのようにワンタップで開けるようになります。</div>
+    </div>`;
+  box.style.display = 'block';
+}
+function dismissA2HS(){
+  const box = document.getElementById('a2hs-banner');
+  if(box) box.style.display = 'none';
+  try{ localStorage.setItem('ensei_a2hs_dismissed', '1'); }catch(e){}
+}
+
 async function createNewNotebook(){
   const btns = document.querySelectorAll('#landing-create-btn, #error-screen .add-btn');
   btns.forEach(b=>{ b.disabled = true; });
@@ -2153,6 +2325,7 @@ async function createNewNotebook(){
     showScreen('loading-screen');
     await fetchNotebook(row.edit_token);
     startApp();
+    showAddToHomeScreenSuggestion();
   }catch(e){
     console.error(e);
     btns.forEach(b=>{ b.disabled = false; });
@@ -2163,33 +2336,56 @@ async function createNewNotebook(){
 /* ---------- 広告ローテーター（1枠で複数広告を順番に表示） ---------- */
 let bannerRotateTimer = null;
 let bannerIdx = 0;
-function initBannerRotator(){
-  const rotator = document.getElementById('banner-rotator');
-  const dotsBox = document.getElementById('banner-dots');
-  if(!rotator) return;
-  const allAds = BANNER_AD_GROUPS.flatMap(g=>g.ads.map(html=>({html, group:g.group})));
-  if(!allAds.length) return;
+// 汎用の広告ローテーター（トップ下・カテゴリ内バナーの両方で使い回す）
+// containerId: 表示先div、dotsId: ドット表示先div（省略可）、ads: HTML文字列の配列、intervalMs: 自動切り替え間隔
+function createAdRotator(containerId, dotsId, ads, intervalMs){
+  const rotator = document.getElementById(containerId);
+  const dotsBox = dotsId ? document.getElementById(dotsId) : null;
+  if(!rotator || !ads || !ads.length) return;
+  let idx = 0;
+  let timer = null;
 
-  dotsBox.innerHTML = allAds.map((_,i)=>`<span class="banner-dot" onclick="gotoBanner(${i})" data-i="${i}" style="width:6px; height:6px; border-radius:50%; background:${i===0?'var(--rose)':'var(--line)'}; cursor:pointer; display:inline-block;"></span>`).join('');
+  if(dotsBox){
+    dotsBox.innerHTML = ads.map((_,i)=>`<span onclick="window.__adRotators['${containerId}'].goto(${i})" data-i="${i}" style="width:6px; height:6px; border-radius:50%; background:${i===0?'var(--rose)':'var(--line)'}; cursor:pointer; display:inline-block;"></span>`).join('');
+  }
+  rotator.style.transition = 'opacity .25s';
 
   function show(i){
-    bannerIdx = (i+allAds.length)%allAds.length;
+    idx = (i+ads.length)%ads.length;
     rotator.style.opacity = '0';
     setTimeout(()=>{
-      rotator.innerHTML = `<div style="text-align:center; max-width:100%;">${allAds[bannerIdx].html}</div>`;
+      rotator.innerHTML = `<div style="text-align:center; max-width:100%; width:100%;">${ads[idx]}</div>`;
       rotator.style.opacity = '1';
-      [...dotsBox.children].forEach((el,i)=>{ el.style.background = i===bannerIdx ? 'var(--rose)' : 'var(--line)'; });
-    }, 200);
+      if(dotsBox){ [...dotsBox.children].forEach((el,i)=>{ el.style.background = i===idx ? 'var(--rose)' : 'var(--line)'; }); }
+    }, 220);
   }
-  rotator.style.transition = 'opacity .2s';
-  window.gotoBanner = function(i){ show(i); resetBannerTimer(allAds.length); };
-  function resetBannerTimer(len){
-    clearInterval(bannerRotateTimer);
-    if(len<=1) return;
-    bannerRotateTimer = setInterval(()=> show(bannerIdx+1), 6000);
+  function resetTimer(){
+    clearInterval(timer);
+    if(ads.length<=1) return;
+    timer = setInterval(()=> show(idx+1), intervalMs || 10000);
   }
+  window.__adRotators = window.__adRotators || {};
+  window.__adRotators[containerId] = { goto: (i)=>{ show(i); resetTimer(); } };
   show(0);
-  resetBannerTimer(allAds.length);
+  resetTimer();
+}
+
+function initBannerRotator(){
+  const allAds = BANNER_AD_GROUPS.flatMap(g=>g.ads);
+  createAdRotator('banner-rotator', 'banner-dots', allAds, 10000);
+}
+
+function initCategoryBannerRotators(){
+  // 各遠征カード×各カテゴリのバナー枠を初期化（開いているパネルのみ実DOMが存在するため、開閉のたびに呼ぶ）
+  Object.keys(CAT_BANNER_ADS).forEach(catKey=>{
+    document.querySelectorAll(`[data-cat-banner="${catKey}"]`).forEach(el=>{
+      if(el.dataset.rotatorInit) return;
+      el.dataset.rotatorInit = '1';
+      const rotId = el.id;
+      const dotsId = rotId + '-dots';
+      createAdRotator(rotId, dotsId, CAT_BANNER_ADS[catKey], 10000);
+    });
+  });
 }
 
 function startApp(){
@@ -2204,6 +2400,23 @@ function startApp(){
 async function initApp(){
   const hashMatch = location.hash.match(/book=([a-zA-Z0-9_-]+)/);
   if(!hashMatch){
+    // URLにハッシュが無い場合（ホーム画面アイコン経由でハッシュが失われるケースを含む）、
+    // 直近アクセスしたトークンが端末に保存されていれば、そこへ自動復帰させる
+    let lastToken = null;
+    try{ lastToken = localStorage.getItem('ensei_last_token'); }catch(e){}
+    if(lastToken){
+      showScreen('loading-screen');
+      try{
+        location.hash = `book=${lastToken}`;
+        await fetchNotebook(lastToken);
+        startApp();
+        return;
+      }catch(e){
+        console.error(e);
+        // 保存されていたトークンが無効になっていた場合はクリアしてランディングへ
+        try{ localStorage.removeItem('ensei_last_token'); }catch(e2){}
+      }
+    }
     showScreen('landing-screen');
     return;
   }
