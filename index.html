@@ -248,6 +248,13 @@
   .seg-btn.seg-done.active{ color:var(--sage); }
   .seg-btn.seg-skip.active{ color:var(--text-dim); }
   .cat-banner-box{ margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
+  .legs-box{ margin-top:2px; }
+  .legs-label{ font-size:10px; color:var(--text-faint); margin-bottom:4px; }
+  .leg-row{ display:flex; gap:6px; margin-bottom:6px; }
+  .leg-row input:first-child{ flex:2; }
+  .leg-row input:nth-child(2){ flex:1; }
+  .leg-remove{ background:var(--surface-2); border:1.5px solid var(--line); border-radius:8px; width:32px; height:32px; flex-shrink:0; font-size:14px; color:var(--text-faint); cursor:pointer; }
+  .leg-add{ background:none; border:1.5px dashed var(--line); border-radius:8px; padding:7px 12px; font-size:11.5px; color:var(--text-dim); cursor:pointer; width:100%; }
   .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
   .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
   .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
@@ -501,6 +508,9 @@
       </div>
       <div class="field">
         <label>応援チーム</label>
+        <div id="f-league-wrap" style="display:none; margin-bottom:8px;">
+          <select id="f-league-select" onchange="handleLeagueSelectChange()" style="font-size:16px;"></select>
+        </div>
         <select id="f-team-select" onchange="handleTeamSelectChange()" style="font-size:16px; display:block;">
           <option value="">チームを選択してください</option>
         </select>
@@ -510,7 +520,10 @@
     </div>
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
     <div class="field">
-      <label>対戦相手</label>
+      <label>対戦相手 <span id="opponent-league-note" style="font-weight:400; color:var(--text-faint); font-size:11px;"></span></label>
+      <div id="f-opponent-league-wrap" style="display:none; margin-bottom:8px;">
+        <select id="f-opponent-league-select" onchange="handleOpponentLeagueChange()" style="font-size:16px;"></select>
+      </div>
       <select id="f-match-select" onchange="handleOpponentSelectChange()" style="font-size:16px; display:block;">
         <option value="">相手チームを選択してください</option>
       </select>
@@ -654,153 +667,197 @@ const BOOKABLE_CATS = CATS.filter(c=>c.bookable).map(c=>c.key);
 const TEAM_DATA = {
   'バスケットボール': [ // B.LEAGUE 2025-26シーズン 全55クラブ（B1:26 / B2:14 / B3:15）。ホームアリーナはB1のみ収録。
     // --- B1（26クラブ） ---
-    {name:'レバンガ北海道', arena:'北海きたえーる'},
-    {name:'仙台89ERS', arena:'ゼビオアリーナ仙台'},
-    {name:'秋田ノーザンハピネッツ', arena:'CNAアリーナあきた'},
-    {name:'茨城ロボッツ', arena:'アダストリアみとアリーナ'},
-    {name:'宇都宮ブレックス', arena:'ブレックスアリーナ宇都宮'},
-    {name:'群馬クレインサンダーズ', arena:'オープンハウスアリーナ太田'},
-    {name:'越谷アルファーズ', arena:'越谷市立総合体育館'},
-    {name:'アルティーリ千葉', arena:'千葉ポートアリーナ'},
-    {name:'千葉ジェッツ', arena:'LaLa arena TOKYO-BAY'},
-    {name:'アルバルク東京', arena:'TOYOTA ARENA TOKYO'},
-    {name:'サンロッカーズ渋谷', arena:'青山学院記念館'},
-    {name:'川崎ブレイブサンダース', arena:'川崎市とどろきアリーナ'},
-    {name:'横浜ビー・コルセアーズ', arena:'横浜国際プール'},
-    {name:'富山グラウジーズ', arena:'富山市総合体育館'},
-    {name:'三遠ネオフェニックス', arena:'豊橋市総合体育館'},
-    {name:'シーホース三河', arena:'ウィングアリーナ刈谷'},
-    {name:'ファイティングイーグルス名古屋', arena:'名古屋市枇杷島スポーツセンター'},
-    {name:'名古屋ダイヤモンドドルフィンズ', arena:'IGアリーナ'},
-    {name:'滋賀レイクス', arena:'滋賀ダイハツアリーナ'},
-    {name:'京都ハンナリーズ', arena:'京都市体育館'},
-    {name:'大阪エヴェッサ', arena:'おおきにアリーナ舞洲'},
-    {name:'島根スサノオマジック', arena:'松江市総合体育館'},
-    {name:'広島ドラゴンフライズ', arena:'広島サンプラザホール'},
-    {name:'佐賀バルーナーズ', arena:'SAGAアリーナ'},
-    {name:'長崎ヴェルカ', arena:'HAPPINESS ARENA'},
-    {name:'琉球ゴールデンキングス', arena:'沖縄サントリーアリーナ'},
+    {name:'レバンガ北海道', arena:'北海きたえーる', league:'B1'},
+    {name:'仙台89ERS', arena:'ゼビオアリーナ仙台', league:'B1'},
+    {name:'秋田ノーザンハピネッツ', arena:'CNAアリーナあきた', league:'B1'},
+    {name:'茨城ロボッツ', arena:'アダストリアみとアリーナ', league:'B1'},
+    {name:'宇都宮ブレックス', arena:'ブレックスアリーナ宇都宮', league:'B1'},
+    {name:'群馬クレインサンダーズ', arena:'オープンハウスアリーナ太田', league:'B1'},
+    {name:'越谷アルファーズ', arena:'越谷市立総合体育館', league:'B1'},
+    {name:'アルティーリ千葉', arena:'千葉ポートアリーナ', league:'B1'},
+    {name:'千葉ジェッツ', arena:'LaLa arena TOKYO-BAY', league:'B1'},
+    {name:'アルバルク東京', arena:'TOYOTA ARENA TOKYO', league:'B1'},
+    {name:'サンロッカーズ渋谷', arena:'TOYOTA ARENA TOKYO', league:'B1'},
+    {name:'川崎ブレイブサンダース', arena:'川崎市とどろきアリーナ', league:'B1'},
+    {name:'横浜ビー・コルセアーズ', arena:'横浜国際プール', league:'B1'},
+    {name:'富山グラウジーズ', arena:'富山市総合体育館', league:'B1'},
+    {name:'三遠ネオフェニックス', arena:'豊橋市総合体育館', league:'B1'},
+    {name:'シーホース三河', arena:'ウィングアリーナ刈谷', league:'B1'},
+    {name:'ファイティングイーグルス名古屋', arena:'名古屋市枇杷島スポーツセンター', league:'B1'},
+    {name:'名古屋ダイヤモンドドルフィンズ', arena:'IGアリーナ', league:'B1'},
+    {name:'滋賀レイクス', arena:'滋賀ダイハツアリーナ', league:'B1'},
+    {name:'京都ハンナリーズ', arena:'京都市体育館', league:'B1'},
+    {name:'大阪エヴェッサ', arena:'おおきにアリーナ舞洲', league:'B1'},
+    {name:'島根スサノオマジック', arena:'松江市総合体育館', league:'B1'},
+    {name:'広島ドラゴンフライズ', arena:'広島サンプラザホール', league:'B1'},
+    {name:'佐賀バルーナーズ', arena:'SAGAアリーナ', league:'B1'},
+    {name:'長崎ヴェルカ', arena:'HAPPINESS ARENA', league:'B1'},
+    {name:'琉球ゴールデンキングス', arena:'沖縄サントリーアリーナ', league:'B1'},
     // --- B2（14クラブ・アリーナ情報は未収録） ---
-    {name:'青森ワッツ', arena:''},
-    {name:'岩手ビッグブルズ', arena:''},
-    {name:'山形ワイヴァンズ', arena:''},
-    {name:'福島ファイヤーボンズ', arena:''},
-    {name:'横浜エクセレンス', arena:''},
-    {name:'福井ブローウィンズ', arena:''},
-    {name:'信州ブレイブウォリアーズ', arena:''},
-    {name:'ベルテックス静岡', arena:''},
-    {name:'神戸ストークス', arena:''},
-    {name:'バンビシャス奈良', arena:''},
-    {name:'愛媛オレンジバイキングス', arena:''},
-    {name:'ライジングゼファー福岡', arena:''},
-    {name:'熊本ヴォルターズ', arena:''},
-    {name:'鹿児島レブナイズ', arena:''},
+    {name:'青森ワッツ', arena:'', league:'B2'},
+    {name:'岩手ビッグブルズ', arena:'', league:'B2'},
+    {name:'山形ワイヴァンズ', arena:'', league:'B2'},
+    {name:'福島ファイヤーボンズ', arena:'', league:'B2'},
+    {name:'横浜エクセレンス', arena:'', league:'B2'},
+    {name:'福井ブローウィンズ', arena:'', league:'B2'},
+    {name:'信州ブレイブウォリアーズ', arena:'', league:'B2'},
+    {name:'ベルテックス静岡', arena:'', league:'B2'},
+    {name:'神戸ストークス', arena:'', league:'B2'},
+    {name:'バンビシャス奈良', arena:'', league:'B2'},
+    {name:'愛媛オレンジバイキングス', arena:'', league:'B2'},
+    {name:'ライジングゼファー福岡', arena:'', league:'B2'},
+    {name:'熊本ヴォルターズ', arena:'', league:'B2'},
+    {name:'鹿児島レブナイズ', arena:'', league:'B2'},
     // --- B3（15クラブ・アリーナ情報は未収録） ---
-    {name:'アースフレンズ東京Z', arena:''},
-    {name:'新潟アルビレックスBB', arena:''},
-    {name:'八王子ビートレインズ', arena:''},
-    {name:'湘南ユナイテッドBC', arena:''},
-    {name:'岐阜スゥープス', arena:''},
-    {name:'山口パッツファイブ', arena:''},
-    {name:'トライフープ岡山', arena:''},
-    {name:'香川ファイブアローズ', arena:''},
-    {name:'しながわシティバスケットボールクラブ', arena:''},
-    {name:'立川ダイス', arena:''},
-    {name:'徳島ガンバロウズ', arena:''},
-    {name:'ヴィアティン三重', arena:''},
-    {name:'さいたまブロンコス', arena:''},
-    {name:'金沢武士団', arena:''},
-    {name:'東京ユナイテッドバスケットボールクラブ', arena:''},
+    {name:'アースフレンズ東京Z', arena:'', league:'B3'},
+    {name:'新潟アルビレックスBB', arena:'', league:'B3'},
+    {name:'八王子ビートレインズ', arena:'', league:'B3'},
+    {name:'湘南ユナイテッドBC', arena:'', league:'B3'},
+    {name:'岐阜スゥープス', arena:'', league:'B3'},
+    {name:'山口パッツファイブ', arena:'', league:'B3'},
+    {name:'トライフープ岡山', arena:'', league:'B3'},
+    {name:'香川ファイブアローズ', arena:'', league:'B3'},
+    {name:'しながわシティバスケットボールクラブ', arena:'', league:'B3'},
+    {name:'立川ダイス', arena:'', league:'B3'},
+    {name:'徳島ガンバロウズ', arena:'', league:'B3'},
+    {name:'ヴィアティン三重', arena:'', league:'B3'},
+    {name:'さいたまブロンコス', arena:'', league:'B3'},
+    {name:'金沢武士団', arena:'', league:'B3'},
+    {name:'東京ユナイテッドバスケットボールクラブ', arena:'', league:'B3'},
+    // --- Wリーグプレミア（女子・8クラブ） ---
+    {name:'デンソー アイリス', arena:'', league:'Wリーグプレミア'},
+    {name:'トヨタ自動車 アンテロープス', arena:'', league:'Wリーグプレミア'},
+    {name:'富士通 レッドウェーブ', arena:'', league:'Wリーグプレミア'},
+    {name:'トヨタ紡織 サンシャインラビッツ', arena:'', league:'Wリーグプレミア'},
+    {name:'ENEOS サンフラワーズ', arena:'', league:'Wリーグプレミア'},
+    {name:'シャンソン化粧品 シャンソンVマジック', arena:'', league:'Wリーグプレミア'},
+    {name:'アイシン ウィングス', arena:'', league:'Wリーグプレミア'},
+    {name:'日立ハイテク クーガーズ', arena:'', league:'Wリーグプレミア'},
+    // --- Wリーグフューチャー（女子・7クラブ） ---
+    {name:'東京羽田ヴィッキーズ', arena:'', league:'Wリーグフューチャー'},
+    {name:'山梨クィーンビーズ', arena:'', league:'Wリーグフューチャー'},
+    {name:'プレステージ・インターナショナル アランマーレ', arena:'', league:'Wリーグフューチャー'},
+    {name:'三菱電機 コアラーズ', arena:'', league:'Wリーグフューチャー'},
+    {name:'SMBC東京ソルーア', arena:'', league:'Wリーグフューチャー'},
+    {name:'姫路イーグレッツ', arena:'', league:'Wリーグフューチャー'},
+    {name:'新潟アルビレックスBBラビッツ', arena:'', league:'Wリーグフューチャー'},
   ],
   '野球': [ // NPB 12球団（1軍本拠地）
-    {name:'読売ジャイアンツ', arena:'東京ドーム'},
-    {name:'東京ヤクルトスワローズ', arena:'明治神宮野球場'},
-    {name:'横浜DeNAベイスターズ', arena:'横浜スタジアム'},
-    {name:'中日ドラゴンズ', arena:'バンテリンドーム ナゴヤ'},
-    {name:'阪神タイガース', arena:'阪神甲子園球場'},
-    {name:'広島東洋カープ', arena:'MAZDA Zoom-Zoom スタジアム広島'},
-    {name:'福岡ソフトバンクホークス', arena:'みずほPayPayドーム福岡'},
-    {name:'千葉ロッテマリーンズ', arena:'ZOZOマリンスタジアム'},
-    {name:'埼玉西武ライオンズ', arena:'ベルーナドーム'},
-    {name:'東北楽天ゴールデンイーグルス', arena:'楽天モバイルパーク宮城'},
-    {name:'オリックス・バファローズ', arena:'京セラドーム大阪'},
-    {name:'北海道日本ハムファイターズ', arena:'エスコンフィールドHOKKAIDO'},
+    {name:'読売ジャイアンツ', arena:'東京ドーム', league:'セ・リーグ'},
+    {name:'東京ヤクルトスワローズ', arena:'明治神宮野球場', league:'セ・リーグ'},
+    {name:'横浜DeNAベイスターズ', arena:'横浜スタジアム', league:'セ・リーグ'},
+    {name:'中日ドラゴンズ', arena:'バンテリンドーム ナゴヤ', league:'セ・リーグ'},
+    {name:'阪神タイガース', arena:'阪神甲子園球場', league:'セ・リーグ'},
+    {name:'広島東洋カープ', arena:'MAZDA Zoom-Zoom スタジアム広島', league:'セ・リーグ'},
+    {name:'福岡ソフトバンクホークス', arena:'みずほPayPayドーム福岡', league:'パ・リーグ'},
+    {name:'千葉ロッテマリーンズ', arena:'ZOZOマリンスタジアム', league:'パ・リーグ'},
+    {name:'埼玉西武ライオンズ', arena:'ベルーナドーム', league:'パ・リーグ'},
+    {name:'東北楽天ゴールデンイーグルス', arena:'楽天モバイルパーク宮城', league:'パ・リーグ'},
+    {name:'オリックス・バファローズ', arena:'京セラドーム大阪', league:'パ・リーグ'},
+    {name:'北海道日本ハムファイターズ', arena:'エスコンフィールドHOKKAIDO', league:'パ・リーグ'},
   ],
   'サッカー': [ // 2026/27シーズン Jリーグ 全60クラブ（J1:20 / J2:20 / J3:20）。J1は全クラブ、J2は判明分のみホームスタジアムを収録。
     // --- J1（20クラブ） ---
-    {name:'鹿島アントラーズ', arena:'メルカリスタジアム'},
-    {name:'水戸ホーリーホック', arena:'ケーズデンキスタジアム水戸'},
-    {name:'浦和レッズ', arena:'埼玉スタジアム2002'},
-    {name:'ジェフユナイテッド千葉', arena:'フクダ電子アリーナ'},
-    {name:'柏レイソル', arena:'三協フロンテア柏スタジアム'},
-    {name:'FC東京', arena:'味の素スタジアム'},
-    {name:'東京ヴェルディ', arena:'味の素スタジアム'},
-    {name:'FC町田ゼルビア', arena:'町田GIONスタジアム'},
-    {name:'川崎フロンターレ', arena:'等々力陸上競技場'},
-    {name:'横浜F・マリノス', arena:'日産スタジアム'},
-    {name:'清水エスパルス', arena:'IAIスタジアム日本平'},
-    {name:'名古屋グランパス', arena:'豊田スタジアム'},
-    {name:'京都サンガF.C.', arena:'サンガスタジアム by KYOCERA'},
-    {name:'ガンバ大阪', arena:'パナソニック スタジアム 吹田'},
-    {name:'セレッソ大阪', arena:'ヨドコウ桜スタジアム'},
-    {name:'ヴィッセル神戸', arena:'ノエビアスタジアム神戸'},
-    {name:'ファジアーノ岡山', arena:'シティライトスタジアム'},
-    {name:'サンフレッチェ広島', arena:'エディオンピースウイング広島'},
-    {name:'アビスパ福岡', arena:'ベスト電器スタジアム'},
-    {name:'V・ファーレン長崎', arena:'トランスコスモススタジアム長崎'},
+    {name:'鹿島アントラーズ', arena:'メルカリスタジアム', league:'J1'},
+    {name:'水戸ホーリーホック', arena:'ケーズデンキスタジアム水戸', league:'J1'},
+    {name:'浦和レッズ', arena:'埼玉スタジアム2002', league:'J1'},
+    {name:'ジェフユナイテッド千葉', arena:'フクダ電子アリーナ', league:'J1'},
+    {name:'柏レイソル', arena:'三協フロンテア柏スタジアム', league:'J1'},
+    {name:'FC東京', arena:'味の素スタジアム', league:'J1'},
+    {name:'東京ヴェルディ', arena:'味の素スタジアム', league:'J1'},
+    {name:'FC町田ゼルビア', arena:'町田GIONスタジアム', league:'J1'},
+    {name:'川崎フロンターレ', arena:'等々力陸上競技場', league:'J1'},
+    {name:'横浜F・マリノス', arena:'日産スタジアム', league:'J1'},
+    {name:'清水エスパルス', arena:'IAIスタジアム日本平', league:'J1'},
+    {name:'名古屋グランパス', arena:'豊田スタジアム', league:'J1'},
+    {name:'京都サンガF.C.', arena:'サンガスタジアム by KYOCERA', league:'J1'},
+    {name:'ガンバ大阪', arena:'パナソニック スタジアム 吹田', league:'J1'},
+    {name:'セレッソ大阪', arena:'ヨドコウ桜スタジアム', league:'J1'},
+    {name:'ヴィッセル神戸', arena:'ノエビアスタジアム神戸', league:'J1'},
+    {name:'ファジアーノ岡山', arena:'シティライトスタジアム', league:'J1'},
+    {name:'サンフレッチェ広島', arena:'エディオンピースウイング広島', league:'J1'},
+    {name:'アビスパ福岡', arena:'ベスト電器スタジアム', league:'J1'},
+    {name:'V・ファーレン長崎', arena:'トランスコスモススタジアム長崎', league:'J1'},
     // --- J2（20クラブ） ---
-    {name:'北海道コンサドーレ札幌', arena:'大和ハウス プレミストドーム'},
-    {name:'ヴァンラーレ八戸', arena:'プライフーズスタジアム'},
-    {name:'ベガルタ仙台', arena:'ユアテックスタジアム仙台'},
-    {name:'ブラウブリッツ秋田', arena:'ソユースタジアム'},
-    {name:'モンテディオ山形', arena:'NDソフトスタジアム山形'},
-    {name:'いわきFC', arena:'いわきグリーンフィールド'},
-    {name:'栃木シティ', arena:''},
-    {name:'RB大宮アルディージャ', arena:'NACK5スタジアム大宮'},
-    {name:'横浜FC', arena:'ニッパツ三ツ沢球技場'},
-    {name:'湘南ベルマーレ', arena:'Shonan BMW スタジアム平塚'},
-    {name:'ヴァンフォーレ甲府', arena:'山梨中銀スタジアム'},
-    {name:'アルビレックス新潟', arena:'デンカビッグスワンスタジアム'},
-    {name:'カターレ富山', arena:'富山県総合運動公園陸上競技場'},
-    {name:'ジュビロ磐田', arena:'ヤマハスタジアム'},
-    {name:'藤枝MYFC', arena:'藤枝総合運動公園サッカー場'},
-    {name:'徳島ヴォルティス', arena:'鳴門・大塚スポーツパーク ポカリスエットスタジアム'},
-    {name:'FC今治', arena:'ありがとうサービス.夢スタジアム'},
-    {name:'サガン鳥栖', arena:'駅前不動産スタジアム'},
-    {name:'大分トリニータ', arena:'昭和電工ドーム大分'},
-    {name:'テゲバジャーロ宮崎', arena:''},
+    {name:'北海道コンサドーレ札幌', arena:'大和ハウス プレミストドーム', league:'J2'},
+    {name:'ヴァンラーレ八戸', arena:'プライフーズスタジアム', league:'J2'},
+    {name:'ベガルタ仙台', arena:'ユアテックスタジアム仙台', league:'J2'},
+    {name:'ブラウブリッツ秋田', arena:'ソユースタジアム', league:'J2'},
+    {name:'モンテディオ山形', arena:'NDソフトスタジアム山形', league:'J2'},
+    {name:'いわきFC', arena:'いわきグリーンフィールド', league:'J2'},
+    {name:'栃木シティ', arena:'', league:'J2'},
+    {name:'RB大宮アルディージャ', arena:'NACK5スタジアム大宮', league:'J2'},
+    {name:'横浜FC', arena:'ニッパツ三ツ沢球技場', league:'J2'},
+    {name:'湘南ベルマーレ', arena:'Shonan BMW スタジアム平塚', league:'J2'},
+    {name:'ヴァンフォーレ甲府', arena:'山梨中銀スタジアム', league:'J2'},
+    {name:'アルビレックス新潟', arena:'デンカビッグスワンスタジアム', league:'J2'},
+    {name:'カターレ富山', arena:'富山県総合運動公園陸上競技場', league:'J2'},
+    {name:'ジュビロ磐田', arena:'ヤマハスタジアム', league:'J2'},
+    {name:'藤枝MYFC', arena:'藤枝総合運動公園サッカー場', league:'J2'},
+    {name:'徳島ヴォルティス', arena:'鳴門・大塚スポーツパーク ポカリスエットスタジアム', league:'J2'},
+    {name:'FC今治', arena:'ありがとうサービス.夢スタジアム', league:'J2'},
+    {name:'サガン鳥栖', arena:'駅前不動産スタジアム', league:'J2'},
+    {name:'大分トリニータ', arena:'昭和電工ドーム大分', league:'J2'},
+    {name:'テゲバジャーロ宮崎', arena:'', league:'J2'},
     // --- J3（20クラブ・ホームスタジアムは未収録） ---
-    {name:'福島ユナイテッドFC', arena:''},
-    {name:'栃木SC', arena:''},
-    {name:'ザスパ群馬', arena:''},
-    {name:'SC相模原', arena:''},
-    {name:'松本山雅FC', arena:''},
-    {name:'AC長野パルセイロ', arena:''},
-    {name:'ツエーゲン金沢', arena:''},
-    {name:'FC岐阜', arena:''},
-    {name:'レイラック滋賀FC', arena:''},
-    {name:'FC大阪', arena:''},
-    {name:'奈良クラブ', arena:''},
-    {name:'ガイナーレ鳥取', arena:''},
-    {name:'レノファ山口FC', arena:''},
-    {name:'カマタマーレ讃岐', arena:''},
-    {name:'愛媛FC', arena:''},
-    {name:'高知ユナイテッドSC', arena:''},
-    {name:'ギラヴァンツ北九州', arena:''},
-    {name:'ロアッソ熊本', arena:''},
-    {name:'鹿児島ユナイテッドFC', arena:''},
-    {name:'FC琉球', arena:''},
+    {name:'福島ユナイテッドFC', arena:'', league:'J3'},
+    {name:'栃木SC', arena:'', league:'J3'},
+    {name:'ザスパ群馬', arena:'', league:'J3'},
+    {name:'SC相模原', arena:'', league:'J3'},
+    {name:'松本山雅FC', arena:'', league:'J3'},
+    {name:'AC長野パルセイロ', arena:'', league:'J3'},
+    {name:'ツエーゲン金沢', arena:'', league:'J3'},
+    {name:'FC岐阜', arena:'', league:'J3'},
+    {name:'レイラック滋賀FC', arena:'', league:'J3'},
+    {name:'FC大阪', arena:'', league:'J3'},
+    {name:'奈良クラブ', arena:'', league:'J3'},
+    {name:'ガイナーレ鳥取', arena:'', league:'J3'},
+    {name:'レノファ山口FC', arena:'', league:'J3'},
+    {name:'カマタマーレ讃岐', arena:'', league:'J3'},
+    {name:'愛媛FC', arena:'', league:'J3'},
+    {name:'高知ユナイテッドSC', arena:'', league:'J3'},
+    {name:'ギラヴァンツ北九州', arena:'', league:'J3'},
+    {name:'ロアッソ熊本', arena:'', league:'J3'},
+    {name:'鹿児島ユナイテッドFC', arena:'', league:'J3'},
+    {name:'FC琉球', arena:'', league:'J3'},
+    // --- WEリーグ（女子・12クラブ） ---
+    {name:'INAC神戸レオネッサ', arena:'', league:'WEリーグ'},
+    {name:'三菱重工浦和レッズレディース', arena:'', league:'WEリーグ'},
+    {name:'日テレ・東京ヴェルディベレーザ', arena:'', league:'WEリーグ'},
+    {name:'サンフレッチェ広島レジーナ', arena:'', league:'WEリーグ'},
+    {name:'ちふれASエルフェン埼玉', arena:'', league:'WEリーグ'},
+    {name:'ノジマステラ神奈川相模原', arena:'', league:'WEリーグ'},
+    {name:'アルビレックス新潟レディース', arena:'', league:'WEリーグ'},
+    {name:'マイナビ仙台レディース', arena:'', league:'WEリーグ'},
+    {name:'ジェフユナイテッド市原・千葉レディース', arena:'', league:'WEリーグ'},
+    {name:'セレッソ大阪ヤンマーレディース', arena:'', league:'WEリーグ'},
+    {name:'大宮アルディージャVENTUS', arena:'', league:'WEリーグ'},
+    {name:'AC長野パルセイロ・レディース', arena:'', league:'WEリーグ'},
   ],
-  'バレーボール': [ // 大同生命SVリーグ男子 2025-26（10クラブ中9クラブ判明分。女子・V2は未収録）。開催地が流動的なクラブが多いためホームアリーナは未収録。
-    {name:'ヴォレアス北海道', arena:''},
-    {name:'東京グレートベアーズ', arena:''},
-    {name:'VC長野トライデンツ', arena:''},
-    {name:'東レアローズ静岡', arena:''},
-    {name:'ジェイテクトSTINGS愛知', arena:''},
-    {name:'ウルフドッグス名古屋', arena:''},
-    {name:'大阪ブルテオン', arena:''},
-    {name:'サントリーサンバーズ大阪', arena:''},
-    {name:'日本製鉄堺ブレイザーズ', arena:''},
+  'バレーボール': [ // 大同生命SVリーグ 2025-26（男子10クラブ中9クラブ判明分／女子14クラブ）。開催地が流動的なクラブが多いためホームアリーナは未収録。
+    {name:'ヴォレアス北海道', arena:'', league:'SVリーグ男子'},
+    {name:'東京グレートベアーズ', arena:'', league:'SVリーグ男子'},
+    {name:'VC長野トライデンツ', arena:'', league:'SVリーグ男子'},
+    {name:'東レアローズ静岡', arena:'', league:'SVリーグ男子'},
+    {name:'ジェイテクトSTINGS愛知', arena:'', league:'SVリーグ男子'},
+    {name:'ウルフドッグス名古屋', arena:'', league:'SVリーグ男子'},
+    {name:'大阪ブルテオン', arena:'', league:'SVリーグ男子'},
+    {name:'サントリーサンバーズ大阪', arena:'', league:'SVリーグ男子'},
+    {name:'日本製鉄堺ブレイザーズ', arena:'', league:'SVリーグ男子'},
+    {name:'アランマーレ山形', arena:'', league:'SVリーグ女子'},
+    {name:'デンソーエアリービーズ', arena:'', league:'SVリーグ女子'},
+    {name:'Astemoリヴァーレ茨城', arena:'', league:'SVリーグ女子'},
+    {name:'群馬グリーンウイングス', arena:'', league:'SVリーグ女子'},
+    {name:'埼玉上尾メディックス', arena:'', league:'SVリーグ女子'},
+    {name:'NECレッドロケッツ川崎', arena:'', league:'SVリーグ女子'},
+    {name:'KUROBEアクアフェアリーズ', arena:'', league:'SVリーグ女子'},
+    {name:'PFUブルーキャッツ石川かほく', arena:'', league:'SVリーグ女子'},
+    {name:'クインシーズ刈谷', arena:'', league:'SVリーグ女子'},
+    {name:'東レアローズ滋賀', arena:'', league:'SVリーグ女子'},
+    {name:'大阪マーヴェラス', arena:'', league:'SVリーグ女子'},
+    {name:'ヴィクトリーナ姫路', arena:'', league:'SVリーグ女子'},
+    {name:'岡山シーガルズ', arena:'', league:'SVリーグ女子'},
+    {name:'SAGA久光スプリングス', arena:'', league:'SVリーグ女子'},
   ],
 };
 
@@ -840,31 +897,38 @@ function renderTeamDatalist(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
   const noTeamData = teams.length === 0; // 「その他」競技などチーム候補が無い場合
-  // selectを再構築
-  const tSel = document.getElementById('f-team-select');
-  tSel.innerHTML = '<option value="">チームを選択してください</option>' +
-    teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+  const leagues = [...new Set(teams.map(t=>t.league).filter(Boolean))]; // 元の配列順を保つ（B1→B2→B3等）
+
+  const leagueWrap = document.getElementById('f-league-wrap');
+  const leagueSel = document.getElementById('f-league-select');
+
+  if(leagues.length > 1){
+    leagueWrap.style.display = 'block';
+    leagueSel.innerHTML = leagues.map(l=>`<option value="${l}">${l}</option>`).join('');
+    leagueSel.value = leagues[0];
+  }else{
+    leagueWrap.style.display = 'none';
+  }
+
   document.getElementById('f-team').value = '';
-  // 対戦相手selectも初期化
-  const mSel = document.getElementById('f-match-select');
-  mSel.innerHTML = '<option value="">相手チームを選択してください</option>' +
-    teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
   document.getElementById('f-match').value = '';
+
+  renderTeamOptionsForLeague();
 
   if(noTeamData){
     // チーム候補が無い競技は、プルダウンを出さず最初から手入力欄を表示する
-    tSel.style.display = 'none';
+    document.getElementById('f-team-select').style.display = 'none';
     document.getElementById('f-team').style.display = 'block';
     document.getElementById('team-manual-toggle').style.display = 'none';
-    mSel.style.display = 'none';
+    document.getElementById('f-match-select').style.display = 'none';
     document.getElementById('f-match').style.display = 'block';
     document.getElementById('match-manual-toggle').style.display = 'none';
   }else{
-    tSel.style.display = 'block';
+    document.getElementById('f-team-select').style.display = 'block';
     document.getElementById('f-team').style.display = 'none';
     document.getElementById('team-manual-toggle').style.display = 'inline-block';
     document.getElementById('team-manual-toggle').textContent = '✏️ 手入力に切り替え';
-    mSel.style.display = 'block';
+    document.getElementById('f-match-select').style.display = 'block';
     document.getElementById('f-match').style.display = 'none';
     document.getElementById('match-manual-toggle').style.display = 'inline-block';
     document.getElementById('match-manual-toggle').textContent = '✏️ 手入力に切り替え';
@@ -877,12 +941,37 @@ function renderTeamDatalist(){
   // 記憶している「この競技での応援チーム」があれば自動選択する（新規登録時のみ。編集時はfillModalFieldsが別途値をセットする）
   if(!editingTripId){
     const favTeam = getFavoriteTeam(sport);
-    if(favTeam && teams.some(t=>t.name===favTeam)){
-      tSel.value = favTeam;
+    const favTeamObj = teams.find(t=>t.name===favTeam);
+    if(favTeamObj){
+      if(favTeamObj.league && leagueSel){ leagueSel.value = favTeamObj.league; renderTeamOptionsForLeague(); }
+      document.getElementById('f-team-select').value = favTeam;
       handleTeamSelectChange();
     }
   }
 }
+
+// リーグ選択(または「その他」等リーグの無い競技)に応じて、チーム/対戦相手のプルダウン中身を作り直す
+function renderTeamOptionsForLeague(){
+  const sport = document.getElementById('f-sport').value;
+  const teams = TEAM_DATA[sport] || [];
+  const leagueSel = document.getElementById('f-league-select');
+  const currentLeague = (leagueSel && leagueSel.style.display !== 'none' && document.getElementById('f-league-wrap').style.display !== 'none') ? leagueSel.value : null;
+  const filtered = currentLeague ? teams.filter(t=>t.league===currentLeague) : teams;
+
+  const tSel = document.getElementById('f-team-select');
+  const prevTeamVal = tSel.value;
+  tSel.innerHTML = '<option value="">チームを選択してください</option>' +
+    filtered.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+  // 同じリーグ内に選択中のチームがまだ存在すれば維持する
+  if(filtered.some(t=>t.name===prevTeamVal)) tSel.value = prevTeamVal;
+
+  handleTeamSelectChange();
+}
+
+function handleLeagueSelectChange(){
+  renderTeamOptionsForLeague();
+}
+
 
 function toggleTeamManual(){
   const sel = document.getElementById('f-team-select');
@@ -912,14 +1001,48 @@ function toggleMatchManual(){
 }
 
 function handleTeamSelectChange(){
-  // 対戦相手のselectから自チームを除外して更新
+  // 対戦相手のリーグは「デフォルトは自チームと同じリーグ、ただし独立して変更可能」にする
+  // （プレシーズンやカップ戦などで、リーグをまたいだ対戦があるため）
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
   const myTeam = getTeamValue();
-  const mSel = document.getElementById('f-match-select');
-  mSel.innerHTML = '<option value="">相手チームを選択してください</option>' +
-    teams.filter(t=>t.name!==myTeam).map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+  const myTeamObj = teams.find(t=>t.name===myTeam);
+  const leagues = [...new Set(teams.map(t=>t.league).filter(Boolean))];
+  const oppLeagueWrap = document.getElementById('f-opponent-league-wrap');
+  const oppLeagueSel = document.getElementById('f-opponent-league-select');
+  const note = document.getElementById('opponent-league-note');
+
+  if(leagues.length > 1 && myTeamObj && myTeamObj.league){
+    oppLeagueWrap.style.display = 'block';
+    oppLeagueSel.innerHTML = leagues.map(l=>`<option value="${l}">${l}</option>`).join('');
+    oppLeagueSel.value = myTeamObj.league; // デフォルトは自チームと同じリーグ
+    note.textContent = '（プレシーズン等で別リーグの相手と対戦する場合は、上のリーグを切り替えられます）';
+  }else{
+    oppLeagueWrap.style.display = 'none';
+    note.textContent = '';
+  }
+  renderOpponentOptionsForLeague();
   handleTeamInput();
+}
+
+// 対戦相手のリーグ選択に応じて、対戦相手のプルダウン中身を作り直す
+function renderOpponentOptionsForLeague(){
+  const sport = document.getElementById('f-sport').value;
+  const teams = TEAM_DATA[sport] || [];
+  const myTeam = getTeamValue();
+  const oppLeagueSel = document.getElementById('f-opponent-league-select');
+  const oppLeagueWrap = document.getElementById('f-opponent-league-wrap');
+  const currentOppLeague = (oppLeagueWrap.style.display !== 'none') ? oppLeagueSel.value : null;
+  const pool = currentOppLeague ? teams.filter(t=>t.league===currentOppLeague) : teams;
+
+  const mSel = document.getElementById('f-match-select');
+  const prevVal = mSel.value;
+  mSel.innerHTML = '<option value="">相手チームを選択してください</option>' +
+    pool.filter(t=>t.name!==myTeam).map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+  if(pool.some(t=>t.name===prevVal)) mSel.value = prevVal;
+}
+function handleOpponentLeagueChange(){
+  renderOpponentOptionsForLeague();
 }
 function handleOpponentSelectChange(){
   if(homeAwayMode === 'AWAY') setHomeAway('AWAY');
@@ -1313,9 +1436,27 @@ function catPanelContent(t, c){
   // 復路パネルには「往路の内容をコピー」ボタンを出す（往復で同じ交通手段のケースが多いため）
   const copyOutboundBlock = (c.key==='transport_return' && IS_EDITABLE) ? (()=>{
     const ob = t.detail.transport_outbound;
-    const hasContent = ob && (ob.method || ob.cost || ob.memo);
-    return hasContent ? `<button type="button" class="copy-btn" onclick="copyOutboundToReturn('${t.id}')" style="background:var(--sage-wash); border-color:var(--sage);">📋 往路の内容を復路にコピー</button>` : '';
+    const hasContent = ob && (ob.method || ob.cost || ob.memo || ob.departureStation);
+    return hasContent ? `<button type="button" class="copy-btn" onclick="copyOutboundToReturn('${t.id}')" style="background:var(--sage-wash); border-color:var(--sage);">📋 往路の内容を復路にコピー（駅名は逆にします）</button>` : '';
   })() : '';
+
+  const isTransport = (c.key==='transport_outbound' || c.key==='transport_return');
+  const stationBlock = isTransport ? `
+    <div class="field-row">
+      <div class="field"><label>発駅</label><input value="${(d.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','departureStation',this.value)"`:'disabled'} placeholder="例）東京"></div>
+      <div class="field"><label>着駅</label><input value="${(d.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
+    </div>
+    <div class="legs-box">
+      <div class="legs-label">乗り継ぎがある場合の内訳（新幹線＋特急など）</div>
+      ${(d.legs||[]).map((leg,i)=>`
+        <div class="leg-row">
+          <input value="${(leg.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'method',this.value)"`:'disabled'} placeholder="例）特急ひだ">
+          <input type="number" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円">
+          ${IS_EDITABLE ? `<button type="button" onclick="removeLeg('${t.id}','${c.key}',${i})" class="leg-remove">×</button>` : ''}
+        </div>`).join('')}
+      ${IS_EDITABLE ? `<button type="button" class="leg-add" onclick="addLeg('${t.id}','${c.key}')">＋ 交通手段を追加</button>` : ''}
+    </div>
+  ` : '';
 
   if(!c.bookable){
     return `
@@ -1333,6 +1474,7 @@ function catPanelContent(t, c){
         <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="例）楽天トラベル"></div>
         <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
+      ${stationBlock}
       <div class="field-row">
         <div class="field"><label>金額</label><input type="number" value="${d.cost||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
         <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="座席・便名など"></div>
@@ -1525,10 +1667,15 @@ async function copyOutboundToReturn(tripId){
   await saveBookingDetail(tripId, 'transport_return', {
     method: ob.method || '',
     cost: ob.cost || 0,
-    memo: ob.memo || ''
+    memo: ob.memo || '',
+    // 復路は往路の逆ルートになるため、発駅・着駅を入れ替えてコピーする
+    departureStation: ob.arrivalStation || '',
+    arrivalStation: ob.departureStation || '',
+    // 乗り継ぎの内訳も、通る順番を反転してコピーする
+    legs: [...(ob.legs||[])].reverse()
     // 予約日(bookedDate)と予約済みフラグはコピーしない（復路は別途予約するはずのため）
   }, true);
-  showToast('往路の内容を復路にコピーしました');
+  showToast('往路の内容を、駅名を逆にして復路にコピーしました');
 }
 
 async function saveBookingDetail(tripId, key, patch, suppressToast){
@@ -1552,7 +1699,10 @@ async function saveBookingDetail(tripId, key, patch, suppressToast){
       p_is_not_needed: !!merged.notNeeded,
       p_sale_date: merged.saleDate || null,
       p_sale_time: merged.saleTime || null,
-      p_notify_on_sale: !!merged.notifyOnSale
+      p_notify_on_sale: !!merged.notifyOnSale,
+      p_departure_station: merged.departureStation || null,
+      p_arrival_station: merged.arrivalStation || null,
+      p_legs: merged.legs || []
     });
     if(error) throw error;
     if(!suppressToast) showToast('✓ 保存しました', 1200);
@@ -1648,6 +1798,32 @@ function updateDetail(tripId, key, field, val){
   const patch = { [field]: field==='cost' ? (parseInt(val)||0) : val };
   saveBookingDetail(tripId, key, patch);
 }
+
+// 交通手段の内訳（新幹線＋特急など、1区間で複数の乗り物を使うケース）
+function addLeg(tripId, key){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const legs = [...(t.detail[key].legs||[]), { method:'', cost:0 }];
+  saveBookingDetail(tripId, key, { legs }, true);
+}
+function updateLeg(tripId, key, index, field, val){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const legs = [...(t.detail[key].legs||[])];
+  if(!legs[index]) return;
+  legs[index] = { ...legs[index], [field]: field==='cost' ? (parseInt(val)||0) : val };
+  saveBookingDetail(tripId, key, { legs });
+}
+function removeLeg(tripId, key, index){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const legs = (t.detail[key].legs||[]).filter((_,i)=>i!==index);
+  saveBookingDetail(tripId, key, { legs }, true);
+}
+
 function updateSimple(tripId, key, val){
   if(!IS_EDITABLE) return;
   saveBookingDetail(tripId, key, { memo: val });
@@ -1682,10 +1858,19 @@ function duplicateTrip(tripId){
   document.getElementById('f-sport').value = isKnown ? t.sport : 'その他';
   toggleCustomSport();
   if(!isKnown) document.getElementById('f-sport-custom').value = t.sport;
+
+  // 保存されているチームが実際にどのリーグに属するか特定し、先にリーグ選択を合わせる
+  const teamsForLookup = isKnown ? (TEAM_DATA[t.sport] || []) : [];
+  const savedTeamObj = teamsForLookup.find(x=>x.name===t.team);
+  if(savedTeamObj && savedTeamObj.league){
+    const leagueSel = document.getElementById('f-league-select');
+    if(leagueSel){ leagueSel.value = savedTeamObj.league; renderTeamOptionsForLeague(); }
+  }
+
   // select/input両方に値をセット
   const tSel2=document.getElementById('f-team-select'); const tInp2=document.getElementById('f-team');
   const tOpt=[...tSel2.options].find(o=>o.value===t.team);
-  if(tOpt){tSel2.value=t.team; tSel2.style.display='block'; tInp2.style.display='none';}
+  if(tOpt){tSel2.value=t.team; tSel2.style.display='block'; tInp2.style.display='none'; handleTeamSelectChange();}
   else{tSel2.style.display='none'; tInp2.style.display='block'; tInp2.value=t.team||'';}
   document.getElementById('f-venue').value = t.venue;
   setCostValue(t.cost || '');
@@ -1812,11 +1997,31 @@ function fillModalFields(t){
     document.getElementById('f-sport-custom').value = t.sport || '';
   }
   renderTeamDatalist();
+
+  // 保存されているチームが実際にどのリーグに属するか特定し、先にリーグ選択を合わせてからチームを選ぶ
+  const sportForLookup = KNOWN_SPORTS.includes(t.sport) ? t.sport : null;
+  const teamsForLookup = sportForLookup ? (TEAM_DATA[sportForLookup] || []) : [];
+  const savedTeamObj = teamsForLookup.find(x=>x.name===t.team);
+  if(savedTeamObj && savedTeamObj.league){
+    const leagueSel = document.getElementById('f-league-select');
+    if(leagueSel){ leagueSel.value = savedTeamObj.league; renderTeamOptionsForLeague(); }
+  }
+
   const tSel3=document.getElementById('f-team-select'); const tInp3=document.getElementById('f-team');
   const tOpt3=[...tSel3.options].find(o=>o.value===t.team);
   const teamToggleBtn = document.getElementById('team-manual-toggle');
-  if(tOpt3){tSel3.value=t.team; tSel3.style.display='block'; tInp3.style.display='none'; if(teamToggleBtn) teamToggleBtn.textContent='✏️ 手入力に切り替え';}
+  if(tOpt3){tSel3.value=t.team; tSel3.style.display='block'; tInp3.style.display='none'; if(teamToggleBtn) teamToggleBtn.textContent='✏️ 手入力に切り替え'; handleTeamSelectChange();}
   else{tSel3.style.display='none'; tInp3.style.display='block'; tInp3.value=t.team||''; if(teamToggleBtn) teamToggleBtn.textContent='← リストに戻る';}
+  // 保存されている対戦相手が、自チームと別リーグに属していないか確認し、必要なら対戦相手側のリーグ選択を合わせる
+  const savedOppObj = teamsForLookup.find(x=>x.name===t.match);
+  if(savedOppObj && savedOppObj.league){
+    const oppLeagueSel = document.getElementById('f-opponent-league-select');
+    if(oppLeagueSel && document.getElementById('f-opponent-league-wrap').style.display !== 'none'){
+      oppLeagueSel.value = savedOppObj.league;
+      renderOpponentOptionsForLeague();
+    }
+  }
+
   const mSel3=document.getElementById('f-match-select'); const mInp3=document.getElementById('f-match');
   const mOpt3=[...mSel3.options].find(o=>o.value===t.match);
   const matchToggleBtn = document.getElementById('match-manual-toggle');
@@ -2329,7 +2534,8 @@ function normalizeTrip(raw){
     const base = { memo: bd.memo || '', notNeeded: !!bd.is_not_needed };
     detail[c.key] = c.bookable
       ? { ...base, method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0,
-          saleDate: bd.sale_date || '', saleTime: bd.sale_time ? String(bd.sale_time).slice(0,5) : '', notifyOnSale: !!bd.notify_on_sale }
+          saleDate: bd.sale_date || '', saleTime: bd.sale_time ? String(bd.sale_time).slice(0,5) : '', notifyOnSale: !!bd.notify_on_sale,
+          departureStation: bd.departure_station || '', arrivalStation: bd.arrival_station || '', legs: Array.isArray(bd.legs) ? bd.legs : [] }
       : base;
   });
   return {
