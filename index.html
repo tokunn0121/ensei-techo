@@ -1179,7 +1179,7 @@ function catPanelContent(t, c){
       </div>
       <div class="field-row">
         <div class="field"><label>金額</label><input type="number" value="${d.cost||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
-        <div class="field"><label>詳細メモ</label><input value="${(saleInfo?saleInfo.rest:(d.memo||'')).replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="座席・便名など"></div>
+        <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="座席・便名など"></div>
       </div>
       ${segment}
       ${(IS_EDITABLE && (d.method || d.bookedDate || d.memo)) ? `<button class="copy-btn" onclick="openCopyModal('${t.id}','${c.key}')">📋 この${c.label}情報を他の遠征にもコピー（連泊・同じ移動手段など）</button>` : ''}
