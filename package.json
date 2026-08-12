@@ -1,0 +1,14 @@
+{
+  "name": "ensei-techo-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "遠征手帳の最小限の自動テスト（構文チェック＋レンダリングのスモークテスト）",
+  "scripts": {
+    "test": "npm run test:syntax && npm run test:smoke",
+    "test:syntax": "node tests/syntax.test.js",
+    "test:smoke": "node tests/smoke.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}
