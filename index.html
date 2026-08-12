@@ -78,12 +78,13 @@
   .add-btn.ghost:hover{ background: var(--rose-wash); box-shadow:none; transform:none; }
 
   /* ---------- tabs ---------- */
-  .tabs{ display:flex; gap:6px; padding: 4px 5vw 0; }
+  .tabs{ display:flex; gap:6px; padding: 4px 5vw 0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
   .tab{
     font-family: var(--font-display); font-weight:700; font-size:13px;
-    padding:11px 14px; border-radius:999px 999px 0 0; cursor:pointer;
-    color: var(--text-dim); background:transparent; border:none; flex:1; white-space:nowrap;
-    min-height:44px;
+    padding:11px 16px; border-radius:999px 999px 0 0; cursor:pointer;
+    color: var(--text-dim); background:transparent; border:none; white-space:nowrap;
+    min-height:44px; flex-shrink:0;
   }
   .tab.active{ background: var(--surface); color: var(--rose-deep); }
   .panel{ display:none; }
@@ -172,6 +173,26 @@
     font-size:12.5px; cursor:pointer;
   }
   .card-share-btn:hover{ border-color:var(--rose); background:var(--rose-wash); color:var(--rose-deep); }
+  /* 遠征の思い出メモ */
+  .journal-box{ margin-top:14px; padding:12px; background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:12px; }
+  .journal-label{ font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px; }
+  .journal-textarea{ width:100%; min-height:56px; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; font-family:var(--font-body); background:#fff; resize:vertical; }
+  /* 訪問スタンプ */
+  .stamp-sport-section{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px; margin-bottom:14px; }
+  .stamp-sport-title{ font-family:var(--font-display); font-weight:900; font-size:16px; margin-bottom:10px; }
+  .stamp-completion{ background:var(--rose-wash); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
+  .stamp-completion-label{ font-size:11.5px; font-weight:700; color:var(--rose-deep); margin-bottom:6px; }
+  .stamp-completion-bar{ height:8px; background:#fff; border-radius:4px; overflow:hidden; margin-bottom:6px; }
+  .stamp-completion-fill{ height:100%; background:var(--rose); border-radius:4px; }
+  .stamp-completion-num{ font-family:var(--font-num); font-size:12px; font-weight:700; color:var(--rose-deep); }
+  .stamp-summary{ font-size:12.5px; color:var(--text-dim); margin-bottom:12px; }
+  .stamp-summary b{ color:var(--text); font-family:var(--font-num); }
+  .stamp-venue-list{ display:flex; flex-direction:column; gap:8px; }
+  .stamp-venue-row{ background:var(--surface-2); border-radius:10px; padding:10px 12px; }
+  .stamp-venue-main{ display:flex; align-items:center; justify-content:space-between; }
+  .stamp-venue-name{ font-size:13px; font-weight:700; }
+  .stamp-venue-count{ font-family:var(--font-num); font-size:12px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:2px 10px; border-radius:999px; }
+  .stamp-venue-memo{ font-size:11.5px; color:var(--text-dim); margin-top:6px; padding-top:6px; border-top:1px solid var(--line); }
   /* カレンダー */
   .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
   .cal-dow{ font-size:10px; font-weight:700; padding:4px 0; text-align:center; }
@@ -431,6 +452,7 @@
   <button class="tab active" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
   <button class="tab" id="tab-calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
   <button class="tab" id="tab-history" onclick="switchTab('history')">予約履歴</button>
+  <button class="tab" id="tab-stamps" onclick="switchTab('stamps')">🏟 スタンプ</button>
 </div>
 
 <div class="panel active" id="panel-cards">
@@ -450,6 +472,10 @@
     <div class="history-controls" id="history-filters"></div>
     <div class="history-list" id="history-list"></div>
   </div>
+</div>
+
+<div class="panel" id="panel-stamps">
+  <div id="stamps-wrap" style="padding:16px 5vw 40px;"></div>
 </div>
 
 <div class="panel" id="panel-calendar">
@@ -1260,12 +1286,13 @@ function completion(t){
 }
 
 function switchTab(name){
-  ['cards','calendar','history'].forEach(n=>{
+  ['cards','calendar','history','stamps'].forEach(n=>{
     document.getElementById('tab-'+n)?.classList.toggle('active', n===name);
     document.getElementById('panel-'+n)?.classList.toggle('active', n===name);
   });
   if(name==='history') renderHistory();
   if(name==='calendar') renderCalendar();
+  if(name==='stamps') renderStamps();
   document.getElementById('tab-'+name)?.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -1547,6 +1574,11 @@ function renderTicketCard(t, isPast){
             </div>`;
           }).join('')}
         </div>
+        ${isPast ? `
+        <div class="journal-box">
+          <div class="journal-label">📝 この遠征の思い出</div>
+          <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)"`:'disabled'}>${(t.journalMemo||'').replace(/</g,'&lt;')}</textarea>
+        </div>` : ''}
         <button class="card-share-btn" onclick="shareTrip('${t.id}')">📤 家族に共有する</button>
       </div>
     </div>`;
@@ -1655,6 +1687,22 @@ async function setBudgetCap(val){
   }catch(e){
     console.error(e);
     showToast('予算の保存に失敗しました。通信環境をご確認ください');
+  }
+}
+
+// 遠征の思い出メモ（何を食べたか、どうだったか等）を保存する
+async function setTripJournal(tripId, memo){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t.journalMemo = memo;
+  try{
+    const { error } = await sb.rpc('set_trip_journal', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_journal_memo: memo || null });
+    if(error) throw error;
+    showToast('✓ 思い出メモを保存しました', 1200);
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認ください');
   }
 }
 
@@ -1913,6 +1961,91 @@ function renderHistory(){
       </div>
     </div>`;
   }).join('');
+}
+
+/* ---------- 訪問スタジアム制覇スタンプ ---------- */
+function renderStamps(){
+  const wrap = document.getElementById('stamps-wrap');
+  const pastTrips = trips.filter(t => t.date < TODAY && t.venue && t.venue.trim());
+
+  if(!pastTrips.length){
+    wrap.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🏟️</div>
+      <div class="empty-title">まだ訪問記録がありません</div>
+      <div class="empty-desc">試合日が過ぎた遠征から、自動的にスタンプが貯まっていきます。<br>過去の遠征を登録すると、この場でも反映されます。</div>
+    </div>`;
+    return;
+  }
+
+  const bySport = {};
+  pastTrips.forEach(t=>{
+    if(!bySport[t.sport]) bySport[t.sport] = [];
+    bySport[t.sport].push(t);
+  });
+
+  // B1（バスケ）のみ全会場データが揃っているため、制覇率バッジの対象にする
+  const b1Arenas = [...new Set((TEAM_DATA['バスケットボール']||[]).filter(x=>x.league==='B1' && x.arena).map(x=>x.arena))];
+
+  const sections = Object.entries(bySport).map(([sport, sportTrips])=>{
+    const venueCounts = {};
+    sportTrips.forEach(t=>{
+      const v = t.venue.trim();
+      venueCounts[v] = (venueCounts[v]||0) + 1;
+    });
+    const venues = Object.entries(venueCounts).sort((a,b)=>b[1]-a[1]);
+    const totalVisits = sportTrips.length;
+
+    let completionBadge = '';
+    if(sport === 'バスケットボール' && b1Arenas.length){
+      const visitedCount = b1Arenas.filter(a => venueCounts[a] > 0).length;
+      const pct = Math.round(visitedCount / b1Arenas.length * 100);
+      completionBadge = `
+        <div class="stamp-completion">
+          <div class="stamp-completion-label">🏆 B1会場制覇率</div>
+          <div class="stamp-completion-bar"><div class="stamp-completion-fill" style="width:${pct}%"></div></div>
+          <div class="stamp-completion-num">${visitedCount} / ${b1Arenas.length}会場（${pct}%）</div>
+        </div>`;
+    }
+
+    return `
+      <div class="stamp-sport-section">
+        <div class="stamp-sport-title">${sport}</div>
+        ${completionBadge}
+        <div class="stamp-summary">通算 <b>${totalVisits}</b>回遠征 ・ <b>${venues.length}</b>会場を訪問</div>
+        <div class="stamp-venue-list">
+          ${venues.map(([venue,count])=>{
+            const trip = sportTrips.find(t=>t.venue.trim()===venue && t.journalMemo);
+            return `
+            <div class="stamp-venue-row">
+              <div class="stamp-venue-main">
+                <span class="stamp-venue-name">🏟️ ${venue}</span>
+                <span class="stamp-venue-count">${count}回</span>
+              </div>
+              ${trip ? `<div class="stamp-venue-memo">📝 ${trip.journalMemo}</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = sections + `<button class="add-btn" style="width:100%; margin-top:6px;" onclick="shareStamps()">📤 スタンプをシェアする</button>`;
+}
+
+function shareStamps(){
+  const pastTrips = trips.filter(t => t.date < TODAY && t.venue && t.venue.trim());
+  if(!pastTrips.length){ showToast('まだ共有できる訪問記録がありません'); return; }
+  const bySport = {};
+  pastTrips.forEach(t=>{
+    if(!bySport[t.sport]) bySport[t.sport] = new Set();
+    bySport[t.sport].add(t.venue.trim());
+  });
+  const lines = ['🏟 遠征手帳スタンプ', ''];
+  Object.entries(bySport).forEach(([sport, venueSet])=>{
+    const count = pastTrips.filter(t=>t.sport===sport).length;
+    lines.push(`⚡ ${sport}：${count}回遠征・${venueSet.size}会場訪問`);
+  });
+  lines.push('', '― 遠征手帳より');
+  shareTextOrCopy(lines.join('\n'), '遠征手帳スタンプ');
 }
 
 /* ---------- add / edit trip modal ---------- */
@@ -2547,6 +2680,7 @@ function normalizeTrip(raw){
     time: raw.start_time ? String(raw.start_time).slice(0,5) : '',
     venue: raw.venue || '',
     cost: raw.estimated_cost || 0,
+    journalMemo: raw.journal_memo || '',
     status, detail
   };
 }
