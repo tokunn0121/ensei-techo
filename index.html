@@ -155,7 +155,10 @@
   .budget-alert{ background:#FBEAEA; border:1.5px solid #E08585; border-radius:14px; padding:12px 16px; margin:0 5vw 14px; display:flex; align-items:center; gap:10px; font-size:12.5px; color:#A93F3F; font-weight:700; }
 
   /* ---------- ticket card ---------- */
-  .ticket{ background: var(--surface); border-radius: var(--radius); box-shadow: 0 6px 20px rgba(74,63,58,0.06); position:relative; overflow:hidden; display:flex; flex-direction:column; scroll-margin-top:20px; }
+  .ticket{ background: var(--surface); border-radius: var(--radius); box-shadow: 0 6px 20px rgba(74,63,58,0.06); position:relative; overflow:hidden; display:flex; flex-direction:column; scroll-margin-top:20px; border-left:4px solid transparent; }
+  .ticket.ticket-urgent{ border-left-color:var(--rose); }
+  .ticket.ticket-ready{ border-left-color:var(--sage); }
+  .next-action{ display:inline-block; margin-top:6px; font-size:11.5px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:5px 10px; border-radius:8px; cursor:pointer; }
   .ticket.pulse{ animation: pulseGlow 1.6s ease; }
   @keyframes pulseGlow{ 0%{ box-shadow:0 0 0 4px rgba(217,139,150,0.5);} 100%{ box-shadow:0 6px 20px rgba(74,63,58,0.06);} }
   .ticket .head{ padding:18px 20px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
@@ -374,6 +377,14 @@
     justify-content:center; transition:border-color .15s;
   }
   .share-icon-btn:hover{ border-color:var(--rose); background:var(--rose-wash); }
+  #fab-add-btn{
+    position:fixed; right:20px; bottom:24px; z-index:90;
+    width:56px; height:56px; border-radius:50%; border:none;
+    background:var(--rose); color:#fff; font-size:26px; font-weight:400; line-height:1;
+    box-shadow:0 4px 16px rgba(217,139,150,0.5); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #fab-add-btn:active{ transform:scale(0.94); }
   .share-action-btn{
     width:100%; padding:14px 16px; margin-bottom:8px; border-radius:12px;
     border:1.5px solid var(--line); background:var(--surface-2);
@@ -556,9 +567,13 @@
     </div>
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
     <div class="field">
-      <label>対戦相手 <span id="opponent-league-note" style="font-weight:400; color:var(--text-faint); font-size:11px;"></span></label>
+      <label>対戦相手</label>
       <div id="f-opponent-league-wrap" style="display:none; margin-bottom:8px;">
-        <select id="f-opponent-league-select" onchange="handleOpponentLeagueChange()" style="font-size:16px;"></select>
+        <a href="javascript:void(0)" id="opponent-league-toggle-link" onclick="toggleOpponentLeaguePicker()" style="font-size:11.5px; color:var(--rose-deep); text-decoration:underline;">別リーグの相手と対戦する場合はこちら</a>
+        <div id="opponent-league-picker" style="display:none; margin-top:6px;">
+          <select id="f-opponent-league-select" onchange="handleOpponentLeagueChange()" style="font-size:16px;"></select>
+          <div id="opponent-league-note" style="font-weight:400; color:var(--text-faint); font-size:11px; margin-top:4px;"></div>
+        </div>
       </div>
       <select id="f-match-select" onchange="handleOpponentSelectChange()" style="font-size:16px; display:block;">
         <option value="">相手チームを選択してください</option>
@@ -604,6 +619,9 @@
     </div>
   </div>
 </div>
+
+<!-- 画面下固定の新規追加ボタン（一覧が長くなってもすぐ追加できるように） -->
+<button id="fab-add-btn" onclick="openModal()" style="display:none;" title="新しい遠征を追加">＋</button>
 
 <script>
 // =========================================================
@@ -1039,7 +1057,8 @@ function toggleMatchManual(){
 
 function handleTeamSelectChange(){
   // 対戦相手のリーグは「デフォルトは自チームと同じリーグ、ただし独立して変更可能」にする
-  // （プレシーズンやカップ戦などで、リーグをまたいだ対戦があるため）
+  // （プレシーズンやカップ戦などで、リーグをまたいだ対戦があるため）。
+  // 普段は選択欄自体を折りたたんでおき、必要な人だけ「別リーグの相手」リンクから開く。
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
   const myTeam = getTeamValue();
@@ -1047,13 +1066,16 @@ function handleTeamSelectChange(){
   const leagues = [...new Set(teams.map(t=>t.league).filter(Boolean))];
   const oppLeagueWrap = document.getElementById('f-opponent-league-wrap');
   const oppLeagueSel = document.getElementById('f-opponent-league-select');
+  const picker = document.getElementById('opponent-league-picker');
   const note = document.getElementById('opponent-league-note');
 
   if(leagues.length > 1 && myTeamObj && myTeamObj.league){
     oppLeagueWrap.style.display = 'block';
     oppLeagueSel.innerHTML = leagues.map(l=>`<option value="${l}">${l}</option>`).join('');
     oppLeagueSel.value = myTeamObj.league; // デフォルトは自チームと同じリーグ
-    note.textContent = '（プレシーズン等で別リーグの相手と対戦する場合は、上のリーグを切り替えられます）';
+    note.textContent = '（プレシーズン等で別リーグの相手と対戦する場合は、ここでリーグを切り替えられます）';
+    picker.style.display = 'none';
+    document.getElementById('opponent-league-toggle-link').textContent = '別リーグの相手と対戦する場合はこちら';
   }else{
     oppLeagueWrap.style.display = 'none';
     note.textContent = '';
@@ -1062,14 +1084,23 @@ function handleTeamSelectChange(){
   handleTeamInput();
 }
 
+function toggleOpponentLeaguePicker(){
+  const picker = document.getElementById('opponent-league-picker');
+  const link = document.getElementById('opponent-league-toggle-link');
+  const isOpen = picker.style.display !== 'none';
+  picker.style.display = isOpen ? 'none' : 'block';
+  link.textContent = isOpen ? '別リーグの相手と対戦する場合はこちら' : '閉じる';
+}
+
 // 対戦相手のリーグ選択に応じて、対戦相手のプルダウン中身を作り直す
+// （選択欄が折りたたまれていても、デフォルト値（自チームと同じリーグ）で絞り込みは効いた状態にする）
 function renderOpponentOptionsForLeague(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
   const myTeam = getTeamValue();
   const oppLeagueSel = document.getElementById('f-opponent-league-select');
   const oppLeagueWrap = document.getElementById('f-opponent-league-wrap');
-  const currentOppLeague = (oppLeagueWrap.style.display !== 'none') ? oppLeagueSel.value : null;
+  const currentOppLeague = (oppLeagueWrap.style.display !== 'none' && oppLeagueSel.options.length) ? oppLeagueSel.value : null;
   const pool = currentOppLeague ? teams.filter(t=>t.league===currentOppLeague) : teams;
 
   const mSel = document.getElementById('f-match-select');
@@ -1533,14 +1564,27 @@ function catPanelContent(t, c){
 function renderTicketCard(t, isPast){
   const {md, dow} = fmtDate(t.date);
   const pct = completion(t);
+
+  // 「次にやること」＝最も優先度の高い未予約カテゴリ（交通→チケット→宿泊の順で最初に見つかったもの）
+  let nextAction = null;
+  if(!isPast){
+    const priorityOrder = ['transport_outbound','ticket','hotel','transport_return'];
+    for(const key of priorityOrder){
+      const c = CATS.find(x=>x.key===key);
+      if(!t.status[key] && !t.detail[key]?.notNeeded){ nextAction = {key, label:c.label, icon:c.icon}; break; }
+    }
+  }
+  const urgencyClass = isPast ? '' : (pct===100 ? 'ticket-ready' : (pct<50 ? 'ticket-urgent' : ''));
+
   return `
-    <div class="ticket" id="trip-${t.id}">
+    <div class="ticket ${urgencyClass}" id="trip-${t.id}">
       <div class="head">
         <div>
           <span class="sport-tag">${t.sport} / ${t.team}</span>
           <div class="matchup">${t.match}</div>
           <div class="venue">${t.venue}${t.venue ? ` <a href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--rose-deep); text-decoration:none; font-size:11px; font-weight:700;">🗺️ 地図</a>` : ''}</div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
+          ${nextAction ? `<div class="next-action" onclick="focusTrip('${t.id}','${nextAction.key}')">👉 次は${nextAction.icon}${nextAction.label}の予約</div>` : ''}
         </div>
         <div class="date-block">
           <div class="d">${md}</div>
@@ -2181,8 +2225,14 @@ function fillModalFields(t){
   if(savedOppObj && savedOppObj.league){
     const oppLeagueSel = document.getElementById('f-opponent-league-select');
     if(oppLeagueSel && document.getElementById('f-opponent-league-wrap').style.display !== 'none'){
+      const wasDifferentLeague = oppLeagueSel.value !== savedOppObj.league;
       oppLeagueSel.value = savedOppObj.league;
       renderOpponentOptionsForLeague();
+      // 自チームと別リーグの相手だった場合は、編集時に気づけるようピッカーを開いておく
+      if(wasDifferentLeague){
+        document.getElementById('opponent-league-picker').style.display = 'block';
+        document.getElementById('opponent-league-toggle-link').textContent = '閉じる';
+      }
     }
   }
 
@@ -2925,6 +2975,8 @@ function applyEditableUI(){
   if(addBtn) addBtn.style.display = IS_EDITABLE ? 'inline-block' : 'none';
   const shareBtn = document.getElementById('header-share-btn');
   if(shareBtn) shareBtn.style.display = 'flex';
+  const fab = document.getElementById('fab-add-btn');
+  if(fab) fab.style.display = IS_EDITABLE ? 'flex' : 'none';
 }
 
 function renderShareBanner(){ /* ポップアップ方式に移行したため空関数 */ }
