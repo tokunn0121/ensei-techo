@@ -164,7 +164,10 @@
   .ticket .head{ padding:18px 20px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
   .ticket .sport-tag{ font-family:var(--font-num); font-size:11px; font-weight:700; letter-spacing:.04em; color: var(--rose-deep); margin-bottom:6px; display:block; }
   .ticket .matchup{ font-family: var(--font-display); font-weight:700; font-size:18px; line-height:1.3; }
-  .ticket .venue{ font-size:12.5px; color:var(--text-dim); margin-top:6px; }
+  .venue-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .ticket .venue{ font-size:12.5px; color:var(--text-dim); margin-top:0; }
+  .map-badge{ display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700; color:#fff; background:var(--rose); padding:4px 10px; border-radius:999px; text-decoration:none; white-space:nowrap; flex-shrink:0; }
+  .map-badge:hover{ background:var(--rose-deep); }
   .ticket .date-block{ text-align:right; flex-shrink:0; }
   .ticket .date-block .d{ font-family:var(--font-num); font-size:22px; font-weight:700; line-height:1; color:var(--text); }
   .ticket .date-block .dow{ font-size:11.5px; color:var(--text-dim); margin-top:4px; }
@@ -243,26 +246,33 @@
   .cost-row .val{ font-family:var(--font-num); font-size:17px; font-weight:700; color:var(--text); }
 
   /* ---------- category accordion ---------- */
-  .status-row{ display:flex; flex-direction:column; gap:8px; }
-  .cat-item{ border-radius:14px; overflow:hidden; background:var(--surface-2); border:1.5px solid transparent; }
-  .cat-item.is-open{ border-color: var(--rose); }
-  .cat-header{ display:flex; align-items:center; gap:9px; padding:13px; cursor:pointer; user-select:none; min-height:44px; }
-  .cat-header .icon{ font-size:16px; }
-  .cat-header .label{ font-weight:700; font-size:12.5px; }
-  .cat-header .label-col{ flex:1; min-width:0; display:flex; flex-direction:column; }
-  .cat-summary{ font-size:10.5px; color:var(--text-faint); font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  /* カテゴリチップストリップ（タブ切り替え式） */
+  .cat-strip{ display:flex; flex-wrap:wrap; gap:6px; }
+  .cat-chip{
+    flex:1 1 30%; min-width:88px; display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding:9px 6px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface-2);
+    cursor:pointer; position:relative; min-height:44px;
+  }
+  .cat-chip-icon{ font-size:16px; }
+  .cat-chip-label{ font-size:10.5px; font-weight:700; color:var(--text-dim); white-space:nowrap; }
+  .cat-chip::after{ content:''; position:absolute; top:6px; right:8px; width:7px; height:7px; border-radius:50%; background:var(--text-faint); }
+  .cat-chip.chip-pending::after{ background:var(--rose); }
+  .cat-chip.chip-done::after{ background:var(--sage); }
+  .cat-chip.chip-not-needed{ opacity:0.55; }
+  .cat-chip.chip-not-needed::after{ background:var(--line); border:1.5px solid var(--text-faint); }
+  .cat-chip.is-active{ border-color:var(--rose); background:var(--rose-wash); }
+  .cat-chip.is-active .cat-chip-label{ color:var(--rose-deep); }
+  .cat-active-panel{ margin-top:10px; border-radius:14px; border:1.5px solid var(--rose); background:var(--surface-2); overflow:hidden; }
+  .cat-active-header{ display:flex; align-items:center; gap:8px; padding:12px 13px; border-bottom:1px solid var(--line); }
+  .cat-active-title{ font-weight:700; font-size:13px; flex:1; }
+  .cat-active-close{ background:var(--surface); border:1.5px solid var(--line); border-radius:8px; width:28px; height:28px; font-size:12px; color:var(--text-dim); cursor:pointer; flex-shrink:0; }
   .status-dot{ width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
-  .status-quick{ display:flex; align-items:center; gap:5px; padding:8px 6px; margin:-8px -6px; border-radius:8px; cursor:pointer; }
-  .status-quick:active{ background:var(--surface-2); }
   .status-dot.done{ background:var(--sage); }
   .status-dot.pending{ background:var(--rose); }
   .status-dot.not-needed{ background:var(--line); border:1.5px solid var(--text-faint); width:7px; height:7px; }
   .status-text{ font-size:11px; color:var(--text-dim); white-space:nowrap; }
   .status-text.not-needed{ color:var(--text-faint); }
-  .chevron{ font-size:10px; color:var(--text-faint); transition: transform .15s; }
-  .cat-item.is-open .chevron{ transform: rotate(180deg); }
-  .cat-panel{ display:none; padding:2px 13px 13px; flex-direction:column; gap:9px; }
-  .cat-item.is-open .cat-panel{ display:flex; }
+  .cat-panel{ display:flex; flex-direction:column; gap:9px; padding:13px; }
   .cat-panel .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .cat-panel .field{ display:flex; flex-direction:column; gap:3px; }
   .cat-panel .field label{ font-size:10px; color:var(--text-faint); }
@@ -282,11 +292,17 @@
   .station-details summary::before{ content:'▸ '; }
   .station-details[open] summary::before{ content:'▾ '; }
   .legs-label{ font-size:10px; color:var(--text-faint); margin-bottom:4px; }
-  .leg-row{ display:flex; gap:6px; margin-bottom:6px; }
-  .leg-row input:first-child{ flex:2; }
-  .leg-row input:nth-child(2){ flex:1; }
-  .leg-remove{ background:var(--surface-2); border:1.5px solid var(--line); border-radius:8px; width:32px; height:32px; flex-shrink:0; font-size:14px; color:var(--text-faint); cursor:pointer; }
+  .leg-card{ background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:8px; }
+  .leg-card-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .leg-method{ flex:1; }
+  .leg-status-dot{ width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+  .leg-status-dot.done{ background:var(--sage); }
+  .leg-status-dot.pending{ background:var(--rose); }
+  .leg-remove{ background:#fff; border:1.5px solid var(--line); border-radius:8px; width:32px; height:32px; flex-shrink:0; font-size:14px; color:var(--text-faint); cursor:pointer; }
   .leg-add{ background:none; border:1.5px dashed var(--line); border-radius:8px; padding:7px 12px; font-size:11.5px; color:var(--text-dim); cursor:pointer; width:100%; }
+  .legs-total{ font-size:12px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:8px 12px; border-radius:8px; margin-bottom:8px; }
+  .legs-total b{ font-family:var(--font-num); }
+  .food-link-btn{ display:block; text-align:center; font-size:12.5px; font-weight:700; color:#fff; background:var(--sage); padding:10px; border-radius:10px; text-decoration:none; margin-top:4px; }
   .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
   .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
   .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
@@ -349,8 +365,8 @@
     .modal-actions button{ width:100%; padding:15px; font-size:15px; }
     .add-btn{ padding:14px 20px; font-size:14px; }
     .ticket{ border-radius:16px; }
-    .cat-header{ padding:14px 13px; }
-    .cat-header .label{ font-size:13.5px; }
+    .cat-chip{ min-width:80px; }
+    .cat-chip-label{ font-size:10px; }
     .stub{ padding:16px; }
     .head{ padding:16px; }
     .card-share-btn{ padding:14px; font-size:13.5px; min-height:44px; }
@@ -427,7 +443,6 @@
   <div class="btn-group" id="header-actions" style="display:none;">
     <button class="share-icon-btn" id="header-settings-btn" onclick="openSettingsPanel()" title="設定・カレンダー連携">⚙️</button>
     <button class="share-icon-btn" id="header-share-btn" onclick="openSharePopup()" title="この手帳を共有">🔗</button>
-    <button class="add-btn" id="header-add-btn" onclick="openModal()">＋ 新しい遠征を追加</button>
   </div>
 </header>
 
@@ -693,7 +708,7 @@ let trips = [];
 let sportFilter = 'ALL';
 let sortMode = 'date'; // 'date'（試合日順） | 'progress'（準備が遅れている順）
 let historyCatFilter = 'ALL';
-let catOpen = new Set(); // `${tripId}:${catKey}` currently expanded
+let activeCat = {}; // { tripId: 現在開いているカテゴリキー } 1遠征につき1カテゴリのみ開く（タブ切り替え式）
 let budgetCap = 0;
 let copySource = { tripId:null, key:null };
 let showPast = false;
@@ -720,82 +735,70 @@ const BOOKABLE_CATS = CATS.filter(c=>c.bookable).map(c=>c.key);
 // ⚠️ 昇降格・改称・アリーナの命名権変更などで毎シーズン変わるデータです。特にサッカーは2026年に大会方式が変更されており未確定要素が多いため、
 //    シーズンの変わり目には内容の見直しをおすすめします（下記オブジェクトを直接編集するだけで反映されます）。
 const TEAM_DATA = {
-  'バスケットボール': [ // B.LEAGUE 2025-26シーズン 全55クラブ（B1:26 / B2:14 / B3:15）。ホームアリーナはB1のみ収録。
-    // --- B1（26クラブ） ---
-    {name:'レバンガ北海道', arena:'北海きたえーる', league:'B1'},
-    {name:'仙台89ERS', arena:'ゼビオアリーナ仙台', league:'B1'},
-    {name:'秋田ノーザンハピネッツ', arena:'CNAアリーナあきた', league:'B1'},
-    {name:'茨城ロボッツ', arena:'アダストリアみとアリーナ', league:'B1'},
-    {name:'宇都宮ブレックス', arena:'ブレックスアリーナ宇都宮', league:'B1'},
-    {name:'群馬クレインサンダーズ', arena:'オープンハウスアリーナ太田', league:'B1'},
-    {name:'越谷アルファーズ', arena:'越谷市立総合体育館', league:'B1'},
-    {name:'アルティーリ千葉', arena:'千葉ポートアリーナ', league:'B1'},
-    {name:'千葉ジェッツ', arena:'LaLa arena TOKYO-BAY', league:'B1'},
-    {name:'アルバルク東京', arena:'TOYOTA ARENA TOKYO', league:'B1'},
-    {name:'サンロッカーズ渋谷', arena:'TOYOTA ARENA TOKYO', league:'B1'},
-    {name:'川崎ブレイブサンダース', arena:'川崎市とどろきアリーナ', league:'B1'},
-    {name:'横浜ビー・コルセアーズ', arena:'横浜国際プール', league:'B1'},
-    {name:'富山グラウジーズ', arena:'富山市総合体育館', league:'B1'},
-    {name:'三遠ネオフェニックス', arena:'豊橋市総合体育館', league:'B1'},
-    {name:'シーホース三河', arena:'ウィングアリーナ刈谷', league:'B1'},
-    {name:'ファイティングイーグルス名古屋', arena:'名古屋市枇杷島スポーツセンター', league:'B1'},
-    {name:'名古屋ダイヤモンドドルフィンズ', arena:'IGアリーナ', league:'B1'},
-    {name:'滋賀レイクス', arena:'滋賀ダイハツアリーナ', league:'B1'},
-    {name:'京都ハンナリーズ', arena:'京都市体育館', league:'B1'},
-    {name:'大阪エヴェッサ', arena:'おおきにアリーナ舞洲', league:'B1'},
-    {name:'島根スサノオマジック', arena:'松江市総合体育館', league:'B1'},
-    {name:'広島ドラゴンフライズ', arena:'広島サンプラザホール', league:'B1'},
-    {name:'佐賀バルーナーズ', arena:'SAGAアリーナ', league:'B1'},
-    {name:'長崎ヴェルカ', arena:'HAPPINESS ARENA', league:'B1'},
-    {name:'琉球ゴールデンキングス', arena:'沖縄サントリーアリーナ', league:'B1'},
-    // --- B2（14クラブ・アリーナ情報は未収録） ---
-    {name:'青森ワッツ', arena:'', league:'B2'},
-    {name:'岩手ビッグブルズ', arena:'', league:'B2'},
-    {name:'山形ワイヴァンズ', arena:'', league:'B2'},
-    {name:'福島ファイヤーボンズ', arena:'', league:'B2'},
-    {name:'横浜エクセレンス', arena:'', league:'B2'},
-    {name:'福井ブローウィンズ', arena:'', league:'B2'},
-    {name:'信州ブレイブウォリアーズ', arena:'', league:'B2'},
-    {name:'ベルテックス静岡', arena:'', league:'B2'},
-    {name:'神戸ストークス', arena:'', league:'B2'},
-    {name:'バンビシャス奈良', arena:'', league:'B2'},
-    {name:'愛媛オレンジバイキングス', arena:'', league:'B2'},
-    {name:'ライジングゼファー福岡', arena:'', league:'B2'},
-    {name:'熊本ヴォルターズ', arena:'', league:'B2'},
-    {name:'鹿児島レブナイズ', arena:'', league:'B2'},
-    // --- B3（15クラブ・アリーナ情報は未収録） ---
-    {name:'アースフレンズ東京Z', arena:'', league:'B3'},
-    {name:'新潟アルビレックスBB', arena:'', league:'B3'},
-    {name:'八王子ビートレインズ', arena:'', league:'B3'},
-    {name:'湘南ユナイテッドBC', arena:'', league:'B3'},
-    {name:'岐阜スゥープス', arena:'', league:'B3'},
-    {name:'山口パッツファイブ', arena:'', league:'B3'},
-    {name:'トライフープ岡山', arena:'', league:'B3'},
-    {name:'香川ファイブアローズ', arena:'', league:'B3'},
-    {name:'しながわシティバスケットボールクラブ', arena:'', league:'B3'},
-    {name:'立川ダイス', arena:'', league:'B3'},
-    {name:'徳島ガンバロウズ', arena:'', league:'B3'},
-    {name:'ヴィアティン三重', arena:'', league:'B3'},
-    {name:'さいたまブロンコス', arena:'', league:'B3'},
-    {name:'金沢武士団', arena:'', league:'B3'},
-    {name:'東京ユナイテッドバスケットボールクラブ', arena:'', league:'B3'},
-    // --- Wリーグプレミア（女子・8クラブ） ---
-    {name:'デンソー アイリス', arena:'', league:'Wリーグプレミア'},
-    {name:'トヨタ自動車 アンテロープス', arena:'', league:'Wリーグプレミア'},
-    {name:'富士通 レッドウェーブ', arena:'', league:'Wリーグプレミア'},
-    {name:'トヨタ紡織 サンシャインラビッツ', arena:'', league:'Wリーグプレミア'},
-    {name:'ENEOS サンフラワーズ', arena:'', league:'Wリーグプレミア'},
-    {name:'シャンソン化粧品 シャンソンVマジック', arena:'', league:'Wリーグプレミア'},
-    {name:'アイシン ウィングス', arena:'', league:'Wリーグプレミア'},
-    {name:'日立ハイテク クーガーズ', arena:'', league:'Wリーグプレミア'},
-    // --- Wリーグフューチャー（女子・7クラブ） ---
-    {name:'東京羽田ヴィッキーズ', arena:'', league:'Wリーグフューチャー'},
-    {name:'山梨クィーンビーズ', arena:'', league:'Wリーグフューチャー'},
-    {name:'プレステージ・インターナショナル アランマーレ', arena:'', league:'Wリーグフューチャー'},
-    {name:'三菱電機 コアラーズ', arena:'', league:'Wリーグフューチャー'},
-    {name:'SMBC東京ソルーア', arena:'', league:'Wリーグフューチャー'},
-    {name:'姫路イーグレッツ', arena:'', league:'Wリーグフューチャー'},
-    {name:'新潟アルビレックスBBラビッツ', arena:'', league:'Wリーグフューチャー'},
+  'バスケットボール': [ // 2026-27シーズン B.LEAGUE 全55クラブ（公式サイト参入決定クラブ一覧より、2026年8月時点）
+    // --- B.LEAGUE PREMIER（東地区・13クラブ） ---
+    {name:'レバンガ北海道', arena:'北海きたえーる', league:'B.LEAGUE PREMIER'},
+    {name:'仙台89ERS', arena:'ゼビオアリーナ仙台', league:'B.LEAGUE PREMIER'},
+    {name:'秋田ノーザンハピネッツ', arena:'新秋田県立体育館', league:'B.LEAGUE PREMIER'},
+    {name:'茨城ロボッツ', arena:'アダストリアみとアリーナ', league:'B.LEAGUE PREMIER'},
+    {name:'宇都宮ブレックス', arena:'ブレックスアリーナ宇都宮', league:'B.LEAGUE PREMIER'},
+    {name:'群馬クレインサンダーズ', arena:'オープンハウスアリーナ太田', league:'B.LEAGUE PREMIER'},
+    {name:'アルティーリ千葉', arena:'千葉ポートアリーナ', league:'B.LEAGUE PREMIER'},
+    {name:'千葉ジェッツ', arena:'LaLa arena TOKYO-BAY', league:'B.LEAGUE PREMIER'},
+    {name:'アルバルク東京', arena:'TOYOTA ARENA TOKYO', league:'B.LEAGUE PREMIER'},
+    {name:'東京サンロッカーズ', arena:'TOYOTA ARENA TOKYO', league:'B.LEAGUE PREMIER'},
+    {name:'川崎ブレイブサンダース', arena:'新とどろきアリーナ（仮称）', league:'B.LEAGUE PREMIER'},
+    {name:'横浜ビー・コルセアーズ', arena:'横浜BUNTAI', league:'B.LEAGUE PREMIER'},
+    {name:'富山グラウジーズ', arena:'YKK AP ARENA', league:'B.LEAGUE PREMIER'},
+    // --- B.LEAGUE PREMIER（西地区・13クラブ） ---
+    {name:'信州ブレイブウォリアーズ', arena:'ホワイトリング', league:'B.LEAGUE PREMIER'},
+    {name:'三遠ネオフェニックス', arena:'多目的屋内施設（名称未定）', league:'B.LEAGUE PREMIER'},
+    {name:'シーホース三河', arena:'三河安城交流拠点（名称未定）', league:'B.LEAGUE PREMIER'},
+    {name:'名古屋ダイヤモンドドルフィンズ', arena:'IGアリーナ', league:'B.LEAGUE PREMIER'},
+    {name:'滋賀レイクス', arena:'滋賀ダイハツアリーナ', league:'B.LEAGUE PREMIER'},
+    {name:'京都ハンナリーズ', arena:'京都アリーナ（仮称）', league:'B.LEAGUE PREMIER'},
+    {name:'大阪エヴェッサ', arena:'おおきにアリーナ舞洲', league:'B.LEAGUE PREMIER'},
+    {name:'神戸ストークス', arena:'GLION ARENA KOBE', league:'B.LEAGUE PREMIER'},
+    {name:'島根スサノオマジック', arena:'松江市総合体育館', league:'B.LEAGUE PREMIER'},
+    {name:'広島ドラゴンフライズ', arena:'広島グリーンアリーナ', league:'B.LEAGUE PREMIER'},
+    {name:'佐賀バルーナーズ', arena:'SAGAアリーナ', league:'B.LEAGUE PREMIER'},
+    {name:'長崎ヴェルカ', arena:'ハピネスアリーナ', league:'B.LEAGUE PREMIER'},
+    {name:'琉球ゴールデンキングス', arena:'沖縄サントリーアリーナ', league:'B.LEAGUE PREMIER'},
+    // --- B.LEAGUE ONE（北地区・5クラブ） ---
+    {name:'青森ワッツ', arena:'カクヒログループスーパーアリーナ', league:'B.LEAGUE ONE'},
+    {name:'岩手ビッグブルズ', arena:'盛岡タカヤアリーナ', league:'B.LEAGUE ONE'},
+    {name:'山形ワイヴァンズ', arena:'山形県総合運動公園', league:'B.LEAGUE ONE'},
+    {name:'福島ファイヤーボンズ', arena:'宝来屋ボンズアリーナ', league:'B.LEAGUE ONE'},
+    {name:'越谷アルファーズ', arena:'越谷市立総合体育館', league:'B.LEAGUE ONE'},
+    // --- B.LEAGUE ONE（東地区・5クラブ） ---
+    {name:'さいたまブロンコス', arena:'浦和駒場体育館', league:'B.LEAGUE ONE'},
+    {name:'東京ユナイテッドバスケットボールクラブ', arena:'有明アリーナ', league:'B.LEAGUE ONE'},
+    {name:'アースフレンズ東京Z', arena:'大田区総合体育館', league:'B.LEAGUE ONE'},
+    {name:'立川ダイス', arena:'アリーナ立川立飛', league:'B.LEAGUE ONE'},
+    {name:'東京八王子ビートレインズ', arena:'エスフォルタアリーナ八王子', league:'B.LEAGUE ONE'},
+    // --- B.LEAGUE ONE（中地区・5クラブ） ---
+    {name:'横浜エクセレンス', arena:'横浜武道館', league:'B.LEAGUE ONE'},
+    {name:'新潟アルビレックスBB', arena:'アオーレ長岡', league:'B.LEAGUE ONE'},
+    {name:'金沢サムライズ', arena:'いしかわ総合スポーツセンター', league:'B.LEAGUE ONE'},
+    {name:'福井ブローウィンズ', arena:'セーレンドリームアリーナ', league:'B.LEAGUE ONE'},
+    {name:'岐阜スゥープス', arena:'OKBぎふ清流アリーナ', league:'B.LEAGUE ONE'},
+    // --- B.LEAGUE ONE（西地区・5クラブ） ---
+    {name:'ベルテックス静岡', arena:'静岡市アリーナ', league:'B.LEAGUE ONE'},
+    {name:'ファイティングイーグルス名古屋', arena:'名古屋市枇杷島スポーツセンター', league:'B.LEAGUE ONE'},
+    {name:'バンビシャス奈良', arena:'ロートアリーナ奈良', league:'B.LEAGUE ONE'},
+    {name:'トライフープ岡山', arena:'シゲトーアリーナ岡山', league:'B.LEAGUE ONE'},
+    {name:'徳島ガンバロウズ', arena:'とくぎんトモニアリーナ', league:'B.LEAGUE ONE'},
+    // --- B.LEAGUE ONE（南地区・5クラブ） ---
+    {name:'香川ファイブアローズ', arena:'あなぶきアリーナ香川', league:'B.LEAGUE ONE'},
+    {name:'愛媛オレンジバイキングス', arena:'松山市総合コミュニティセンター', league:'B.LEAGUE ONE'},
+    {name:'ライジングゼファー福岡', arena:'照葉積水ハウスアリーナ', league:'B.LEAGUE ONE'},
+    {name:'熊本ヴォルターズ', arena:'熊本県立総合体育館', league:'B.LEAGUE ONE'},
+    {name:'鹿児島レブナイズ', arena:'西原商会アリーナ', league:'B.LEAGUE ONE'},
+    // --- B.LEAGUE NEXT（4クラブ） ---
+    {name:'しながわシティバスケットボールクラブ', arena:'品川区立総合体育館', league:'B.LEAGUE NEXT'},
+    {name:'ウォルガ湘南', arena:'秋葉台文化体育館', league:'B.LEAGUE NEXT'},
+    {name:'ヴィアティン三重', arena:'AGF鈴鹿体育館', league:'B.LEAGUE NEXT'},
+    {name:'山口パッツファイブ', arena:'俵田翁記念館', league:'B.LEAGUE NEXT'},
   ],
   '野球': [ // NPB 12球団（1軍本拠地）
     {name:'読売ジャイアンツ', arena:'東京ドーム', league:'セ・リーグ'},
@@ -1122,7 +1125,9 @@ function updateHomeAwayUI(){
   const teams = TEAM_DATA[sport] || [];
   const match = teams.find(t=>t.name===teamVal);
   const section = document.getElementById('home-away-section');
-  if(match && match.arena){
+  // チームが選択されていればHOME/AWAYボタン自体は常に出す（アリーナデータが無いリーグでも、
+  // AWAYの相手がアリーナ登録済みのチームというケースがあるため）
+  if(match){
     section.style.display = 'block';
   }else{
     section.style.display = 'none';
@@ -1143,10 +1148,15 @@ function setHomeAway(mode){
   const note = document.getElementById('venue-suggest-note');
   const venueInput = document.getElementById('f-venue');
   const venueList = document.getElementById('f-venue-list');
-  if(mode === 'HOME' && myTeam && myTeam.arena){
-    venueInput.value = myTeam.arena;
-    venueList.innerHTML = `<option value="${myTeam.arena}">`;
-    note.textContent = '（自チームのホームアリーナをセット）';
+  if(mode === 'HOME'){
+    if(myTeam && myTeam.arena){
+      venueInput.value = myTeam.arena;
+      venueList.innerHTML = `<option value="${myTeam.arena}">`;
+      note.textContent = '（自チームのホームアリーナをセット）';
+    }else{
+      note.textContent = '（このチームのアリーナ情報が未登録です。会場欄に直接入力してください）';
+      venueInput.focus();
+    }
   } else if(mode === 'AWAY'){
     const matchText = getMatchValue();
     const arenas = getOpponentArenas(sport, matchText, teams);
@@ -1157,7 +1167,7 @@ function setHomeAway(mode){
     }else{
       venueInput.value = '';
       venueList.innerHTML = '';
-      note.textContent = '（対戦相手欄にチーム名を入れると候補が出ます）';
+      note.textContent = '（対戦相手のアリーナ情報が未登録、または対戦相手が未選択です。会場欄に直接入力してください）';
     }
   }
 }
@@ -1396,7 +1406,7 @@ function renderAlerts(){
 }
 
 function focusTrip(tripId, key){
-  if(key) catOpen.add(`${tripId}:${key}`);
+  if(key) activeCat[tripId] = key;
   render();
   setTimeout(()=>{
     const el = document.getElementById('trip-'+tripId);
@@ -1480,6 +1490,17 @@ function statusSegment(t, c){
     </div>`;
 }
 
+// カテゴリごとに分かりやすい詳細メモのプレースホルダーを出し分ける
+function memoPlaceholder(key){
+  const map = {
+    ticket: '座席番号など',
+    hotel: 'ホテル名など',
+    transport_outbound: '座席・便名など',
+    transport_return: '座席・便名など',
+  };
+  return map[key] || '詳細メモ';
+}
+
 function catPanelContent(t, c){
   const d = t.detail[c.key];
   const segment = statusSegment(t, c);
@@ -1519,22 +1540,43 @@ function catPanelContent(t, c){
         <div class="field"><label>着駅</label><input value="${(d.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
       </div>
       <div class="legs-box">
-        <div class="legs-label">乗り継ぎがある場合の内訳（新幹線＋特急など）</div>
-        ${(d.legs||[]).map((leg,i)=>`
-          <div class="leg-row">
-            <input value="${(leg.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'method',this.value)"`:'disabled'} placeholder="例）特急ひだ">
-            <input type="number" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円">
-            ${IS_EDITABLE ? `<button type="button" onclick="removeLeg('${t.id}','${c.key}',${i})" class="leg-remove">×</button>` : ''}
-          </div>`).join('')}
+        <div class="legs-label">乗り継ぎがある場合の内訳（新幹線＋特急など。それぞれ別に予約できます）</div>
+        ${(d.legs||[]).map((leg,i)=>{
+          const legBooked = !!(leg.bookedDate);
+          return `
+          <div class="leg-card">
+            <div class="leg-card-top">
+              <input class="leg-method" value="${(leg.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'method',this.value)"`:'disabled'} placeholder="例）特急ひだ">
+              <span class="leg-status-dot ${legBooked?'done':'pending'}"></span>
+              ${IS_EDITABLE ? `<button type="button" onclick="removeLeg('${t.id}','${c.key}',${i})" class="leg-remove">×</button>` : ''}
+            </div>
+            <div class="field-row">
+              <div class="field"><label>発駅</label><input value="${(leg.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)"`:'disabled'} placeholder="例）名古屋"></div>
+              <div class="field"><label>着駅</label><input value="${(leg.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
+              <div class="field"><label>この区間の金額</label><input type="number" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
+            </div>
+            <div class="field"><label>予約リンク・確認番号</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'link',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+          </div>`;
+        }).join('')}
+        ${(d.legs||[]).length ? `<div class="legs-total">乗り継ぎ合計：<b>¥${sumLegs(d.legs).toLocaleString()}</b>（上の「金額」欄に自動反映されます）</div>` : ''}
         ${IS_EDITABLE ? `<button type="button" class="leg-add" onclick="addLeg('${t.id}','${c.key}')">＋ 交通手段を追加</button>` : ''}
       </div>
     </details>
   ` : '';
 
   if(!c.bookable){
+    const link = (d.link||'').trim();
+    const linkUrl = link && !/^https?:\/\//i.test(link) ? `https://${link}` : link;
     return `
       <div class="cat-panel">
         <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="お店の名前など"></div>
+        ${c.key==='food' ? `
+        <div class="field"><label>お店のリンク（食べログ・地図など）</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','link',this.value)"`:'disabled'} placeholder="URLを貼り付け"></div>
+        ${link ? `<a href="${linkUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="food-link-btn">🔗 お店のページを開く</a>` : ''}
+        ` : ''}
         ${segment}
         ${c.key==='food' ? `<div class="pr-row">${getPrLinks('food').map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
         ${c.key==='other' ? `<div class="pr-row">${getPrLinks('other').map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
@@ -1549,8 +1591,8 @@ function catPanelContent(t, c){
       </div>
       ${stationBlock}
       <div class="field-row">
-        <div class="field"><label>金額</label><input type="number" value="${d.cost||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
-        <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="座席・便名など"></div>
+        <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
+        <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
       </div>
       ${segment}
       ${copyOutboundBlock}
@@ -1582,7 +1624,10 @@ function renderTicketCard(t, isPast){
         <div>
           <span class="sport-tag">${t.sport} / ${t.team}</span>
           <div class="matchup">${t.match}</div>
-          <div class="venue">${t.venue}${t.venue ? ` <a href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--rose-deep); text-decoration:none; font-size:11px; font-weight:700;">🗺️ 地図</a>` : ''}</div>
+          <div class="venue-row">
+            <span class="venue">${t.venue}</span>
+            ${t.venue ? `<a class="map-badge" href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ 地図を見る</a>` : ''}
+          </div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
           ${nextAction ? `<div class="next-action" onclick="focusTrip('${t.id}','${nextAction.key}')">👉 次は${nextAction.icon}${nextAction.label}の予約</div>` : ''}
         </div>
@@ -1608,36 +1653,33 @@ function renderTicketCard(t, isPast){
           <span class="label">想定予算</span>
           <span class="val">¥${(t.cost||0).toLocaleString()}</span>
         </div>
-        <div class="status-row">
+        <div class="cat-strip">
           ${CATS.map(c=>{
-            const open = catOpen.has(`${t.id}:${c.key}`);
             const done = t.status[c.key];
             const notNeeded = !!t.detail[c.key]?.notNeeded;
-            const d = t.detail[c.key] || {};
-            const summaryText = c.bookable
-              ? [d.method, d.cost ? `¥${Number(d.cost).toLocaleString()}` : ''].filter(Boolean).join(' ・ ')
-              : (d.memo || '');
-            return `
-            <div class="cat-item ${open?'is-open':''} ${notNeeded?'cat-not-needed':''}">
-              <div class="cat-header" onclick="toggleCat('${t.id}','${c.key}')">
-                <span class="icon" style="${notNeeded?'opacity:0.4;':''}">${c.icon}</span>
-                <span class="label-col" style="${notNeeded?'opacity:0.4;':''}">
-                  <span class="label">${c.label}</span>
-                  ${(!open && summaryText) ? `<span class="cat-summary">${summaryText}</span>` : ''}
-                </span>
-                ${IS_EDITABLE && c.bookable ? `
-                <span class="status-quick" onclick="event.stopPropagation(); quickToggleStatus('${t.id}','${c.key}')" title="タップで予約済み/未予約を切り替え">
-                  <span class="status-dot ${notNeeded?'not-needed':done?'done':'pending'}"></span>
-                  <span class="status-text ${notNeeded?'not-needed':''}">${notNeeded?'対象外':done?'予約済み':'未予約'}</span>
-                </span>` : `
-                <span class="status-dot ${notNeeded?'not-needed':done?'done':'pending'}"></span>
-                <span class="status-text ${notNeeded?'not-needed':''}">${notNeeded?'対象外':done?'予約済み':'未予約'}</span>`}
-                <span class="chevron">▾</span>
-              </div>
-              ${catPanelContent(t,c)}
-            </div>`;
+            const isActive = activeCat[t.id] === c.key;
+            const statusClass = notNeeded ? 'chip-not-needed' : (done ? 'chip-done' : 'chip-pending');
+            return `<button type="button" class="cat-chip ${statusClass} ${isActive?'is-active':''}" onclick="toggleCat('${t.id}','${c.key}')">
+              <span class="cat-chip-icon">${c.icon}</span>
+              <span class="cat-chip-label">${c.label}</span>
+            </button>`;
           }).join('')}
         </div>
+        ${activeCat[t.id] ? (()=>{
+          const c = CATS.find(x=>x.key===activeCat[t.id]);
+          const done = t.status[c.key];
+          const notNeeded = !!t.detail[c.key]?.notNeeded;
+          return `
+          <div class="cat-active-panel">
+            <div class="cat-active-header">
+              <span class="cat-active-title">${c.icon} ${c.label}</span>
+              <span class="status-dot ${notNeeded?'not-needed':done?'done':'pending'}"></span>
+              <span class="status-text ${notNeeded?'not-needed':''}">${notNeeded?'対象外':done?'予約済み':'未予約'}</span>
+              <button type="button" class="cat-active-close" onclick="toggleCat('${t.id}','${c.key}')">✕</button>
+            </div>
+            ${catPanelContent(t,c)}
+          </div>`;
+        })() : ''}
         ${isPast ? `
         <div class="journal-box">
           <div class="journal-label">📝 この遠征の思い出</div>
@@ -1706,20 +1748,13 @@ function renderPastToggle(count, past){
 function togglePast(){ showPast = !showPast; renderGrid(); }
 
 function toggleCat(tripId, key){
-  const k = `${tripId}:${key}`;
-  if(catOpen.has(k)) catOpen.delete(k); else catOpen.add(k);
+  if(activeCat[tripId] === key){
+    delete activeCat[tripId]; // 同じカテゴリを再タップしたら閉じる
+  }else{
+    activeCat[tripId] = key; // 別のカテゴリに切り替え（他は自動的に閉じる＝タブのような挙動）
+  }
   render();
   setTimeout(initCategoryBannerRotators, 50);
-}
-
-// カテゴリを開かずに、ステータスの丸をタップするだけで「未予約⇄予約済み」を即座に切り替える
-// （「不要」への切り替えは誤操作防止のため、パネルを開いての3択操作のみとする）
-function quickToggleStatus(tripId, key){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  if(!t) return;
-  if(t.detail[key]?.notNeeded) return; // 「対象外」の場合はワンタップでは変更しない（開いて操作してもらう）
-  setCatState(tripId, key, t.status[key] ? 'pending' : 'done');
 }
 
 function renderBudgetBox(){
@@ -1807,7 +1842,7 @@ async function saveBookingDetail(tripId, key, patch, suppressToast){
   const merged = { ...t.detail[key], ...patch };
   if(patch.is_booked !== undefined) t.status[key] = patch.is_booked;
   t.detail[key] = merged;
-  catOpen.add(`${tripId}:${key}`);
+  activeCat[tripId] = key;
   render();
   try{
     const { error } = await sb.rpc('upsert_booking_detail', {
@@ -1825,7 +1860,8 @@ async function saveBookingDetail(tripId, key, patch, suppressToast){
       p_notify_on_sale: !!merged.notifyOnSale,
       p_departure_station: merged.departureStation || null,
       p_arrival_station: merged.arrivalStation || null,
-      p_legs: merged.legs || []
+      p_legs: merged.legs || [],
+      p_link: merged.link || null
     });
     if(error) throw error;
     if(!suppressToast) showToast('✓ 保存しました', 1200);
@@ -1927,8 +1963,8 @@ function addLeg(tripId, key){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
-  const legs = [...(t.detail[key].legs||[]), { method:'', cost:0 }];
-  saveBookingDetail(tripId, key, { legs }, true);
+  const legs = [...(t.detail[key].legs||[]), { method:'', cost:0, bookedDate:'', link:'', departureStation:'', arrivalStation:'' }];
+  saveBookingDetail(tripId, key, { legs, cost: sumLegs(legs) }, true);
 }
 function updateLeg(tripId, key, index, field, val){
   if(!IS_EDITABLE) return;
@@ -1937,14 +1973,18 @@ function updateLeg(tripId, key, index, field, val){
   const legs = [...(t.detail[key].legs||[])];
   if(!legs[index]) return;
   legs[index] = { ...legs[index], [field]: field==='cost' ? (parseInt(val)||0) : val };
-  saveBookingDetail(tripId, key, { legs });
+  // 乗り継ぎがある場合、各区間の金額の合計をカテゴリ全体の金額欄に自動反映する
+  saveBookingDetail(tripId, key, { legs, cost: sumLegs(legs) });
 }
 function removeLeg(tripId, key, index){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
   const legs = (t.detail[key].legs||[]).filter((_,i)=>i!==index);
-  saveBookingDetail(tripId, key, { legs }, true);
+  saveBookingDetail(tripId, key, { legs, cost: sumLegs(legs) }, true);
+}
+function sumLegs(legs){
+  return (legs||[]).reduce((sum, leg) => sum + (parseInt(leg.cost) || 0), 0);
 }
 
 function updateSimple(tripId, key, val){
@@ -1961,7 +2001,7 @@ async function deleteTrip(tripId){
     const { error } = await sb.rpc('delete_trip', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId });
     if(error) throw error;
     trips = trips.filter(x=>x.id!==tripId);
-    [...catOpen].forEach(k=>{ if(k.startsWith(`${tripId}:`)) catOpen.delete(k); });
+    delete activeCat[tripId];
     render();
   }catch(e){
     console.error(e);
@@ -2058,8 +2098,8 @@ function renderStamps(){
     bySport[t.sport].push(t);
   });
 
-  // B1（バスケ）のみ全会場データが揃っているため、制覇率バッジの対象にする
-  const b1Arenas = [...new Set((TEAM_DATA['バスケットボール']||[]).filter(x=>x.league==='B1' && x.arena).map(x=>x.arena))];
+  // B.LEAGUE PREMIER（バスケ最上位）のみ全会場データが揃っているため、制覇率バッジの対象にする
+  const b1Arenas = [...new Set((TEAM_DATA['バスケットボール']||[]).filter(x=>x.league==='B.LEAGUE PREMIER' && x.arena).map(x=>x.arena))];
 
   const sections = Object.entries(bySport).map(([sport, sportTrips])=>{
     const venueCounts = {};
@@ -2076,7 +2116,7 @@ function renderStamps(){
       const pct = Math.round(visitedCount / b1Arenas.length * 100);
       completionBadge = `
         <div class="stamp-completion">
-          <div class="stamp-completion-label">🏆 B1会場制覇率</div>
+          <div class="stamp-completion-label">🏆 B.LEAGUE PREMIER会場制覇率</div>
           <div class="stamp-completion-bar"><div class="stamp-completion-fill" style="width:${pct}%"></div></div>
           <div class="stamp-completion-num">${visitedCount} / ${b1Arenas.length}会場（${pct}%）</div>
         </div>`;
@@ -2335,13 +2375,19 @@ async function submitTrip(keepOpen){
       const detailTemplate = duplicateTemplateDetail;
       duplicateTemplateDetail = null;
 
+      // 飲食・その他は使わない人も多いため、デフォルトで「対象外」にしておく
+      const DEFAULT_NOT_NEEDED = ['food', 'other'];
       const status = {}, detail = {};
       CATS.forEach(c=>{
         status[c.key] = false;
-        detail[c.key] = c.bookable ? {method:'',bookedDate:'',cost:0,memo:''} : {memo:''};
+        const notNeeded = DEFAULT_NOT_NEEDED.includes(c.key);
+        detail[c.key] = c.bookable ? {method:'',bookedDate:'',cost:0,memo:'',notNeeded} : {memo:'',notNeeded,link:''};
       });
       trips.push({ id:newId, sport, team, match, date, time, venue, cost, status, detail });
 
+      for(const key of DEFAULT_NOT_NEEDED){
+        await saveBookingDetail(newId, key, { notNeeded: true }, true);
+      }
       if(isDayTrip){
         await saveBookingDetail(newId, 'hotel', { notNeeded: true }, true);
       }
@@ -2369,11 +2415,10 @@ async function submitTrip(keepOpen){
       }
       render();
 
-      // 未訪問のスタジアムなら、達成感の通知とあわせて宿泊・交通の予約欄を開いておく（自然な形で予約導線・広告に繋げる）
+      // 未訪問のスタジアムなら、達成感の通知とあわせて交通の予約欄を開いておく（自然な形で予約導線・広告に繋げる）
       if(isNewVenue && !isDayTrip){
         setTimeout(()=>{
-          catOpen.add(`${newId}:hotel`);
-          catOpen.add(`${newId}:transport_outbound`);
+          activeCat[newId] = 'transport_outbound';
           render();
           setTimeout(initCategoryBannerRotators, 50);
           focusTrip(newId);
@@ -2768,7 +2813,7 @@ function normalizeTrip(raw){
   CATS.forEach(c=>{
     const bd = (raw.booking_details||[]).find(x=>x.category===c.key) || {};
     status[c.key] = !!bd.is_booked;
-    const base = { memo: bd.memo || '', notNeeded: !!bd.is_not_needed };
+    const base = { memo: bd.memo || '', notNeeded: !!bd.is_not_needed, link: bd.link || '' };
     detail[c.key] = c.bookable
       ? { ...base, method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0,
           saleDate: bd.sale_date || '', saleTime: bd.sale_time ? String(bd.sale_time).slice(0,5) : '', notifyOnSale: !!bd.notify_on_sale,
@@ -2971,8 +3016,6 @@ async function copyShareLink(url){
 
 function applyEditableUI(){
   document.getElementById('header-actions').style.display = 'flex';
-  const addBtn = document.getElementById('header-add-btn');
-  if(addBtn) addBtn.style.display = IS_EDITABLE ? 'inline-block' : 'none';
   const shareBtn = document.getElementById('header-share-btn');
   if(shareBtn) shareBtn.style.display = 'flex';
   const fab = document.getElementById('fab-add-btn');
