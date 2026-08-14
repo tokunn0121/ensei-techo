@@ -2878,6 +2878,11 @@ function openSettingsPanel(){
   const icsUrl = SUPABASE_URL + '/functions/v1/ics-feed?token=' + encodeURIComponent(SHARE_TOKEN || TOKEN);
 
   body.innerHTML = `
+    ${IS_EDITABLE ? `
+    <div style="margin-bottom:18px; background:var(--rose-wash); border:1.5px solid var(--rose); border-radius:12px; padding:14px;">
+      <div style="font-size:12.5px; font-weight:700; color:var(--rose-deep); margin-bottom:6px;">🔒 リンクのバックアップ、できていますか？</div>
+      <div style="font-size:11.5px; color:var(--text); line-height:1.7;">このリンクは他の人には分からない、あなただけの合言葉のようなものです。誤って消してしまうと、運営側でも復元する手立てがありません。家族の誰か1人にも共有しておく、または🔗共有ボタンからQRコードを保存しておくことをおすすめします。</div>
+    </div>` : ''}
     <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📅 外部カレンダーに登録</div>
       <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">登録した試合日を、GoogleカレンダーやiPhoneの標準カレンダーに自動反映できます。下のリンクを「URLで購読」に登録すると、以後この手帳に試合を追加するたびに自動で反映されます。</div>
@@ -2941,7 +2946,15 @@ function openSharePopup(){
           <div class="sab-title">編集リンクをコピー</div>
           <div class="sab-sub">家族・一緒に管理する人へ（編集できます）</div>
         </span>
-      </button>`;
+      </button>
+      <button class="share-action-btn" onclick="toggleQrCode('edit','${editUrl.replace(/'/g,"\\'")}')">
+        <span class="sab-icon">📱</span>
+        <span class="sab-body">
+          <div class="sab-title">編集リンクのQRコードを表示</div>
+          <div class="sab-sub">スクショで保存しておくと、リンクを見失っても復元できます</div>
+        </span>
+      </button>
+      <div id="qr-box-edit" style="display:none;"></div>`;
     viewSection.innerHTML = shareUrl ? `
       <button class="share-action-btn" onclick="popupCopy('${shareUrl.replace(/'/g,"\\'")}','view')">
         <span class="sab-icon">👀</span>
@@ -2949,7 +2962,14 @@ function openSharePopup(){
           <div class="sab-title">閲覧専用リンクをコピー</div>
           <div class="sab-sub">友達・SNS公開用（編集不可・安心）</div>
         </span>
-      </button>` : '';
+      </button>
+      <button class="share-action-btn" onclick="toggleQrCode('view','${shareUrl.replace(/'/g,"\\'")}')">
+        <span class="sab-icon">📱</span>
+        <span class="sab-body">
+          <div class="sab-title">閲覧専用リンクのQRコードを表示</div>
+        </span>
+      </button>
+      <div id="qr-box-view" style="display:none;"></div>` : '';
     readonlyMsg.innerHTML = '';
   }else{
     modeLabel.textContent = 'これは閲覧専用リンクです';
@@ -2961,7 +2981,14 @@ function openSharePopup(){
           <div class="sab-title">このリンクをコピー</div>
           <div class="sab-sub">閲覧専用リンク（相手は編集できません）</div>
         </span>
-      </button>`;
+      </button>
+      <button class="share-action-btn" onclick="toggleQrCode('view','${editUrl.replace(/'/g,"\\'")}')">
+        <span class="sab-icon">📱</span>
+        <span class="sab-body">
+          <div class="sab-title">QRコードを表示</div>
+        </span>
+      </button>
+      <div id="qr-box-view" style="display:none;"></div>`;
     readonlyMsg.innerHTML = '<div style="font-size:12px; color:var(--text-dim); text-align:center; padding:4px 0;">編集リンクをお持ちの方からリンクをもらってください</div>';
   }
 
@@ -2985,6 +3012,25 @@ function openSharePopup(){
 function closeSharePopup(){
   document.getElementById('share-popup-overlay').style.display = 'none';
   document.getElementById('share-popup').style.display = 'none';
+}
+
+// QRコードを表示/非表示（外部の無料QR生成サービスを画像として読み込むだけなので、新規ライブラリは不要）
+function toggleQrCode(kind, url){
+  const box = document.getElementById(`qr-box-${kind}`);
+  if(!box) return;
+  const isOpen = box.style.display !== 'none';
+  if(isOpen){
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}`;
+  box.innerHTML = `
+    <div style="text-align:center; background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:14px; margin-bottom:8px;">
+      <img src="${qrImgUrl}" width="220" height="220" alt="QRコード" style="max-width:100%; height:auto; border-radius:8px;">
+      <div style="font-size:11px; color:var(--text-dim); margin-top:8px; line-height:1.6;">この画面をスクリーンショットして保存しておくと、<br>リンクを見失った時にカメラで読み取って復元できます</div>
+    </div>`;
+  box.style.display = 'block';
 }
 
 async function popupCopy(url, type){
