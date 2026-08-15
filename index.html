@@ -1422,21 +1422,27 @@ function renderHero(){
 function renderAlerts(){
   const catInfo = k => CATS.find(c=>c.key===k);
   const items = [];
+  let laterCount = 0; // 1ヶ月より先で、まだアラートには出していない未予約件数（参考表示用）
   trips.filter(t=>new Date(t.date) >= new Date(TODAY)).forEach(t=>{
+    const withinMonth = daysUntil(t.date) <= 31;
     BOOKABLE_CATS.forEach(key=>{
-      if(!t.status[key] && !t.detail[key]?.notNeeded) items.push({trip:t, key});
+      if(!t.status[key] && !t.detail[key]?.notNeeded){
+        if(withinMonth) items.push({trip:t, key});
+        else laterCount++;
+      }
     });
   });
   items.sort((a,b)=> new Date(a.trip.date) - new Date(b.trip.date));
   const box = document.getElementById('alerts');
+  const laterNote = laterCount ? `<div class="sub" style="margin-top:6px;">（1ヶ月より先の未予約が他に${laterCount}件あります。新幹線・特急等は1ヶ月前から予約開始が多いため、ここでは表示していません）</div>` : '';
   if(!items.length){
-    box.innerHTML = `<h3>⚠️ 確認が必要な項目</h3><div class="all-clear">✓ 今のところ未予約の項目はありません</div>`;
+    box.innerHTML = `<h3>⚠️ 確認が必要な項目</h3><div class="all-clear">✓ 今のところ未予約の項目はありません</div>${laterNote}`;
     return;
   }
   const shown = items.slice(0,6);
   box.innerHTML = `
     <h3>⚠️ 確認が必要な項目（${items.length}件）</h3>
-    <div class="sub">タップするとその遠征カードにジャンプします</div>
+    <div class="sub">タップするとその遠征カードにジャンプします（試合日まで1ヶ月以内のもののみ表示）</div>
     ${shown.map(it=>{
       const c = catInfo(it.key);
       const d = daysUntil(it.trip.date);
@@ -1446,6 +1452,7 @@ function renderAlerts(){
       </div>`;
     }).join('')}
     ${items.length>6 ? `<div class="more">ほか${items.length-6}件あります</div>` : ''}
+    ${laterNote}
   `;
 }
 
@@ -2020,25 +2027,14 @@ function setCatState(tripId, key, state){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
-  const c = CATS.find(x=>x.key===key);
   const notNeeded = state==='skip';
   const isBooked = state==='done';
   const patch = { notNeeded, is_booked: isBooked };
-  if(isBooked && c.bookable && !t.detail[key].bookedDate) patch.bookedDate = TODAY;
+  // 予約日は自動で入れない（実際に予約した日を手動で入力してもらう）
   t.detail[key] = { ...t.detail[key], notNeeded };
   saveBookingDetail(tripId, key, patch, true);
 }
 
-
-function setStatus(tripId, key, val){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  if(!t) return;
-  const c = CATS.find(x=>x.key===key);
-  const patch = { is_booked: val };
-  if(val && c.bookable && !t.detail[key].bookedDate) patch.bookedDate = TODAY;
-  saveBookingDetail(tripId, key, patch);
-}
 function updateDetail(tripId, key, field, val){
   if(!IS_EDITABLE) return;
   const patch = { [field]: field==='cost' ? (parseInt(val)||0) : val };
