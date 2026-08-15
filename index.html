@@ -139,10 +139,23 @@
   .recent .empty{ color:var(--text-faint); font-size:13px; padding:6px 0; }
 
   /* ---------- filters ---------- */
+  .search-box-wrap{ position:relative; padding:20px 5vw 0; }
+  .search-box{ width:100%; background:var(--surface); border:1.5px solid var(--line); border-radius:12px; padding:12px 40px 12px 16px; font-size:15px; font-family:var(--font-body); color:var(--text); }
+  .search-box:focus{ border-color:var(--rose); outline:none; }
+  .search-clear{ position:absolute; right:calc(5vw + 10px); top:50%; transform:translateY(-50%); background:var(--surface-2); border:none; border-radius:50%; width:26px; height:26px; font-size:12px; color:var(--text-faint); cursor:pointer; align-items:center; justify-content:center; }
   .filters{ display:flex; gap:8px; padding: 20px 5vw 6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
   .filters::-webkit-scrollbar{ display:none; }
   .chip{ font-family: var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background: var(--surface); border:1px solid var(--line); padding:9px 16px; border-radius:999px; cursor:pointer; user-select:none; transition:.15s; flex-shrink:0; min-height:38px; display:flex; align-items:center; }
   .chip.active, .chip:hover{ color:#fff; border-color:var(--rose); background:var(--rose); }
+
+  /* 並び替え＋表示密度：役割が違うことが一目でわかるよう、チップとは異なる見た目にする */
+  .control-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 5vw 6px; flex-wrap:wrap; }
+  .sort-select-wrap{ display:flex; align-items:center; gap:8px; }
+  .sort-select-label{ font-size:11.5px; color:var(--text-faint); font-weight:700; white-space:nowrap; }
+  .sort-select{ font-family:var(--font-body); font-size:12.5px; color:var(--text); background:var(--surface); border:1.5px solid var(--line); border-radius:10px; padding:8px 10px; min-height:38px; }
+  .density-switch{ display:flex; gap:2px; background:var(--surface); border:1.5px solid var(--line); border-radius:10px; padding:2px; flex-shrink:0; }
+  .density-btn{ background:none; border:none; font-size:15px; padding:6px 10px; border-radius:8px; cursor:pointer; min-height:34px; min-width:38px; }
+  .density-btn.active{ background:var(--rose-wash); }
 
   /* ---------- grid ---------- */
   .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:20px; padding: 16px 5vw 40px; }
@@ -163,17 +176,19 @@
   @keyframes pulseGlow{ 0%{ box-shadow:0 0 0 4px rgba(217,139,150,0.5);} 100%{ box-shadow:0 6px 20px rgba(74,63,58,0.06);} }
   /* コンパクト表示（1行リスト） */
   .ticket.ticket-slim{ min-height:0; }
-  .ticket-compact-row{ display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; min-height:44px; }
-  .tcr-date{ text-align:center; flex-shrink:0; width:38px; }
-  .tcr-d{ font-family:var(--font-num); font-weight:700; font-size:13px; }
+  .ticket-compact-row{ display:flex; align-items:center; gap:12px; padding:14px; cursor:pointer; min-height:44px; }
+  .tcr-date{ text-align:center; flex-shrink:0; width:40px; }
+  .tcr-d{ font-family:var(--font-num); font-weight:700; font-size:14px; }
   .tcr-dow{ font-size:9.5px; color:var(--text-faint); }
   .tcr-main{ flex:1; min-width:0; }
-  .tcr-team{ font-size:11px; color:var(--rose-deep); font-weight:700; }
-  .tcr-match{ font-size:12.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tcr-status{ text-align:right; flex-shrink:0; }
-  .tcr-pct{ font-family:var(--font-num); font-weight:700; font-size:13px; }
-  .tcr-pending{ font-size:9.5px; color:var(--rose-deep); white-space:nowrap; }
-  .tcr-ok{ font-size:9.5px; color:var(--sage); white-space:nowrap; }
+  .tcr-line1{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+  .tcr-team{ font-size:11px; color:var(--rose-deep); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tcr-pct{ font-family:var(--font-num); font-weight:700; font-size:13px; flex-shrink:0; }
+  .tcr-line2{ display:flex; align-items:baseline; gap:8px; margin-top:2px; }
+  .tcr-match{ font-size:13.5px; color:var(--text); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tcr-venue{ font-size:11px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:1; min-width:0; }
+  .tcr-pending{ font-size:10.5px; color:var(--rose-deep); margin-top:3px; }
+  .tcr-ok{ font-size:10.5px; color:var(--sage); margin-top:3px; }
   .tcr-chevron{ font-size:10px; color:var(--text-faint); flex-shrink:0; }
   .compact-collapse-bar{ text-align:center; font-size:11px; color:var(--rose-deep); padding:8px; cursor:pointer; border-bottom:1px solid var(--line); background:var(--rose-wash); }
   .ticket .head{ padding:18px 20px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
@@ -410,7 +425,7 @@
   }
   .share-icon-btn:hover{ border-color:var(--rose); background:var(--rose-wash); }
   #fab-add-btn{
-    position:fixed; right:20px; bottom:24px; z-index:90;
+    position:fixed; right:20px; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:90;
     width:56px; height:56px; border-radius:50%; border:none;
     background:var(--rose); color:#fff; font-size:26px; font-weight:400; line-height:1;
     box-shadow:0 4px 16px rgba(217,139,150,0.5); cursor:pointer;
@@ -512,9 +527,12 @@
   <div class="alerts" id="alerts"></div>
   <div class="summary" id="summary"></div>
   <div class="recent" id="recent"></div>
+  <div class="search-box-wrap">
+    <input type="text" id="trip-search" class="search-box" placeholder="🔍 チーム名・対戦相手で検索" oninput="setSearchQuery(this.value)">
+    <button type="button" id="search-clear-btn" class="search-clear" onclick="clearSearchQuery()" style="display:none;">✕</button>
+  </div>
   <div class="filters" id="filters"></div>
-  <div class="filters" id="sort-toggle" style="padding-top:0;"></div>
-  <div class="filters" id="density-toggle" style="padding-top:0;"></div>
+  <div class="control-row" id="control-row"></div>
   <div class="grid" id="grid"></div>
 </div>
 
@@ -546,6 +564,9 @@
   <div class="modal">
     <div class="modal-title" id="modal-title-si">スケジュールをまとめて入力</div>
     <div class="modal-sub">公式サイトやLINEメモなどからコピーしたスケジュールテキストを貼り付けると、AIが試合を自動検出して登録します。</div>
+    <div style="background:var(--butter-wash,#FFF7E6); border:1px solid var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:11.5px; color:#8a6d1f; line-height:1.7;">
+      ⚠️ この機能はサーバー側の追加設定（Edge Function・AI利用料）が済んでいる場合のみ動作します。未設定の場合は「解析に失敗しました」と表示されます。
+    </div>
     <div class="field" style="margin-top:14px;">
       <label>スケジュールテキスト（コピペでOK）</label>
       <textarea id="schedule-import-text" style="width:100%; min-height:140px; border:1.5px solid var(--line); border-radius:10px; padding:12px; font-size:14px; font-family:var(--font-body); background:var(--surface-2); resize:vertical;" placeholder="例）&#10;10/3(金) 18:00 アルバルク東京 vs 宇都宮ブレックス @ TOYOTA ARENA TOKYO&#10;10/5(日) 14:00 千葉ジェッツ vs 琉球ゴールデンキングス @ LaLa arena TOKYO-BAY"></textarea>
@@ -722,6 +743,7 @@ Settings.migrateLegacyKeys();
 let notebook = null;      // { id, title, budget_cap, is_editable, share_token }
 let trips = [];
 let sportFilter = 'ALL';
+let searchQuery = '';
 let sortMode = 'date'; // 'date'（試合日順） | 'progress'（準備が遅れている順）
 let cardViewMode = Settings.get('cardViewMode', null); // 'detailed'（詳細カード） | 'compact'（コンパクトリスト） | null（未設定＝件数に応じて自動判定）
 let expandedTrips = new Set(); // コンパクト表示時に、手動で展開した遠征のID
@@ -1487,22 +1509,36 @@ function renderFilters(){
   document.getElementById('filters').innerHTML = sports.map(s=>
     `<div class="chip ${sportFilter===s?'active':''}" onclick="setFilter('${s}')">${s==='ALL'?'すべて':s}</div>`
   ).join('');
-  const sortBox = document.getElementById('sort-toggle');
-  if(sortBox){
-    sortBox.innerHTML = `
-      <div class="chip ${sortMode==='date'?'active':''}" onclick="setSortMode('date')">📅 試合日順</div>
-      <div class="chip ${sortMode==='progress'?'active':''}" onclick="setSortMode('progress')">⚠️ 準備が遅れている順</div>
-    `;
-  }
-  const densityBox = document.getElementById('density-toggle');
-  if(densityBox){
-    densityBox.innerHTML = `
-      <div class="chip ${cardViewMode==='detailed'?'active':''}" onclick="setCardViewMode('detailed')">📋 詳細表示</div>
-      <div class="chip ${cardViewMode==='compact'?'active':''}" onclick="setCardViewMode('compact')">📃 コンパクト表示</div>
+  const controlRow = document.getElementById('control-row');
+  if(controlRow){
+    controlRow.innerHTML = `
+      <div class="sort-select-wrap">
+        <label class="sort-select-label">並び替え</label>
+        <select class="sort-select" onchange="setSortMode(this.value)">
+          <option value="date" ${sortMode==='date'?'selected':''}>📅 試合日順</option>
+          <option value="progress" ${sortMode==='progress'?'selected':''}>⚠️ 準備が遅れている順</option>
+        </select>
+      </div>
+      <div class="density-switch">
+        <button type="button" class="density-btn ${cardViewMode==='detailed'?'active':''}" onclick="setCardViewMode('detailed')" title="詳細表示">🔍</button>
+        <button type="button" class="density-btn ${cardViewMode==='compact'?'active':''}" onclick="setCardViewMode('compact')" title="コンパクト表示">📃</button>
+      </div>
     `;
   }
 }
 function setFilter(s){ sportFilter = s; render(); }
+function setSearchQuery(v){
+  searchQuery = v;
+  const clearBtn = document.getElementById('search-clear-btn');
+  if(clearBtn) clearBtn.style.display = v ? 'flex' : 'none';
+  renderGrid(); // 検索は一覧の絞り込みだけに影響するため、軽量にgridだけ再描画する
+}
+function clearSearchQuery(){
+  searchQuery = '';
+  document.getElementById('trip-search').value = '';
+  document.getElementById('search-clear-btn').style.display = 'none';
+  renderGrid();
+}
 function setSortMode(m){ sortMode = m; render(); }
 function setCardViewMode(m){ cardViewMode = m; Settings.set('cardViewMode', m); render(); }
 function toggleExpand(tripId){
@@ -1662,7 +1698,7 @@ function renderTicketCard(t, isPast){
   const showSlim = isCompact && !isExpanded;
   const showFull = !isCompact || isExpanded;
 
-  // コンパクト表示（折りたたみ状態）：1行だけの簡易表示。タップで展開する
+  // コンパクト表示（折りたたみ状態）：編集操作は持たせず、タップで展開してから行う設計にする
   const slimRow = showSlim ? `
     <div class="ticket-compact-row" onclick="toggleExpand('${t.id}')">
       <div class="tcr-date">
@@ -1670,19 +1706,16 @@ function renderTicketCard(t, isPast){
         <div class="tcr-dow">${dow}</div>
       </div>
       <div class="tcr-main">
-        <div class="tcr-team">${t.sport} / ${t.team}</div>
-        <div class="tcr-match">${t.match}${t.venue ? ' ・ '+t.venue : ''}</div>
+        <div class="tcr-line1">
+          <span class="tcr-team">${sportIcon(t.sport)} ${t.team}</span>
+          <span class="tcr-pct" style="color:${pct===100?'var(--sage)':'var(--rose-deep)'};">${pct}%</span>
+        </div>
+        <div class="tcr-line2">
+          <span class="tcr-match">vs ${t.match || '対戦未定'}</span>
+          ${t.venue ? `<span class="tcr-venue">📍${t.venue}</span>` : ''}
+        </div>
+        ${pendingCount>0 ? `<div class="tcr-pending">⚠️ 未予約${pendingCount}件</div>` : `<div class="tcr-ok">✓ 準備OK</div>`}
       </div>
-      <div class="tcr-status">
-        <div class="tcr-pct" style="color:${pct===100?'var(--sage)':'var(--rose-deep)'};">${pct}%</div>
-        ${pendingCount>0 ? `<div class="tcr-pending">未予約${pendingCount}件</div>` : `<div class="tcr-ok">準備OK</div>`}
-      </div>
-      ${IS_EDITABLE ? `
-      <div class="card-actions" onclick="event.stopPropagation();">
-        <button class="icon-btn" title="編集" onclick="openModal('${t.id}')">✏️</button>
-        <button class="icon-btn" title="複製して次を作る" onclick="duplicateTrip('${t.id}')">📋</button>
-        <button class="icon-btn" title="削除" onclick="deleteTrip('${t.id}')">🗑</button>
-      </div>` : ''}
       <span class="tcr-chevron">▾</span>
     </div>` : '';
 
@@ -1691,14 +1724,14 @@ function renderTicketCard(t, isPast){
       ${isCompact ? `<div class="compact-collapse-bar" onclick="toggleExpand('${t.id}')">︿ コンパクト表示に戻す</div>` : ''}
       <div class="head">
         <div>
-          <span class="sport-tag">${t.sport} / ${t.team}</span>
+          <span class="sport-tag">${sportIcon(t.sport)} ${t.team}</span>
           <div class="matchup">${t.match}</div>
           <div class="venue-row">
             <span class="venue">${t.venue}</span>
             ${t.venue ? `<a class="map-badge" href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ 地図を見る</a>` : ''}
           </div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
-          ${nextAction ? `<div class="next-action" onclick="focusTrip('${t.id}','${nextAction.key}')">👉 次は${nextAction.icon}${nextAction.label}の予約</div>` : ''}
+          ${nextAction ? `<div class="next-action" onclick="focusTrip('${t.id}','${nextAction.key}')">👉 次は${nextAction.icon}${nextAction.label}の予約${pendingCount>1?`<span style="opacity:0.75;">（他${pendingCount-1}件）</span>`:''}</div>` : ''}
         </div>
         <div class="date-block">
           <div class="d">${md}</div>
@@ -1762,7 +1795,11 @@ function renderTicketCard(t, isPast){
 }
 
 function renderGrid(){
-  const filtered = trips.filter(t => sportFilter==='ALL' || t.sport===sportFilter);
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = trips.filter(t =>
+    (sportFilter==='ALL' || t.sport===sportFilter) &&
+    (!q || t.team.toLowerCase().includes(q) || (t.match||'').toLowerCase().includes(q) || (t.venue||'').toLowerCase().includes(q))
+  );
   const upcoming = filtered.filter(t=>t.date >= TODAY);
   const past = filtered.filter(t=>t.date < TODAY).sort((a,b)=> new Date(b.date) - new Date(a.date));
 
@@ -1777,6 +1814,13 @@ function renderGrid(){
   let html = '';
 
   if(!upcoming.length && !past.length){
+    const noMatchAtAll = trips.length === 0;
+    if(!noMatchAtAll){
+      // 遠征自体はあるが、検索・競技フィルターの条件に一致するものが無い場合
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">条件に一致する遠征がありません</div><div class="empty-desc">検索キーワードや競技の絞り込みを変えてみてください。</div></div>`;
+      renderPastToggle(0);
+      return;
+    }
     grid.innerHTML = IS_EDITABLE
       ? `<div class="empty-state">
           <div class="empty-icon">🎟️</div>
@@ -2230,7 +2274,7 @@ function renderStamps(){
 
     return `
       <div class="stamp-sport-section">
-        <div class="stamp-sport-title">${sport}</div>
+        <div class="stamp-sport-title">${sportIcon(sport)} ${sport}</div>
         ${completionBadge}
         <div class="stamp-summary">通算 <b>${totalVisits}</b>回遠征 ・ <b>${venues.length}</b>会場を訪問</div>
         <div class="stamp-venue-list">
@@ -2272,6 +2316,9 @@ function shareStamps(){
 /* ---------- add / edit trip modal ---------- */
 let editingTripId = null;
 const KNOWN_SPORTS = ['バスケットボール','サッカー','野球','バレーボール'];
+// 競技名は場所によって長く場所を取るため、アイコンで代用できるようにする
+const SPORT_ICONS = { 'バスケットボール':'🏀', 'サッカー':'⚽', '野球':'⚾', 'バレーボール':'🏐' };
+function sportIcon(sport){ return SPORT_ICONS[sport] || '🎫'; }
 
 // 競技ごとのplaceholderサンプル（モーダルを開いた時に競技に合わせて切り替わる）
 const SPORT_PLACEHOLDERS = {
@@ -2790,7 +2837,7 @@ function openCalPopup(y,m,d){
       const pct = completion(t);
       return `
       <div class="cpop-trip">
-        <div class="cpop-team">${t.sport} / ${t.team}</div>
+        <div class="cpop-team">${sportIcon(t.sport)} ${t.team}</div>
         <div class="cpop-meta">${t.match||''}　${t.time||''}　${t.venue?'@ '+t.venue:''}</div>
         <div class="cpop-prog"><div class="cpop-prog-fill" style="width:${pct}%; background:${pct===100?'var(--sage)':'var(--rose)'};"></div></div>
         <div class="cpop-btns">
@@ -2864,7 +2911,7 @@ async function runScheduleImport(){
     document.getElementById('schedule-import-result').dataset.parsed = JSON.stringify(parsed);
     document.getElementById('schedule-import-confirm-btn').style.display = 'block';
   }catch(e){
-    status.textContent = '解析に失敗しました。テキストを確認してもう一度お試しください。';
+    status.textContent = '解析に失敗しました。サーバー側の追加設定（Edge Function）が未完了の可能性があります。テキストの問題ではない場合があります。';
     console.error(e);
   }finally{
     btn.disabled = false;
@@ -3008,7 +3055,7 @@ function openSettingsPanel(){
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">⭐ 記憶している応援チーム</div>
       ${favEntries.length ? favEntries.map(([sport,team])=>`
         <div style="display:flex; align-items:center; justify-content:space-between; background:var(--surface-2); border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:12.5px;">
-          <span>${sport}：<b>${team}</b></span>
+          <span>${sportIcon(sport)} ${sport}：<b>${team}</b></span>
           <button onclick="clearFavoriteTeamUI('${sport.replace(/'/g,"\\'")}')" style="background:none; border:none; color:var(--text-faint); font-size:11px; cursor:pointer; text-decoration:underline;">忘れる</button>
         </div>`).join('') : `<div style="font-size:11.5px; color:var(--text-faint);">まだ記憶しているチームはありません。遠征を登録すると、次回から競技ごとに自動選択されます。</div>`}
     </div>
