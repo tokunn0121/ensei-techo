@@ -1639,7 +1639,7 @@ function catPanelContent(t, c){
               <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
               <div class="field"><label>この区間の金額</label><input type="number" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
             </div>
-            <div class="field"><label>予約リンク・確認番号</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'link',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+            <div class="field"><label>予約リンク・確認番号</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLegLink('${t.id}','${c.key}',${i},this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
           </div>`;
         }).join('')}
         ${(d.legs||[]).length ? `<div class="legs-total">乗り継ぎ合計：<b>¥${sumLegs(d.legs).toLocaleString()}</b>（上の「金額」欄に自動反映されます）</div>` : ''}
@@ -1654,9 +1654,9 @@ function catPanelContent(t, c){
     return `
       <div class="cat-panel">
         <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="お店の名前など"></div>
-        ${c.key==='food' ? `
-        <div class="field"><label>お店のリンク（食べログ・地図など）</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','link',this.value)"`:'disabled'} placeholder="URLを貼り付け"></div>
-        ${link ? `<a href="${linkUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="food-link-btn">🔗 お店のページを開く</a>` : ''}
+        ${(c.key==='food' || c.key==='other') ? `
+        <div class="field"><label>${c.key==='food' ? 'お店のリンク（食べログ・地図など）' : 'リンク'}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLを貼り付け"></div>
+        ${link ? `<a href="${linkUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="food-link-btn">🔗 ${c.key==='food'?'お店':'リンク先'}のページを開く</a>` : ''}
         ` : ''}
         ${segment}
         ${c.key==='food' ? `<div class="pr-row">${getPrLinks('food').map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
@@ -1675,6 +1675,8 @@ function catPanelContent(t, c){
         <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
         <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
       </div>
+      <div class="field"><label>予約リンク・確認ページ</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLを貼り付け"></div>
+      ${(()=>{ const link=(d.link||'').trim(); if(!link) return ''; const linkUrl = /^https?:\/\//i.test(link) ? link : `https://${link}`; return `<a href="${linkUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="food-link-btn">🔗 予約ページを開く</a>`; })()}
       ${segment}
       ${copyOutboundBlock}
       ${(IS_EDITABLE && (d.method || d.bookedDate || d.memo)) ? `<button class="copy-btn" onclick="openCopyModal('${t.id}','${c.key}')">📋 この${c.label}情報を他の遠征にもコピー（連泊・同じ移動手段など）</button>` : ''}
@@ -2040,6 +2042,19 @@ function setCatState(tripId, key, state){
   // 予約日は自動で入れない（実際に予約した日を手動で入力してもらう）
   t.detail[key] = { ...t.detail[key], notNeeded };
   saveBookingDetail(tripId, key, patch, true);
+}
+
+// 「店名＋電話番号＋住所＋URL」のようにまとめてコピペされた場合でも、URL部分だけを自動で抜き出して保存する
+// （食べログ等の「共有」機能は、リンクだけでなく店舗情報も一緒にクリップボードへコピーすることが多いため）
+function extractUrl(text){
+  const match = (text||'').match(/https?:\/\/\S+/);
+  return match ? match[0] : (text||'').trim();
+}
+function updateLinkField(tripId, key, val){
+  updateDetail(tripId, key, 'link', extractUrl(val));
+}
+function updateLegLink(tripId, key, index, val){
+  updateLeg(tripId, key, index, 'link', extractUrl(val));
 }
 
 function updateDetail(tripId, key, field, val){
