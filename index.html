@@ -152,7 +152,7 @@
   .empty-title{ font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--text); margin-bottom:8px; }
   .empty-desc{ font-size:12.5px; color:var(--text-faint); line-height:1.8; }
   /* 予算オーバー警告バナー */
-  .budget-alert{ background:#FBEAEA; border:1.5px solid #E08585; border-radius:14px; padding:12px 16px; margin:0 5vw 14px; display:flex; align-items:center; gap:10px; font-size:12.5px; color:#A93F3F; font-weight:700; }
+  /* 予算オーバー警告バナーは廃止（可視化がプレッシャーになるとのフィードバックのため） */
 
   /* ---------- ticket card ---------- */
   .ticket{ background: var(--surface); border-radius: var(--radius); box-shadow: 0 6px 20px rgba(74,63,58,0.06); position:relative; overflow:hidden; display:flex; flex-direction:column; scroll-margin-top:20px; border-left:4px solid transparent; }
@@ -161,6 +161,21 @@
   .next-action{ display:inline-block; margin-top:6px; font-size:11.5px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:5px 10px; border-radius:8px; cursor:pointer; }
   .ticket.pulse{ animation: pulseGlow 1.6s ease; }
   @keyframes pulseGlow{ 0%{ box-shadow:0 0 0 4px rgba(217,139,150,0.5);} 100%{ box-shadow:0 6px 20px rgba(74,63,58,0.06);} }
+  /* コンパクト表示（1行リスト） */
+  .ticket.ticket-slim{ min-height:0; }
+  .ticket-compact-row{ display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; min-height:44px; }
+  .tcr-date{ text-align:center; flex-shrink:0; width:38px; }
+  .tcr-d{ font-family:var(--font-num); font-weight:700; font-size:13px; }
+  .tcr-dow{ font-size:9.5px; color:var(--text-faint); }
+  .tcr-main{ flex:1; min-width:0; }
+  .tcr-team{ font-size:11px; color:var(--rose-deep); font-weight:700; }
+  .tcr-match{ font-size:12.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tcr-status{ text-align:right; flex-shrink:0; }
+  .tcr-pct{ font-family:var(--font-num); font-weight:700; font-size:13px; }
+  .tcr-pending{ font-size:9.5px; color:var(--rose-deep); white-space:nowrap; }
+  .tcr-ok{ font-size:9.5px; color:var(--sage); white-space:nowrap; }
+  .tcr-chevron{ font-size:10px; color:var(--text-faint); flex-shrink:0; }
+  .compact-collapse-bar{ text-align:center; font-size:11px; color:var(--rose-deep); padding:8px; cursor:pointer; border-bottom:1px solid var(--line); background:var(--rose-wash); }
   .ticket .head{ padding:18px 20px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
   .ticket .sport-tag{ font-family:var(--font-num); font-size:11px; font-weight:700; letter-spacing:.04em; color: var(--rose-deep); margin-bottom:6px; display:block; }
   .ticket .matchup{ font-family: var(--font-display); font-weight:700; font-size:18px; line-height:1.3; }
@@ -308,15 +323,16 @@
   .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
   .copy-btn:hover{ background: #eef4f7; }
 
-  .budget-box{ margin:16px 5vw 0; background:var(--surface); border-radius:var(--radius); padding:16px 22px; box-shadow:0 4px 14px rgba(74,63,58,0.05); }
-  .budget-row1{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-  .budget-label{ font-family:var(--font-display); font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px; }
-  .budget-label input{ width:130px; background:var(--surface-2); border:1.5px solid var(--line); border-radius:8px; padding:7px 10px; font-family:var(--font-num); font-size:13px; color:var(--text); }
-  .budget-track{ height:8px; background:var(--surface-2); border-radius:6px; overflow:hidden; margin-top:12px; }
-  .budget-fill{ height:100%; background: linear-gradient(90deg, var(--sage), var(--sky)); border-radius:6px; }
-  .budget-fill.over{ background: linear-gradient(90deg, var(--rose), #c0392b); }
-  .budget-status{ font-size:12px; color:var(--sage); font-weight:700; margin-top:8px; }
-  .budget-status.over{ color:#c0392b; }
+  /* 支出サマリー（予約履歴タブ・中立的な実績表示） */
+  .spending-tabs{ display:flex; gap:6px; margin-bottom:10px; }
+  .spending-tab{ flex:1; text-align:center; padding:9px; border-radius:10px; border:1.5px solid var(--line); background:var(--surface-2); font-size:12.5px; font-weight:700; color:var(--text-dim); cursor:pointer; }
+  .spending-tab.active{ background:var(--rose); border-color:var(--rose); color:#fff; }
+  .spending-box{ background:var(--surface); border-radius:var(--radius); padding:16px 18px; box-shadow:0 4px 14px rgba(74,63,58,0.05); margin-bottom:16px; }
+  .spending-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .spending-row:last-child{ border-bottom:none; }
+  .spending-row b{ font-family:var(--font-num); color:var(--text); }
+  .spending-total{ text-align:center; font-size:13.5px; margin-top:4px; color:var(--text-dim); }
+  .spending-total b{ font-family:var(--font-num); font-size:16px; color:var(--rose-deep); }
   .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 22px; border-radius:999px; font-size:13px; z-index:200; box-shadow:0 8px 20px rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition:opacity .25s; }
   .toast.show{ opacity:1; }
   .pr-btn{ flex:1; min-width:120px; text-decoration:none; font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--text); background:#fff; border:1.5px solid var(--line); padding:10px 8px; border-radius:10px; text-align:center; position:relative; display:block; transition:.15s; }
@@ -492,19 +508,19 @@
 </div>
 
 <div class="panel active" id="panel-cards">
-  <div id="budget-alert-banner"></div>
   <div id="hero"></div>
   <div class="alerts" id="alerts"></div>
   <div class="summary" id="summary"></div>
-  <div id="budget-box"></div>
   <div class="recent" id="recent"></div>
   <div class="filters" id="filters"></div>
   <div class="filters" id="sort-toggle" style="padding-top:0;"></div>
+  <div class="filters" id="density-toggle" style="padding-top:0;"></div>
   <div class="grid" id="grid"></div>
 </div>
 
 <div class="panel" id="panel-history">
   <div class="history-wrap">
+    <div id="spending-summary"></div>
     <div class="history-controls" id="history-filters"></div>
     <div class="history-list" id="history-list"></div>
   </div>
@@ -707,6 +723,8 @@ let notebook = null;      // { id, title, budget_cap, is_editable, share_token }
 let trips = [];
 let sportFilter = 'ALL';
 let sortMode = 'date'; // 'date'（試合日順） | 'progress'（準備が遅れている順）
+let cardViewMode = Settings.get('cardViewMode', null); // 'detailed'（詳細カード） | 'compact'（コンパクトリスト） | null（未設定＝件数に応じて自動判定）
+let expandedTrips = new Set(); // コンパクト表示時に、手動で展開した遠征のID
 let historyCatFilter = 'ALL';
 let activeCat = {}; // { tripId: 現在開いているカテゴリキー } 1遠征につき1カテゴリのみ開く（タブ切り替え式）
 let budgetCap = 0;
@@ -747,16 +765,16 @@ const TEAM_DATA = {
     {name:'千葉ジェッツ', arena:'LaLa arena TOKYO-BAY', league:'B.LEAGUE PREMIER'},
     {name:'アルバルク東京', arena:'TOYOTA ARENA TOKYO', league:'B.LEAGUE PREMIER'},
     {name:'東京サンロッカーズ', arena:'TOYOTA ARENA TOKYO', league:'B.LEAGUE PREMIER'},
-    {name:'川崎ブレイブサンダース', arena:'新とどろきアリーナ（仮称）', league:'B.LEAGUE PREMIER'},
+    {name:'川崎ブレイブサンダース', arena:'東急ドレッセとどろきアリーナ', league:'B.LEAGUE PREMIER'},
     {name:'横浜ビー・コルセアーズ', arena:'横浜BUNTAI', league:'B.LEAGUE PREMIER'},
     {name:'富山グラウジーズ', arena:'YKK AP ARENA', league:'B.LEAGUE PREMIER'},
     // --- B.LEAGUE PREMIER（西地区・13クラブ） ---
     {name:'信州ブレイブウォリアーズ', arena:'ホワイトリング', league:'B.LEAGUE PREMIER'},
-    {name:'三遠ネオフェニックス', arena:'多目的屋内施設（名称未定）', league:'B.LEAGUE PREMIER'},
-    {name:'シーホース三河', arena:'三河安城交流拠点（名称未定）', league:'B.LEAGUE PREMIER'},
+    {name:'三遠ネオフェニックス', arena:'豊橋市総合体育館', league:'B.LEAGUE PREMIER'},
+    {name:'シーホース三河', arena:'ウィングアリーナ刈谷', league:'B.LEAGUE PREMIER'},
     {name:'名古屋ダイヤモンドドルフィンズ', arena:'IGアリーナ', league:'B.LEAGUE PREMIER'},
     {name:'滋賀レイクス', arena:'滋賀ダイハツアリーナ', league:'B.LEAGUE PREMIER'},
-    {name:'京都ハンナリーズ', arena:'京都アリーナ（仮称）', league:'B.LEAGUE PREMIER'},
+    {name:'京都ハンナリーズ', arena:'にっしんでんきアリーナ京都', league:'B.LEAGUE PREMIER'},
     {name:'大阪エヴェッサ', arena:'おおきにアリーナ舞洲', league:'B.LEAGUE PREMIER'},
     {name:'神戸ストークス', arena:'GLION ARENA KOBE', league:'B.LEAGUE PREMIER'},
     {name:'島根スサノオマジック', arena:'松江市総合体育館', league:'B.LEAGUE PREMIER'},
@@ -970,6 +988,10 @@ function renderTeamDatalist(){
 
   document.getElementById('f-team').value = '';
   document.getElementById('f-match').value = '';
+  // 競技を切り替えたら、前の競技のアリーナ名が残らないよう会場欄もクリアする
+  // （編集時にfillModalFieldsから呼ばれる場合は、この後で正しい値が再セットされるので問題ない）
+  document.getElementById('f-venue').value = '';
+  document.getElementById('f-venue-list').innerHTML = '';
 
   renderTeamOptionsForLeague();
 
@@ -1406,7 +1428,10 @@ function renderAlerts(){
 }
 
 function focusTrip(tripId, key){
-  if(key) activeCat[tripId] = key;
+  if(key){
+    activeCat[tripId] = key;
+    expandedTrips.add(tripId); // コンパクト表示で折りたたまれていても、強制的に展開して中身を見せる
+  }
   render();
   setTimeout(()=>{
     const el = document.getElementById('trip-'+tripId);
@@ -1420,12 +1445,12 @@ function focusTrip(tripId, key){
 
 function renderSummary(){
   const upcoming = trips.filter(t => new Date(t.date) >= new Date(TODAY)).length;
-  const totalCost = trips.reduce((s,t)=>s+(t.cost||0),0);
+  const totalCost = trips.reduce((s,t)=>s+tripSpend(t),0);
   const avgProg = trips.length ? Math.round(trips.reduce((s,t)=>s+completion(t),0)/trips.length) : 0;
   const teams = new Set(trips.map(t=>t.team)).size;
   document.getElementById('summary').innerHTML = `
     <div class="cell"><div class="n">${upcoming}</div><div class="l">予定中の遠征</div></div>
-    <div class="cell"><div class="n">¥${totalCost.toLocaleString()}</div><div class="l">合計予算</div></div>
+    <div class="cell"><div class="n">¥${totalCost.toLocaleString()}</div><div class="l">合計金額</div></div>
     <div class="cell"><div class="n">${avgProg}%</div><div class="l">平均準備進捗</div></div>
     <div class="cell"><div class="n">${teams}</div><div class="l">応援中のチーム</div></div>
   `;
@@ -1469,9 +1494,22 @@ function renderFilters(){
       <div class="chip ${sortMode==='progress'?'active':''}" onclick="setSortMode('progress')">⚠️ 準備が遅れている順</div>
     `;
   }
+  const densityBox = document.getElementById('density-toggle');
+  if(densityBox){
+    densityBox.innerHTML = `
+      <div class="chip ${cardViewMode==='detailed'?'active':''}" onclick="setCardViewMode('detailed')">📋 詳細表示</div>
+      <div class="chip ${cardViewMode==='compact'?'active':''}" onclick="setCardViewMode('compact')">📃 コンパクト表示</div>
+    `;
+  }
 }
 function setFilter(s){ sportFilter = s; render(); }
 function setSortMode(m){ sortMode = m; render(); }
+function setCardViewMode(m){ cardViewMode = m; Settings.set('cardViewMode', m); render(); }
+function toggleExpand(tripId){
+  if(expandedTrips.has(tripId)) expandedTrips.delete(tripId); else expandedTrips.add(tripId);
+  render();
+  setTimeout(initCategoryBannerRotators, 50);
+}
 
 function statusSegment(t, c){
   if(!IS_EDITABLE){
@@ -1606,6 +1644,7 @@ function catPanelContent(t, c){
 function renderTicketCard(t, isPast){
   const {md, dow} = fmtDate(t.date);
   const pct = completion(t);
+  const pendingCount = BOOKABLE_CATS.filter(k=>!t.status[k] && !t.detail[k]?.notNeeded).length;
 
   // 「次にやること」＝最も優先度の高い未予約カテゴリ（交通→チケット→宿泊の順で最初に見つかったもの）
   let nextAction = null;
@@ -1618,8 +1657,38 @@ function renderTicketCard(t, isPast){
   }
   const urgencyClass = isPast ? '' : (pct===100 ? 'ticket-ready' : (pct<50 ? 'ticket-urgent' : ''));
 
-  return `
-    <div class="ticket ${urgencyClass}" id="trip-${t.id}">
+  const isCompact = cardViewMode === 'compact';
+  const isExpanded = expandedTrips.has(t.id);
+  const showSlim = isCompact && !isExpanded;
+  const showFull = !isCompact || isExpanded;
+
+  // コンパクト表示（折りたたみ状態）：1行だけの簡易表示。タップで展開する
+  const slimRow = showSlim ? `
+    <div class="ticket-compact-row" onclick="toggleExpand('${t.id}')">
+      <div class="tcr-date">
+        <div class="tcr-d">${md}</div>
+        <div class="tcr-dow">${dow}</div>
+      </div>
+      <div class="tcr-main">
+        <div class="tcr-team">${t.sport} / ${t.team}</div>
+        <div class="tcr-match">${t.match}${t.venue ? ' ・ '+t.venue : ''}</div>
+      </div>
+      <div class="tcr-status">
+        <div class="tcr-pct" style="color:${pct===100?'var(--sage)':'var(--rose-deep)'};">${pct}%</div>
+        ${pendingCount>0 ? `<div class="tcr-pending">未予約${pendingCount}件</div>` : `<div class="tcr-ok">準備OK</div>`}
+      </div>
+      ${IS_EDITABLE ? `
+      <div class="card-actions" onclick="event.stopPropagation();">
+        <button class="icon-btn" title="編集" onclick="openModal('${t.id}')">✏️</button>
+        <button class="icon-btn" title="複製して次を作る" onclick="duplicateTrip('${t.id}')">📋</button>
+        <button class="icon-btn" title="削除" onclick="deleteTrip('${t.id}')">🗑</button>
+      </div>` : ''}
+      <span class="tcr-chevron">▾</span>
+    </div>` : '';
+
+  // 詳細表示（従来のフルカード）：detailedモード、またはcompactモードで手動展開した場合に表示
+  const fullCard = showFull ? `
+      ${isCompact ? `<div class="compact-collapse-bar" onclick="toggleExpand('${t.id}')">︿ コンパクト表示に戻す</div>` : ''}
       <div class="head">
         <div>
           <span class="sport-tag">${t.sport} / ${t.team}</span>
@@ -1650,8 +1719,8 @@ function renderTicketCard(t, isPast){
           <div class="progress-label">${pct}% 準備完了</div>
         </div>
         <div class="cost-row">
-          <span class="label">想定予算</span>
-          <span class="val">¥${(t.cost||0).toLocaleString()}</span>
+          <span class="label">${BOOKABLE_CATS.some(k=>t.detail[k]?.cost) ? '実績金額' : '想定予算'}</span>
+          <span class="val">¥${tripSpend(t).toLocaleString()}</span>
         </div>
         <div class="cat-strip">
           ${CATS.map(c=>{
@@ -1686,8 +1755,10 @@ function renderTicketCard(t, isPast){
           <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)"`:'disabled'}>${(t.journalMemo||'').replace(/</g,'&lt;')}</textarea>
         </div>` : ''}
         <button class="card-share-btn" onclick="shareTrip('${t.id}')">📤 家族に共有する</button>
-      </div>
-    </div>`;
+      </div>` : '';
+
+  return `
+    <div class="ticket ${urgencyClass} ${showSlim?'ticket-slim':''}" id="trip-${t.id}">${slimRow}${fullCard}</div>`;
 }
 
 function renderGrid(){
@@ -1757,36 +1828,8 @@ function toggleCat(tripId, key){
   setTimeout(initCategoryBannerRotators, 50);
 }
 
-function renderBudgetBox(){
-  const totalCost = trips.reduce((s,t)=>s+(t.cost||0),0);
-  const box = document.getElementById('budget-box');
-  const pct = budgetCap>0 ? Math.min(100, Math.round(totalCost/budgetCap*100)) : 0;
-  const over = budgetCap>0 && totalCost>budgetCap;
-
-  // カード一覧の一番上に出す、より目立つ予算超過バナー
-  const alertBox = document.getElementById('budget-alert-banner');
-  if(alertBox){
-    alertBox.innerHTML = over
-      ? `<div class="budget-alert">⚠️ シーズン予算の上限（¥${budgetCap.toLocaleString()}）を ¥${(totalCost-budgetCap).toLocaleString()} 超えています</div>`
-      : '';
-  }
-
-  box.innerHTML = `
-    <div class="budget-box">
-      <div class="budget-row1">
-        <div class="budget-label">💰 シーズン予算上限
-          <input type="number" id="budget-cap-input" value="${budgetCap||''}" placeholder="未設定" ${IS_EDITABLE?`onchange="setBudgetCap(this.value)"`:'disabled'}>円
-        </div>
-        <div style="font-family:var(--font-num); font-weight:700; color:${over?'#c0392b':'var(--text-dim)'};">${totalCost>0?'現在 ¥'+totalCost.toLocaleString():'予算未入力'}</div>
-      </div>
-      ${budgetCap>0 ? `
-        <div class="budget-track"><div class="budget-fill ${over?'over':''}" style="width:${pct}%"></div></div>
-        <div class="budget-status ${over?'over':''}">${over ? `⚠️ 上限を¥${(totalCost-budgetCap).toLocaleString()}超えています` : `残り¥${(budgetCap-totalCost).toLocaleString()}（${pct}%使用）`}</div>
-      ` : `<div class="budget-status" style="color:var(--text-faint); font-weight:400;">上限を設定すると使いすぎをお知らせします</div>`}
-    </div>`;
-}
-
-/* ---------- mutations (Supabase RPC) ---------- */
+// 予算上限機能は「可視化するとプレッシャーになる」というフィードバックにより廃止しました。
+// setBudgetCap関数とDB側のbudget_capカラムは、将来的な復活に備えてそのまま残しています。
 async function setBudgetCap(val){
   if(!IS_EDITABLE) return;
   budgetCap = parseInt(val)||0;
@@ -2002,6 +2045,7 @@ async function deleteTrip(tripId){
     if(error) throw error;
     trips = trips.filter(x=>x.id!==tripId);
     delete activeCat[tripId];
+    expandedTrips.delete(tripId);
     render();
   }catch(e){
     console.error(e);
@@ -2041,6 +2085,67 @@ function duplicateTrip(tripId){
   document.getElementById('modal-save-msg').textContent = `「${t.match}」の情報を引き継ぎました。日付と対戦カードを入力してください。`;
 }
 
+/* ---------- 支出サマリー（予算上限に代わる、月別・期間別の実績表示。プレッシャーを与えない中立的な集計のみ） ---------- */
+let spendingRangeMode = 'monthly'; // 'monthly'（月別一覧） | 'custom'（期間指定）
+let spendingRangeStart = '';
+let spendingRangeEnd = '';
+
+// 遠征1件あたりの実質的な金額を算出する：
+// カテゴリ別（交通・チケット・宿泊）に金額が入力されていればその合計を優先し、
+// まだ何も入力していない場合のみ「想定予算」欄の概算値で代用する
+function tripSpend(t){
+  const catSum = BOOKABLE_CATS.reduce((s,k)=> s + (t.detail[k]?.cost || 0), 0);
+  return catSum > 0 ? catSum : (t.cost || 0);
+}
+
+function renderSpendingSummary(){
+  const wrap = document.getElementById('spending-summary');
+  if(!wrap) return;
+
+  const tabsHtml = `
+    <div class="spending-tabs">
+      <div class="spending-tab ${spendingRangeMode==='monthly'?'active':''}" onclick="setSpendingMode('monthly')">月別</div>
+      <div class="spending-tab ${spendingRangeMode==='custom'?'active':''}" onclick="setSpendingMode('custom')">期間を指定</div>
+    </div>`;
+
+  if(spendingRangeMode === 'custom'){
+    const total = trips
+      .filter(t => (!spendingRangeStart || t.date >= spendingRangeStart) && (!spendingRangeEnd || t.date <= spendingRangeEnd))
+      .reduce((s,t)=>s+tripSpend(t),0);
+    wrap.innerHTML = tabsHtml + `
+      <div class="spending-box">
+        <div class="field-row">
+          <div class="field"><label>開始日</label><input type="date" value="${spendingRangeStart}" onchange="setSpendingRange('start',this.value)"></div>
+          <div class="field"><label>終了日</label><input type="date" value="${spendingRangeEnd}" onchange="setSpendingRange('end',this.value)"></div>
+        </div>
+        <div class="spending-total">この期間の合計：<b>¥${total.toLocaleString()}</b></div>
+      </div>`;
+    return;
+  }
+
+  // 月別一覧（試合日の年月でグルーピング。降順）
+  const byMonth = {};
+  trips.forEach(t=>{
+    if(!t.date) return;
+    const ym = t.date.slice(0,7); // "2026-08"
+    byMonth[ym] = (byMonth[ym]||0) + tripSpend(t);
+  });
+  const months = Object.keys(byMonth).sort().reverse();
+
+  wrap.innerHTML = tabsHtml + `
+    <div class="spending-box">
+      ${months.length ? months.map(ym=>{
+        const [y,m] = ym.split('-');
+        return `<div class="spending-row"><span>${y}年${parseInt(m)}月</span><b>¥${byMonth[ym].toLocaleString()}</b></div>`;
+      }).join('') : `<div style="font-size:12.5px; color:var(--text-faint); text-align:center; padding:8px 0;">まだ想定予算が入力された遠征がありません</div>`}
+    </div>`;
+}
+function setSpendingMode(mode){ spendingRangeMode = mode; renderSpendingSummary(); }
+function setSpendingRange(which, val){
+  if(which==='start') spendingRangeStart = val; else spendingRangeEnd = val;
+  renderSpendingSummary();
+}
+
 function renderHistoryFilters(){
   const cats = ['ALL', ...BOOKABLE_CATS];
   const label = k => k==='ALL' ? 'すべて' : CATS.find(c=>c.key===k).label;
@@ -2051,6 +2156,7 @@ function renderHistoryFilters(){
 function setHistoryFilter(k){ historyCatFilter = k; renderHistory(); }
 
 function renderHistory(){
+  renderSpendingSummary();
   renderHistoryFilters();
   let entries = allBookingEntries();
   if(historyCatFilter!=='ALL') entries = entries.filter(e=>e.key===historyCatFilter);
@@ -2419,6 +2525,7 @@ async function submitTrip(keepOpen){
       if(isNewVenue && !isDayTrip){
         setTimeout(()=>{
           activeCat[newId] = 'transport_outbound';
+          expandedTrips.add(newId); // コンパクト表示中でも展開して見せる
           render();
           setTimeout(initCategoryBannerRotators, 50);
           focusTrip(newId);
@@ -2501,7 +2608,7 @@ function buildTripShareText(t){
     if(done && !c.bookable && d.memo) line += `：${d.memo}`;
     lines.push(line);
   });
-  lines.push('', `準備進捗：${completion(t)}%　想定予算：¥${(t.cost||0).toLocaleString()}`);
+  lines.push('', `準備進捗：${completion(t)}%　${BOOKABLE_CATS.some(k=>t.detail[k]?.cost) ? '実績金額' : '想定予算'}：¥${tripSpend(t).toLocaleString()}`);
   lines.push('', '― 遠征手帳より');
   return lines.join('\n');
 }
@@ -2801,7 +2908,6 @@ function render(){
   renderHero();
   renderAlerts();
   renderSummary();
-  renderBudgetBox();
   renderRecent();
   renderFilters();
   renderGrid();
@@ -3191,6 +3297,11 @@ async function startApp(){
   renderShareBanner();
   applyEditableUI();
   await loadAds();
+  // 表示密度を明示的に選んだことが無い場合、遠征の件数に応じて自動で見やすい方を選ぶ
+  // （選んだ後は上書きしない。ユーザーが手動でtoggleすると以後はSettingsに保存され、この自動判定は行われなくなる）
+  if(cardViewMode === null){
+    cardViewMode = trips.length > 15 ? 'compact' : 'detailed';
+  }
   render();
   scanAndScheduleAllNotifications();
   initBannerRotator();
