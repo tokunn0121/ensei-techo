@@ -1916,6 +1916,14 @@ async function copyOutboundToReturn(tripId){
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
   const ob = t.detail.transport_outbound;
+  // 乗り継ぎの内訳は、通る順番を反転させたうえで、各区間の中の発駅・着駅もそれぞれ入れ替える
+  const reversedLegs = [...(ob.legs||[])].reverse().map(leg => ({
+    ...leg,
+    departureStation: leg.arrivalStation || '',
+    arrivalStation: leg.departureStation || '',
+    bookedDate: '', // 予約日は復路で別途入れてもらうため引き継がない
+    link: '' // 予約リンクも往路のものなので引き継がない
+  }));
   await saveBookingDetail(tripId, 'transport_return', {
     method: ob.method || '',
     cost: ob.cost || 0,
@@ -1923,8 +1931,7 @@ async function copyOutboundToReturn(tripId){
     // 復路は往路の逆ルートになるため、発駅・着駅を入れ替えてコピーする
     departureStation: ob.arrivalStation || '',
     arrivalStation: ob.departureStation || '',
-    // 乗り継ぎの内訳も、通る順番を反転してコピーする
-    legs: [...(ob.legs||[])].reverse()
+    legs: reversedLegs
     // 予約日(bookedDate)と予約済みフラグはコピーしない（復路は別途予約するはずのため）
   }, true);
   showToast('往路の内容を、駅名を逆にして復路にコピーしました');
