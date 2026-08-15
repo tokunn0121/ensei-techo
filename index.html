@@ -74,8 +74,6 @@
   }
   .add-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 20px rgba(217,139,150,0.45);}
   .add-btn:focus-visible{ outline:3px solid var(--butter); outline-offset:3px; }
-  .add-btn.ghost{ background: var(--surface); color: var(--rose-deep); border:1.5px solid var(--rose); box-shadow:none; }
-  .add-btn.ghost:hover{ background: var(--rose-wash); box-shadow:none; transform:none; }
 
   /* ---------- tabs ---------- */
   .tabs-wrap{ position:relative; }
@@ -140,7 +138,7 @@
 
   /* ---------- filters ---------- */
   .search-box-wrap{ position:relative; padding:20px 5vw 0; }
-  .search-box{ width:100%; background:var(--surface); border:1.5px solid var(--line); border-radius:12px; padding:12px 40px 12px 16px; font-size:15px; font-family:var(--font-body); color:var(--text); }
+  .search-box{ width:100%; background:var(--surface); border:1.5px solid var(--line); border-radius:12px; padding:12px 40px 12px 16px; font-size:16px; font-family:var(--font-body); color:var(--text); }
   .search-box:focus{ border-color:var(--rose); outline:none; }
   .search-clear{ position:absolute; right:calc(5vw + 10px); top:50%; transform:translateY(-50%); background:var(--surface-2); border:none; border-radius:50%; width:26px; height:26px; font-size:12px; color:var(--text-faint); cursor:pointer; align-items:center; justify-content:center; }
   .filters{ display:flex; gap:8px; padding: 20px 5vw 6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
@@ -198,6 +196,7 @@
   .ticket .venue{ font-size:12.5px; color:var(--text-dim); margin-top:0; }
   .map-badge{ display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700; color:#fff; background:var(--rose); padding:4px 10px; border-radius:999px; text-decoration:none; white-space:nowrap; flex-shrink:0; }
   .map-badge:hover{ background:var(--rose-deep); }
+  .venue-copy-badge{ display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; font-size:12px; border:1.5px solid var(--line); border-radius:50%; background:var(--surface-2); color:var(--text-dim); cursor:pointer; flex-shrink:0; }
   .ticket .date-block{ text-align:right; flex-shrink:0; }
   .ticket .date-block .d{ font-family:var(--font-num); font-size:22px; font-weight:700; line-height:1; color:var(--text); }
   .ticket .date-block .dow{ font-size:11.5px; color:var(--text-dim); margin-top:4px; }
@@ -217,9 +216,29 @@
   .stay-info-hint{ font-size:11px; color:var(--text-dim); background:var(--surface-2); border-radius:8px; padding:8px 10px; margin-top:2px; }
   .day2-title{ font-size:12.5px; font-weight:700; color:#3d5a68; }
   .day2-box.day2-nogame{ font-size:12.5px; font-weight:700; color:#3d5a68; text-align:center; padding:14px; }
+  /* 持ち物リスト */
+  .packing-details{ margin-top:10px; }
+  .packing-count{ font-weight:400; color:var(--text-faint); }
+  .packing-item{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
+  .packing-item:last-of-type{ border-bottom:none; }
+  .packing-item input[type="checkbox"]{ width:18px; height:18px; flex-shrink:0; accent-color: var(--sage); }
+  .packing-item-text{ flex:1; font-size:13px; }
+  .packing-item-text.checked{ text-decoration:line-through; color:var(--text-faint); }
+  .packing-add-row{ display:flex; gap:6px; margin-top:8px; }
+  .packing-add-row input{ flex:1; background:var(--surface-2); border:1.5px solid var(--line); border-radius:8px; padding:9px 10px; font-size:16px; }
+  .packing-add-row button{ background:var(--rose); color:#fff; border:none; border-radius:8px; padding:0 16px; font-size:12.5px; font-weight:700; cursor:pointer; }
+  .packing-presets{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .packing-preset-chip{ background:var(--surface-2); border:1.5px dashed var(--line); border-radius:999px; padding:5px 10px; font-size:11px; color:var(--text-dim); cursor:pointer; }
+  .packing-template-btn{ display:block; width:100%; margin-top:10px; padding:9px; border-radius:8px; border:1.5px solid var(--sage); background:var(--sage-wash); color:#3d6b4a; font-size:11.5px; font-weight:700; cursor:pointer; }
+  /* 複数日程（モーダル入力欄） */
+  .extra-days-section{ margin-top:2px; }
+  .extra-day-block{ background:var(--surface-2); border:1.5px solid var(--sky,#93B5C6); border-radius:10px; padding:10px; margin-bottom:8px; }
+  .extra-day-block-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .extra-day-label{ font-size:11.5px; font-weight:700; color:#3d5a68; }
   .journal-label{ font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px; }
-  .journal-textarea{ width:100%; min-height:56px; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; font-family:var(--font-body); background:#fff; resize:vertical; }
+  .journal-textarea{ width:100%; min-height:56px; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:16px; font-family:var(--font-body); background:#fff; resize:vertical; }
   /* 訪問スタンプ */
+  .memo-nudge{ background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:12.5px; color:#8a6d1f; font-weight:700; cursor:pointer; line-height:1.6; }
   .stamp-sport-section{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px; margin-bottom:14px; }
   .stamp-sport-title{ font-family:var(--font-display); font-weight:900; font-size:16px; margin-bottom:10px; }
   .stamp-completion{ background:var(--rose-wash); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
@@ -310,9 +329,12 @@
   .cat-panel .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .cat-panel .field{ display:flex; flex-direction:column; gap:3px; }
   .cat-panel .field label{ font-size:10px; color:var(--text-faint); }
-  .cat-panel .field input{ width:100%; background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:12.5px; font-family:var(--font-body); }
+  .cat-panel .field input{ width:100%; background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:16px; font-family:var(--font-body); }
   .cat-panel .field input:focus{ outline:2px solid var(--rose); }
   .done-toggle{ display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:700; color:var(--sage); background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:9px 12px; cursor:pointer; }
+  .date-quick-row{ display:flex; gap:8px; margin-top:-6px; margin-bottom:2px; }
+  .date-quick-btn{ flex:1; background:var(--surface-2); border:1.5px dashed var(--line); border-radius:8px; padding:7px; font-size:11.5px; color:var(--text-dim); cursor:pointer; }
+  .quick-fill-chip{ display:block; width:100%; background:var(--rose-wash); border:1.5px dashed var(--rose); border-radius:8px; padding:8px 10px; font-size:11.5px; color:var(--rose-deep); font-weight:700; cursor:pointer; margin-top:-2px; }
   /* 予約状態の3択セグメントコントロール（未予約／予約済み／不要） */
   .status-segment{ display:flex; gap:4px; background:var(--surface-2); border-radius:10px; padding:4px; }
   .seg-btn{ flex:1; border:none; background:none; padding:9px 6px; border-radius:8px; font-family:var(--font-body); font-weight:700; font-size:12px; color:var(--text-faint); cursor:pointer; min-height:38px; transition:.15s; }
@@ -351,6 +373,14 @@
   .spending-row:last-child{ border-bottom:none; }
   .spending-row b{ font-family:var(--font-num); color:var(--text); }
   .spending-total{ text-align:center; font-size:13.5px; margin-top:4px; color:var(--text-dim); }
+  /* テーマカラー選択 */
+  .theme-color-presets{ display:flex; flex-wrap:wrap; gap:10px; }
+  .theme-color-swatch{ width:40px; height:40px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; flex-shrink:0; }
+  .theme-color-custom{ display:flex; align-items:center; justify-content:center; background:var(--surface-2); font-size:16px; position:relative; }
+  .spending-box .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .spending-box .field{ display:flex; flex-direction:column; gap:4px; }
+  .spending-box .field input{ width:100%; font-size:16px; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2); }
+  .spending-box .field label{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
   .spending-total b{ font-family:var(--font-num); font-size:16px; color:var(--rose-deep); }
   .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 22px; border-radius:999px; font-size:13px; z-index:200; box-shadow:0 8px 20px rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition:opacity .25s; }
   .toast.show{ opacity:1; }
@@ -409,7 +439,7 @@
     .card-actions{ gap:6px; }
     .done-toggle{ min-height:32px; }
     .done-toggle input[type="checkbox"]{ width:20px; height:20px; }
-    .cat-panel .field input{ min-height:44px; font-size:16px; }
+    .cat-panel .field input{ min-height:44px; }
     .pr-btn{ min-height:44px; display:flex; align-items:center; justify-content:center; }
     .share-icon-btn{ width:44px; height:44px; }
     #header-share-btn{ width:44px; height:44px; }
@@ -446,8 +476,6 @@
   .share-action-btn .sab-icon{ font-size:20px; width:28px; text-align:center; }
   .share-action-btn .sab-body .sab-title{ font-size:14px; }
   .share-action-btn .sab-body .sab-sub{ font-size:11px; color:var(--text-dim); font-weight:400; margin-top:2px; }
-  .share-divider{ border:none; border-top:1px solid var(--line); margin:12px 0; }
-
   .past-toggle{ text-align:center; margin:6px 5vw 0; }
   .past-toggle button{ font-family:var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:9px 20px; cursor:pointer; }
   .past-toggle button:hover{ border-color:var(--rose); color:var(--rose-deep); }
@@ -532,7 +560,7 @@
   <div class="summary" id="summary"></div>
   <div class="recent" id="recent"></div>
   <div class="search-box-wrap">
-    <input type="text" id="trip-search" class="search-box" placeholder="🔍 チーム名・対戦相手で検索" oninput="setSearchQuery(this.value)">
+    <input type="text" id="trip-search" class="search-box" placeholder="🔍 チーム名・対戦相手・思い出メモで検索" oninput="setSearchQuery(this.value)">
     <button type="button" id="search-clear-btn" class="search-clear" onclick="clearSearchQuery()" style="display:none;">✕</button>
   </div>
   <div class="filters" id="filters"></div>
@@ -573,7 +601,7 @@
     </div>
     <div class="field" style="margin-top:14px;">
       <label>スケジュールテキスト（コピペでOK）</label>
-      <textarea id="schedule-import-text" style="width:100%; min-height:140px; border:1.5px solid var(--line); border-radius:10px; padding:12px; font-size:14px; font-family:var(--font-body); background:var(--surface-2); resize:vertical;" placeholder="例）&#10;10/3(金) 18:00 アルバルク東京 vs 宇都宮ブレックス @ TOYOTA ARENA TOKYO&#10;10/5(日) 14:00 千葉ジェッツ vs 琉球ゴールデンキングス @ LaLa arena TOKYO-BAY"></textarea>
+      <textarea id="schedule-import-text" style="width:100%; min-height:140px; border:1.5px solid var(--line); border-radius:10px; padding:12px; font-size:16px; font-family:var(--font-body); background:var(--surface-2); resize:vertical;" placeholder="例）&#10;10/3(金) 18:00 アルバルク東京 vs 宇都宮ブレックス @ TOYOTA ARENA TOKYO&#10;10/5(日) 14:00 千葉ジェッツ vs 琉球ゴールデンキングス @ LaLa arena TOKYO-BAY"></textarea>
     </div>
     <div id="schedule-import-status" style="font-size:12.5px; color:var(--rose-deep); min-height:18px; margin:8px 0;"></div>
     <div id="schedule-import-result" style="max-height:240px; overflow-y:auto;"></div>
@@ -648,21 +676,26 @@
       <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;" onchange="updateDay2MinDate()"></div>
       <div class="field"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
     </div>
+    <div class="date-quick-row">
+      <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
+      <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
+    </div>
+    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-is-no-game"> この日は試合がない（前泊・観光など）</label>
     <div class="field">
       <label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label>
       <input id="f-venue" list="f-venue-list" placeholder="例）LaLa arena TOKYO-BAY" style="font-size:16px;">
       <datalist id="f-venue-list"></datalist>
     </div>
     <div class="field"><label>想定予算（円）</label><input id="f-cost-display" type="text" inputmode="numeric" placeholder="例）32,000" oninput="handleCostDisplayInput()" style="font-size:16px;"><input type="hidden" id="f-cost"></div>
-    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-day-trip"> 日帰り（宿泊は「対象外」として登録します）</label>
-    <details class="station-details" id="f-day2-details">
-      <summary>📅 2日目を追加（土日連戦など）</summary>
-      <div style="margin-top:10px;">
-        <div class="field"><label>2日目の日付</label><input type="date" id="f-day2-date" style="font-size:16px;"></div>
-        <label class="done-toggle" style="margin-top:8px;"><input type="checkbox" id="f-day2-no-game" onchange="toggleDay2NoGame()"> この日は試合がない（観光DAYなど）</label>
-        <div id="f-day2-game-fields">
-          <div class="field" style="margin-top:8px;"><label>2日目の対戦相手</label><input id="f-day2-opponent" placeholder="例）1日目と同じ相手なら空欄でOK" style="font-size:16px;"></div>
-          <div class="field" style="margin-top:8px;"><label>2日目の会場</label><input id="f-day2-venue" placeholder="例）1日目と同じ会場なら空欄でOK" style="font-size:16px;"></div>
+    <div id="cost-quick-fill"></div>
+    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-day-trip" onchange="checkDayTripConflict()"> 日帰り（宿泊は「対象外」として登録します）</label>
+    <details class="station-details" id="f-extra-days-details">
+      <summary>📅 複数日程の遠征を追加（連戦など）</summary>
+      <div class="extra-days-section" style="margin-top:10px;">
+        <div id="f-extra-days-container"></div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="leg-add" style="flex:1;" onclick="addNextDaySameOpponent()">＋ 翌日も同じ相手と対戦</button>
+          <button type="button" class="leg-add" style="flex:1;" onclick="addExtraDayForm()">＋ 別日程を追加</button>
         </div>
       </div>
     </details>
@@ -765,6 +798,7 @@ let expandedTrips = new Set(); // コンパクト表示時に、手動で展開�
 let historyCatFilter = 'ALL';
 let activeCat = {}; // { tripId: 現在開いているカテゴリキー } 1遠征につき1カテゴリのみ開く（タブ切り替え式）
 let budgetCap = 0;
+let packingTemplate = []; // 手帳全体で共通の持ち物テンプレート（文字列の配列）。新規遠征作成時に自動でコピーされる
 let copySource = { tripId:null, key:null };
 let showPast = false;
 
@@ -1144,6 +1178,24 @@ function handleTeamSelectChange(){
   }
   renderOpponentOptionsForLeague();
   handleTeamInput();
+  renderCostQuickFill();
+}
+
+// 想定予算欄に「前回と同じ金額」のクイック入力チップを出す（既に金額が入っている場合は出さない）
+function renderCostQuickFill(){
+  const box = document.getElementById('cost-quick-fill');
+  if(!box) return;
+  const costVal = document.getElementById('f-cost').value;
+  if(costVal){ box.innerHTML = ''; return; }
+  const sport = document.getElementById('f-sport').value;
+  const team = getTeamValue();
+  if(!team){ box.innerHTML = ''; return; }
+  const candidates = trips
+    .filter(t => t.sport===sport && t.team===team && t.id !== editingTripId && t.cost)
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  if(!candidates.length){ box.innerHTML = ''; return; }
+  const lastCost = candidates[0].cost;
+  box.innerHTML = `<button type="button" class="quick-fill-chip" onclick="setCostValue(${lastCost}); document.getElementById('cost-quick-fill').innerHTML='';">↺ 前回と同じ「¥${lastCost.toLocaleString()}」を使う</button>`;
 }
 
 function toggleOpponentLeaguePicker(){
@@ -1383,17 +1435,34 @@ function fmtShort(iso){
   const d = new Date(iso);
   return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} に予約`;
 }
-// 遠征が実質的に終わる日付を返す（2日目がある場合は2日目の日付、無ければ1日目の日付）
-// 「過去/今後」の判定はすべてこれを基準にする（1日目の日付だけで判定すると、2日目当日にまだ2日目が
-// 終わっていないのに「終了」扱いになってしまうため）
-function tripEndDate(t){
-  return (t.day2 && t.day2.date) ? t.day2.date : t.date;
+// 遠征が実質的に終わる日付を返す（追加日程がある場合は一番最後の日程の日付、無ければ1日目の日付）
+// 「過去/今後」の判定はすべてこれを基準にする（1日目の日付だけで判定すると、まだ最終日を
+// 迎えていないのに「終了」扱いになってしまうため）
+// 追加日程を実際の日付順に並べ替えて返す（入力順・day_indexの順番に依存しないようにするため）
+function sortedExtraDays(t){
+  return [...(t.extraDays||[])].sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
 }
 
-// 「あと◯日」表示に使う基準日：1日目が既に過ぎていて、まだ2日目が残っている場合は2日目の日付を使う
-function tripDisplayDate(t){
-  if(t.day2 && t.day2.date && t.date < TODAY) return t.day2.date;
+function tripEndDate(t){
+  const sorted = sortedExtraDays(t);
+  if(sorted.length) return sorted[sorted.length-1].date;
   return t.date;
+}
+
+// 「あと◯日」表示に使う基準日：既に過ぎた日程をスキップし、まだ来ていない最初の日程の日付を返す
+function tripDisplayDate(t){
+  const allDates = [t.date, ...sortedExtraDays(t).map(d=>d.date)].sort();
+  const upcoming = allDates.find(d => d >= TODAY);
+  return upcoming || t.date;
+}
+
+// TODAY時点で「現在の日程」に該当する日を返す（過ぎた日をスキップして最初に見つかったもの）
+// 1日目自身の場合はnullを返す
+function currentExtraDay(t){
+  const sorted = sortedExtraDays(t);
+  if(!sorted.length) return null;
+  if(t.date >= TODAY) return null; // 1日目がまだ来ていなければ1日目が「現在」
+  return sorted.find(d => d.date >= TODAY) || sorted[sorted.length-1];
 }
 
 function daysUntil(iso){
@@ -1432,9 +1501,9 @@ function renderHero(){
   box.innerHTML = `
     <div class="hero" onclick="focusTrip('${t.id}')">
       <div>
-        <div class="htitle">${t.date < TODAY && t.day2 ? '次の遠征（2日目）' : '次の遠征'}</div>
-        <div class="hmatch">${t.team} ${t.date < TODAY && t.day2 ? (t.day2.opponent||t.match) : t.match}</div>
-        <div class="hmeta">${t.date < TODAY && t.day2 ? `${fmtDate(t.day2.date).md}（${fmtDate(t.day2.date).dow}）　${t.day2.venue||t.venue||''}` : `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}`}</div>
+        <div class="htitle">${currentExtraDay(t) ? `次の遠征（${currentExtraDay(t).dayIndex}日目）` : '次の遠征'}</div>
+        <div class="hmatch">${t.team} ${currentExtraDay(t) ? (currentExtraDay(t).opponent||t.match) : t.match}</div>
+        <div class="hmeta">${currentExtraDay(t) ? `${fmtDate(currentExtraDay(t).date).md}（${fmtDate(currentExtraDay(t).date).dow}）　${currentExtraDay(t).venue||t.venue||''}` : `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}`}</div>
         ${pending.length
           ? `<div class="hpending">${pending.map(k=>`<span>${catInfo(k).icon} ${catInfo(k).label}が未予約</span>`).join('')}</div>`
           : `<div class="hall-set">✓ 交通・チケット・宿泊はすべて予約済みです</div>`}
@@ -1595,11 +1664,24 @@ function statusSegment(t, c){
     <div class="status-segment">
       <button type="button" class="seg-btn ${state==='pending'?'active':''}" onclick="setCatState('${t.id}','${c.key}','pending')">未予約</button>
       <button type="button" class="seg-btn seg-done ${state==='done'?'active':''}" onclick="setCatState('${t.id}','${c.key}','done')">予約済み</button>
-      <button type="button" class="seg-btn seg-skip ${state==='skip'?'active':''}" onclick="setCatState('${t.id}','${c.key}','skip')">不要</button>
+      <button type="button" class="seg-btn seg-skip ${state==='skip'?'active':''}" onclick="setCatState('${t.id}','${c.key}','skip')">対象外</button>
     </div>`;
 }
 
 // カテゴリごとに分かりやすい詳細メモのプレースホルダーを出し分ける
+// 同じ競技・チームの過去の遠征から、直近でそのカテゴリのfieldに値が入っていたものを探す
+// （「前回と同じ」クイック入力の元データとして使う）
+function getLastUsedValue(sport, team, categoryKey, field){
+  const candidates = trips
+    .filter(t => t.sport===sport && t.team===team && t.id !== editingTripId)
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  for(const t of candidates){
+    const val = t.detail[categoryKey]?.[field];
+    if(val) return val;
+  }
+  return null;
+}
+
 function memoPlaceholder(key){
   const map = {
     ticket: '座席番号など',
@@ -1611,31 +1693,64 @@ function memoPlaceholder(key){
 }
 
 // 2日目のミニセクション（観光DAYならバッジのみ、試合があればチケット予約トグルを出す）
-function renderDay2Section(t){
-  const d2 = t.day2;
-  const {md, dow} = fmtDate(d2.date);
-  if(d2.noGame){
-    return `<div class="day2-box day2-nogame">🏙 2日目（${md}${dow}）は観光DAYです</div>`;
-  }
-  const opponent = d2.opponent || t.match || '対戦未定';
-  const venue = d2.venue || t.venue || '';
-  const booked = d2.ticketBooked;
+// よく使う持ち物のプリセット（タップだけで追加できるようにし、入力の手間を減らす）
+const PACKING_PRESETS = ['🎫 チケット', '🔋 モバイルバッテリー', '👕 ユニフォーム', '🧣 防寒具', '☂️ 雨具', '💊 常備薬', '📷 カメラ', '🎌 応援グッズ'];
+
+function renderPackingListSection(t){
+  const list = t.packingList || [];
+  const checkedCount = list.filter(i=>i.checked).length;
+  const presetsToShow = PACKING_PRESETS.filter(p => !list.some(i=>i.text===p));
   return `
-    <div class="day2-box">
-      <div class="day2-title">📅 2日目（${md}${dow}）：vs ${opponent}${venue?` <span style="font-weight:400; color:var(--text-faint);">@ ${venue}</span>`:''}</div>
-      <div class="status-segment" style="margin-top:8px;">
-        <button type="button" class="seg-btn ${!booked?'active':''}" ${IS_EDITABLE?`onclick="setDay2Ticket('${t.id}',false)"`:'disabled'}>未予約</button>
-        <button type="button" class="seg-btn seg-done ${booked?'active':''}" ${IS_EDITABLE?`onclick="setDay2Ticket('${t.id}',true)"`:'disabled'}>予約済み</button>
+    <details class="station-details packing-details">
+      <summary>🎒 持ち物リスト${list.length ? `<span class="packing-count">（${checkedCount}/${list.length}）</span>` : ''}</summary>
+      <div style="margin-top:8px;">
+        ${list.map((item, idx) => `
+          <div class="packing-item">
+            <input type="checkbox" ${item.checked?'checked':''} ${IS_EDITABLE?`onchange="togglePackingItem('${t.id}',${idx})"`:'disabled'}>
+            <span class="packing-item-text ${item.checked?'checked':''}">${item.text}</span>
+            ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:26px; height:26px; font-size:12px;" onclick="removePackingItem('${t.id}',${idx})">×</button>` : ''}
+          </div>`).join('')}
+        ${IS_EDITABLE ? `
+        <div class="packing-add-row">
+          <input type="text" id="packing-input-${t.id}" placeholder="持ち物を追加してEnter" onkeydown="if(event.key==='Enter'){ event.preventDefault(); addPackingItemFromInput('${t.id}'); }">
+          <button type="button" onclick="addPackingItemFromInput('${t.id}')">追加</button>
+        </div>
+        ${presetsToShow.length ? `
+        <div class="packing-presets">
+          ${presetsToShow.map(p=>`<button type="button" class="packing-preset-chip" onclick="addPackingItem('${t.id}','${p.replace(/'/g,"\\'")}')">＋ ${p}</button>`).join('')}
+        </div>` : ''}
+        ${list.length ? `<button type="button" class="packing-template-btn" onclick="saveAsPackingTemplate('${t.id}')">📋 これをテンプレートとして保存（次回以降の遠征に自動反映）</button>` : ''}
+        ` : (list.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">持ち物リストはまだありません</div>` : '')}
       </div>
-      ${booked ? `
-      <div class="field-row" style="margin-top:8px;">
-        <div class="field"><label>金額</label><input type="number" value="${d2.ticketCost||''}" ${IS_EDITABLE?`onchange="updateDay2TicketField('${t.id}','ticketCost',this.value)"`:'disabled'} placeholder="円"></div>
-        <div class="field"><label>座席番号など</label><input value="${(d2.ticketMemo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDay2TicketField('${t.id}','ticketMemo',this.value)"`:'disabled'}></div>
-      </div>
-      <div class="field" style="margin-top:8px;"><label>予約リンク・確認ページ</label><input value="${(d2.ticketLink||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDay2TicketField('${t.id}','ticketLink',this.value)"`:'disabled'} placeholder="URLを貼り付け"></div>
-      ${d2.ticketLink ? `<a href="${/^https?:\/\//i.test(d2.ticketLink)?d2.ticketLink:'https://'+d2.ticketLink}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="link-open-btn">🔗 予約ページを開く</a>` : ''}
-      ` : ''}
-    </div>`;
+    </details>`;
+}
+
+function renderExtraDaysSection(t){
+  return sortedExtraDays(t).map(d => {
+    const {md, dow} = fmtDate(d.date);
+    if(d.noGame){
+      return `<div class="day2-box day2-nogame">🏙 ${d.dayIndex}日目（${md}${dow}）は観光DAYです</div>`;
+    }
+    const opponent = d.opponent || t.match || '対戦未定';
+    const venue = d.venue || t.venue || '';
+    const booked = d.ticketBooked;
+    return `
+      <div class="day2-box">
+        <div class="day2-title">📅 ${d.dayIndex}日目（${md}${dow}）：vs ${opponent}${venue?` <span style="font-weight:400; color:var(--text-faint);">@ ${venue}</span>`:''}</div>
+        <div class="status-segment" style="margin-top:8px;">
+          <button type="button" class="seg-btn ${!booked?'active':''}" ${IS_EDITABLE?`onclick="setExtraDayTicket('${t.id}',${d.dayIndex},false)"`:'disabled'}>未予約</button>
+          <button type="button" class="seg-btn seg-done ${booked?'active':''}" ${IS_EDITABLE?`onclick="setExtraDayTicket('${t.id}',${d.dayIndex},true)"`:'disabled'}>予約済み</button>
+        </div>
+        ${booked ? `
+        <div class="field-row" style="margin-top:8px;">
+          <div class="field"><label>金額</label><input type="number" min="0" value="${d.ticketCost||''}" ${IS_EDITABLE?`onchange="updateExtraDayTicketField('${t.id}',${d.dayIndex},'ticketCost',this.value)"`:'disabled'} placeholder="円"></div>
+          <div class="field"><label>座席番号など</label><input value="${(d.ticketMemo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateExtraDayTicketField('${t.id}',${d.dayIndex},'ticketMemo',this.value)"`:'disabled'}></div>
+        </div>
+        <div class="field" style="margin-top:8px;"><label>予約リンク・確認番号</label><input value="${(d.ticketLink||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateExtraDayTicketField('${t.id}',${d.dayIndex},'ticketLink',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+        ${renderLinkAction(d.ticketLink, '予約ページ')}
+        ` : ''}
+      </div>`;
+  }).join('');
 }
 
 function catPanelContent(t, c){
@@ -1693,9 +1808,10 @@ function catPanelContent(t, c){
             </div>
             <div class="field-row">
               <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
-              <div class="field"><label>この区間の金額</label><input type="number" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
+              <div class="field"><label>この区間の金額</label><input type="number" min="0" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
             </div>
             <div class="field"><label>予約リンク・確認番号</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLegLink('${t.id}','${c.key}',${i},this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+            ${renderLinkAction(leg.link, '予約ページ')}
           </div>`;
         }).join('')}
         ${(d.legs||[]).length ? `<div class="legs-total">乗り継ぎ合計：<b>¥${sumLegs(d.legs).toLocaleString()}</b>（上の「金額」欄に自動反映されます）</div>` : ''}
@@ -1706,23 +1822,22 @@ function catPanelContent(t, c){
 
   const stayInfoBlock = (c.key==='hotel') ? (()=>{
     const checkInMd = fmtDate(t.date).md, checkInDow = fmtDate(t.date).dow;
-    // 観光DAY（試合が無い日）でも宿泊自体は必要なはずなので、2日目があれば観光/試合の別に関わらず宿泊対象に含める
-    const checkOutDate = t.day2 ? t.day2.date : t.date;
+    // 観光DAY（試合が無い日）でも宿泊自体は必要なはずなので、追加日程があれば一番最後の日を宿泊対象に含める
+    const hasExtra = t.extraDays && t.extraDays.length;
+    const checkOutDate = hasExtra ? tripEndDate(t) : t.date;
     const checkOutMd = fmtDate(checkOutDate).md, checkOutDow = fmtDate(checkOutDate).dow;
-    // 泊数は実際の日付差から計算する（2日目が翌日とは限らない。例：8/21着・8/23発なら2泊）
-    const nights = t.day2 ? Math.round((new Date(checkOutDate) - new Date(t.date)) / (1000*60*60*24)) : 0;
-    return `<div class="stay-info-hint">🏨 宿泊対象：${checkInMd}(${checkInDow})${t.day2?`〜${checkOutMd}(${checkOutDow})`:''}${nights?`（${nights}泊）`:'（日帰りの場合は不要かも）'}</div>`;
+    // 泊数は実際の日付差から計算する（日程が連続しているとは限らない。例：8/21着・8/23発なら2泊）
+    const nights = hasExtra ? Math.round((new Date(checkOutDate) - new Date(t.date)) / (1000*60*60*24)) : 0;
+    return `<div class="stay-info-hint">🏨 宿泊対象：${checkInMd}(${checkInDow})${hasExtra?`〜${checkOutMd}(${checkOutDow})`:''}${nights?`（${nights}泊）`:'（日帰りの場合は不要かも）'}</div>`;
   })() : '';
 
   if(!c.bookable){
-    const link = (d.link||'').trim();
-    const linkUrl = link && !/^https?:\/\//i.test(link) ? `https://${link}` : link;
     return `
       <div class="cat-panel">
         <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="お店の名前など"></div>
         ${(c.key==='food' || c.key==='other') ? `
-        <div class="field"><label>${c.key==='food' ? 'お店のリンク（食べログ・地図など）' : 'リンク'}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLを貼り付け"></div>
-        ${link ? `<a href="${linkUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="link-open-btn">🔗 ${c.key==='food'?'お店':'リンク先'}のページを開く</a>` : ''}
+        <div class="field"><label>${c.key==='food' ? 'お店のリンク（食べログ・地図など）' : 'リンク'}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは電話番号など"></div>
+        ${renderLinkAction(d.link, c.key==='food'?'お店のページ':'リンク先')}
         ` : ''}
         ${segment}
         ${c.key==='food' ? `<div class="pr-row">${getPrLinks('food').map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
@@ -1737,13 +1852,14 @@ function catPanelContent(t, c){
         <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="例）楽天トラベル"></div>
         <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
+      ${(()=>{ if(d.method || !IS_EDITABLE) return ''; const lastMethod = getLastUsedValue(t.sport, t.team, c.key, 'method'); return lastMethod ? `<button type="button" class="quick-fill-chip" onclick="updateDetail('${t.id}','${c.key}','method','${lastMethod.replace(/'/g,"\\'")}')">↺ 前回と同じ「${lastMethod}」を使う</button>` : ''; })()}
       ${stationBlock}
       <div class="field-row">
-        <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
+        <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" min="0" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
         <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
       </div>
-      <div class="field"><label>予約リンク・確認ページ</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLを貼り付け"></div>
-      ${(()=>{ const link=(d.link||'').trim(); if(!link) return ''; const linkUrl = /^https?:\/\//i.test(link) ? link : `https://${link}`; return `<a href="${linkUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="link-open-btn">🔗 予約ページを開く</a>`; })()}
+      <div class="field"><label>予約リンク・確認番号</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+      ${renderLinkAction(d.link, '予約ページ')}
       ${segment}
       ${copyOutboundBlock}
       ${(IS_EDITABLE && (d.method || d.bookedDate || d.memo)) ? `<button class="copy-btn" onclick="openCopyModal('${t.id}','${c.key}')">📋 この${c.label}情報を他の遠征にもコピー（連泊・同じ移動手段など）</button>` : ''}
@@ -1778,8 +1894,8 @@ function renderTicketCard(t, isPast){
   const slimRow = showSlim ? `
     <div class="ticket-compact-row" onclick="toggleExpand('${t.id}')">
       <div class="tcr-date">
-        <div class="tcr-d">${md}${t.day2 ? '〜' : ''}</div>
-        <div class="tcr-dow">${t.day2 ? `${fmtDate(t.day2.date).md}` : dow}</div>
+        <div class="tcr-d">${md}${(t.extraDays&&t.extraDays.length) ? '〜' : ''}</div>
+        <div class="tcr-dow">${(t.extraDays&&t.extraDays.length) ? `${fmtDate(tripEndDate(t)).md}` : dow}</div>
       </div>
       <div class="tcr-main">
         <div class="tcr-line1">
@@ -1787,7 +1903,7 @@ function renderTicketCard(t, isPast){
           <span class="tcr-pct" style="color:${pct===100?'var(--sage)':'var(--rose-deep)'};">${pct}%</span>
         </div>
         <div class="tcr-line2">
-          <span class="tcr-match">vs ${t.match || '対戦未定'}</span>
+          <span class="tcr-match">${t.isNoGame ? '🏙 観光DAY' : 'vs '+(t.match || '対戦未定')}</span>
           ${t.venue ? `<span class="tcr-venue">📍${t.venue}</span>` : ''}
         </div>
         ${pendingCount>0 ? `<div class="tcr-pending">⚠️ 未予約${pendingCount}件</div>` : `<div class="tcr-ok">✓ 準備OK</div>`}
@@ -1801,18 +1917,19 @@ function renderTicketCard(t, isPast){
       <div class="head">
         <div>
           <span class="sport-tag">${sportIcon(t.sport)} ${t.team}</span>
-          <div class="matchup">${t.match}</div>
+          <div class="matchup">${t.isNoGame ? '🏙 観光DAY（試合なし）' : t.match}</div>
           <div class="venue-row">
             <span class="venue">${t.venue}</span>
             ${t.venue ? `<a class="map-badge" href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ 地図を見る</a>` : ''}
+            ${t.venue ? `<button type="button" class="venue-copy-badge" onclick="event.stopPropagation(); copyVenueName('${t.venue.replace(/'/g,"\\'")}')" title="会場名をコピー">📋</button>` : ''}
           </div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
           ${nextAction ? `<div class="next-action" onclick="focusTrip('${t.id}','${nextAction.key}')">👉 次は${nextAction.icon}${nextAction.label}の予約${pendingCount>1?`<span style="opacity:0.75;">（他${pendingCount-1}件）</span>`:''}</div>` : ''}
         </div>
         <div class="date-block">
-          ${t.day2 ? `
-          <div class="d" style="font-size:15px;">${md}〜${fmtDate(t.day2.date).md}</div>
-          <div class="dow">${dow}〜${fmtDate(t.day2.date).dow}曜</div>` : `
+          ${(t.extraDays&&t.extraDays.length) ? `
+          <div class="d" style="font-size:15px;">${md}〜${fmtDate(tripEndDate(t)).md}</div>
+          <div class="dow">${dow}〜${fmtDate(tripEndDate(t)).dow}曜</div>` : `
           <div class="d">${md}</div>
           <div class="dow">${dow}曜日</div>
           <div class="t">${t.time || ''}</div>`}
@@ -1834,15 +1951,15 @@ function renderTicketCard(t, isPast){
           <span class="label">${BOOKABLE_CATS.some(k=>t.detail[k]?.cost) ? '実績金額' : '想定予算'}</span>
           <span class="val">¥${tripSpend(t).toLocaleString()}</span>
         </div>
-        ${t.day2 ? renderDay2Section(t) : ''}
+        ${(t.extraDays&&t.extraDays.length) ? renderExtraDaysSection(t) : ''}
         <div class="cat-strip">
           ${CATS.map(c=>{
             const done = t.status[c.key];
             const notNeeded = !!t.detail[c.key]?.notNeeded;
             const isActive = activeCat[t.id] === c.key;
             const statusClass = notNeeded ? 'chip-not-needed' : (done ? 'chip-done' : 'chip-pending');
-            const hasDay2Game = t.day2 && !t.day2.noGame;
-            const chipLabel = (c.key==='ticket' && hasDay2Game) ? `${c.label}(1日目)` : c.label;
+            const hasExtraGame = (t.extraDays||[]).some(d=>!d.noGame);
+            const chipLabel = (c.key==='ticket' && hasExtraGame && !t.isNoGame) ? `${c.label}(1日目)` : c.label;
             return `<button type="button" class="cat-chip ${statusClass} ${isActive?'is-active':''}" onclick="toggleCat('${t.id}','${c.key}')">
               <span class="cat-chip-icon">${c.icon}</span>
               <span class="cat-chip-label">${chipLabel}</span>
@@ -1856,7 +1973,7 @@ function renderTicketCard(t, isPast){
           return `
           <div class="cat-active-panel">
             <div class="cat-active-header">
-              <span class="cat-active-title">${c.icon} ${(c.key==='ticket' && t.day2 && !t.day2.noGame) ? `${c.label}(1日目)` : c.label}</span>
+              <span class="cat-active-title">${c.icon} ${(c.key==='ticket' && (t.extraDays||[]).some(d=>!d.noGame) && !t.isNoGame) ? `${c.label}(1日目)` : c.label}</span>
               <span class="status-dot ${notNeeded?'not-needed':done?'done':'pending'}"></span>
               <span class="status-text ${notNeeded?'not-needed':''}">${notNeeded?'対象外':done?'予約済み':'未予約'}</span>
               <button type="button" class="cat-active-close" onclick="toggleCat('${t.id}','${c.key}')">✕</button>
@@ -1864,6 +1981,7 @@ function renderTicketCard(t, isPast){
             ${catPanelContent(t,c)}
           </div>`;
         })() : ''}
+        ${renderPackingListSection(t)}
         ${isPast ? `
         <div class="journal-box">
           <div class="journal-label">📝 この遠征の思い出</div>
@@ -1881,7 +1999,8 @@ function renderGrid(){
   const filtered = trips.filter(t =>
     (sportFilter==='ALL' || t.sport===sportFilter) &&
     (!q || t.team.toLowerCase().includes(q) || (t.match||'').toLowerCase().includes(q) || (t.venue||'').toLowerCase().includes(q)
-      || (t.day2?.opponent||'').toLowerCase().includes(q) || (t.day2?.venue||'').toLowerCase().includes(q))
+      || (t.journalMemo||'').toLowerCase().includes(q)
+      || (t.extraDays||[]).some(d=>(d.opponent||'').toLowerCase().includes(q) || (d.venue||'').toLowerCase().includes(q)))
   );
   const upcoming = filtered.filter(t=>tripEndDate(t) >= TODAY);
   const past = filtered.filter(t=>tripEndDate(t) < TODAY).sort((a,b)=> new Date(b.date) - new Date(a.date));
@@ -1959,7 +2078,7 @@ function toggleCat(tripId, key){
 // setBudgetCap関数とDB側のbudget_capカラムは、将来的な復活に備えてそのまま残しています。
 async function setBudgetCap(val){
   if(!IS_EDITABLE) return;
-  budgetCap = parseInt(val)||0;
+  budgetCap = Math.max(0, parseInt(val)||0);
   render();
   try{
     const { error } = await sb.rpc('set_budget_cap', { p_edit_token: EDIT_TOKEN, p_budget_cap: budgetCap });
@@ -1970,19 +2089,20 @@ async function setBudgetCap(val){
   }
 }
 
-// 遠征の思い出メモ（何を食べたか、どうだったか等）を保存する
-// 2日目のチケット予約状況を更新する（軽量なset_day2_ticket RPCを使う）
-async function saveDay2Ticket(tripId){
+// 追加日程のチケット予約状況を更新する（set_trip_day_ticket RPCを使う）
+async function saveExtraDayTicket(tripId, dayIndex){
   const t = trips.find(x=>x.id===tripId);
-  if(!t || !t.day2) return;
+  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
+  if(!d) return;
   try{
-    const { error } = await sb.rpc('set_day2_ticket', {
+    const { error } = await sb.rpc('set_trip_day_ticket', {
       p_edit_token: EDIT_TOKEN,
       p_trip_id: tripId,
-      p_booked: !!t.day2.ticketBooked,
-      p_cost: t.day2.ticketCost || null,
-      p_memo: t.day2.ticketMemo || null,
-      p_link: t.day2.ticketLink || null
+      p_day_index: dayIndex,
+      p_booked: !!d.ticketBooked,
+      p_cost: d.ticketCost || null,
+      p_memo: d.ticketMemo || null,
+      p_link: d.ticketLink || null
     });
     if(error) throw error;
     showToast('✓ 保存しました', 1200);
@@ -1991,21 +2111,23 @@ async function saveDay2Ticket(tripId){
     showToast('保存に失敗しました。通信環境をご確認ください');
   }
 }
-function setDay2Ticket(tripId, booked){
+function setExtraDayTicket(tripId, dayIndex, booked){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
-  if(!t || !t.day2) return;
-  t.day2.ticketBooked = booked;
+  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
+  if(!d) return;
+  d.ticketBooked = booked;
   render();
   setTimeout(initCategoryBannerRotators, 50);
-  saveDay2Ticket(tripId);
+  saveExtraDayTicket(tripId, dayIndex);
 }
-function updateDay2TicketField(tripId, field, val){
+function updateExtraDayTicketField(tripId, dayIndex, field, val){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
-  if(!t || !t.day2) return;
-  t.day2[field] = field==='ticketCost' ? (parseInt(val)||0) : (field==='ticketLink' ? extractUrl(val) : val);
-  saveDay2Ticket(tripId);
+  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
+  if(!d) return;
+  d[field] = field==='ticketCost' ? Math.max(0, parseInt(val)||0) : (field==='ticketLink' ? extractUrl(val) : val);
+  saveExtraDayTicket(tripId, dayIndex);
 }
 
 async function setTripJournal(tripId, memo){
@@ -2161,6 +2283,25 @@ function extractUrl(text){
   const match = (text||'').match(/https?:\/\/\S+/);
   return match ? match[0] : (text||'').trim();
 }
+
+// 値が実際にURLらしい形か判定する（http(s)://始まり、または「〇〇.com」のようなドメイン形式）
+function looksLikeUrl(text){
+  const v = (text||'').trim();
+  if(!v) return false;
+  return /^https?:\/\//i.test(v) || /^[a-z0-9-]+(\.[a-z0-9-]+)+(\/\S*)?$/i.test(v);
+}
+// リンク欄の値に応じて、URLらしければ「開く」リンク、そうでなければ「コピー」ボタンを出す
+// （予約番号のような非URL値に対して、開けないはずのURLへ遷移しようとするボタンを出さないようにするため）
+function renderLinkAction(value, label){
+  const v = (value||'').trim();
+  if(!v) return '';
+  if(looksLikeUrl(v)){
+    const url = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+    return `<a href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="link-open-btn">🔗 ${label}を開く</a>`;
+  }
+  return `<button type="button" onclick="event.stopPropagation(); copyVenueName('${v.replace(/'/g,"\\'")}')" class="link-open-btn" style="border:none; width:100%; cursor:pointer;">📋 予約番号をコピー（${v}）</button>`;
+}
+
 function updateLinkField(tripId, key, val){
   updateDetail(tripId, key, 'link', extractUrl(val));
 }
@@ -2170,7 +2311,7 @@ function updateLegLink(tripId, key, index, val){
 
 function updateDetail(tripId, key, field, val){
   if(!IS_EDITABLE) return;
-  const patch = { [field]: field==='cost' ? (parseInt(val)||0) : val };
+  const patch = { [field]: field==='cost' ? Math.max(0, parseInt(val)||0) : val };
   saveBookingDetail(tripId, key, patch);
 }
 
@@ -2188,7 +2329,7 @@ function updateLeg(tripId, key, index, field, val){
   if(!t) return;
   const legs = [...(t.detail[key].legs||[])];
   if(!legs[index]) return;
-  legs[index] = { ...legs[index], [field]: field==='cost' ? (parseInt(val)||0) : val };
+  legs[index] = { ...legs[index], [field]: field==='cost' ? Math.max(0, parseInt(val)||0) : val };
   // 乗り継ぎがある場合、各区間の金額の合計をカテゴリ全体の金額欄に自動反映する
   saveBookingDetail(tripId, key, { legs, cost: sumLegs(legs) });
 }
@@ -2268,8 +2409,8 @@ let spendingRangeEnd = '';
 // まだ何も入力していない場合のみ「想定予算」欄の概算値で代用する
 function tripSpend(t){
   const catSum = BOOKABLE_CATS.reduce((s,k)=> s + (t.detail[k]?.cost || 0), 0);
-  const day2Ticket = t.day2?.ticketCost || 0;
-  return (catSum > 0 ? catSum : (t.cost || 0)) + day2Ticket;
+  const extraTicketSum = (t.extraDays||[]).reduce((s,d)=> s + (d.ticketCost || 0), 0);
+  return (catSum > 0 ? catSum : (t.cost || 0)) + extraTicketSum;
 }
 
 function renderSpendingSummary(){
@@ -2423,7 +2564,13 @@ function renderStamps(){
       </div>`;
   }).join('');
 
-  wrap.innerHTML = sections + `<button class="add-btn" style="width:100%; margin-top:6px;" onclick="shareStamps()">📤 スタンプをシェアする</button>`;
+  const noMemoCount = pastTrips.filter(t => !t.journalMemo || !t.journalMemo.trim()).length;
+  const memoNudge = noMemoCount ? `
+    <div class="memo-nudge" onclick="switchTab('cards'); setSortMode('date');">
+      📝 思い出メモが未記入の遠征が${noMemoCount}件あります。書き残しておきませんか？
+    </div>` : '';
+
+  wrap.innerHTML = memoNudge + sections + `<button class="add-btn" style="width:100%; margin-top:6px;" onclick="shareStamps()">📤 スタンプをシェアする</button>`;
 }
 
 function shareStamps(){
@@ -2449,6 +2596,49 @@ const KNOWN_SPORTS = ['バスケットボール','サッカー','野球','バレ
 // 競技名は場所によって長く場所を取るため、アイコンで代用できるようにする
 const SPORT_ICONS = { 'バスケットボール':'🏀', 'サッカー':'⚽', '野球':'⚾', 'バレーボール':'🏐' };
 function sportIcon(sport){ return SPORT_ICONS[sport] || '🎫'; }
+
+/* ---------- テーマカラー ---------- */
+// 基準色1つから、濃い色（ボタン等）・薄い色（背景ウォッシュ）を自動計算する
+function hexToRgb(hex){
+  hex = (hex||'').replace('#','');
+  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const num = parseInt(hex,16);
+  return { r:(num>>16)&255, g:(num>>8)&255, b:num&255 };
+}
+function shadeColor(hex, percent){
+  const {r,g,b} = hexToRgb(hex);
+  const f = (c) => percent < 0 ? c*(1+percent) : c+(255-c)*percent;
+  const clamp = (c) => Math.max(0, Math.min(255, Math.round(c)));
+  return '#' + [f(r),f(g),f(b)].map(c=>clamp(c).toString(16).padStart(2,'0')).join('');
+}
+function applyThemeColor(hex){
+  if(!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+  document.documentElement.style.setProperty('--rose', hex);
+  document.documentElement.style.setProperty('--rose-deep', shadeColor(hex, -0.22));
+  document.documentElement.style.setProperty('--rose-wash', shadeColor(hex, 0.88));
+  document.documentElement.style.setProperty('--bg', shadeColor(hex, 0.95)); // ページ全体の背景も、読みやすさを保ちつつごく薄く色づける
+}
+// テーマカラーの候補プリセット（特定チームの色ではなく、汎用的で見栄えの良い配色）
+const THEME_COLOR_PRESETS = ['#D98B96', '#5B8DBE', '#4A9B7F', '#E0954F', '#8B6BB0', '#C24B4B', '#3D8B8B', '#B0894F'];
+
+async function saveThemeColor(hex){
+  if(!IS_EDITABLE) return;
+  applyThemeColor(hex);
+  try{
+    const { error } = await sb.rpc('set_theme_color', { p_edit_token: EDIT_TOKEN, p_theme_color: hex });
+    if(error) throw error;
+    showToast('✓ テーマカラーを変更しました', 1500);
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認ください');
+  }
+}
+
+// 日程番号を丸数字で表示する（②③④…20を超えたら数字のまま）
+function circledNumber(n){
+  const map = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮','⑯','⑰','⑱','⑲','⑳'];
+  return map[n-1] || `(${n})`;
+}
 
 // 競技ごとのplaceholderサンプル（モーダルを開いた時に競技に合わせて切り替わる）
 const SPORT_PLACEHOLDERS = {
@@ -2510,18 +2700,93 @@ function applyPlaceholders(sport){
   document.getElementById('f-cost-display').placeholder  = ph.cost;
 }
 
-function toggleDay2NoGame(){
-  const noGame = document.getElementById('f-day2-no-game').checked;
-  document.getElementById('f-day2-game-fields').style.display = noGame ? 'none' : 'block';
+// 複数日程（2日目以降）の入力状態。モーダルを開いている間だけ保持する
+let extraDaysFormState = []; // [{dayIndex, date, opponent, venue, noGame}, ...]
+
+function renderExtraDaysForm(){
+  const container = document.getElementById('f-extra-days-container');
+  const minDate = document.getElementById('f-date').value;
+  container.innerHTML = extraDaysFormState.map((d, i) => `
+    <div class="extra-day-block">
+      <div class="extra-day-block-top">
+        <span class="extra-day-label">${d.dayIndex}日目</span>
+        <button type="button" class="leg-remove" onclick="removeExtraDayForm(${i})">×</button>
+      </div>
+      <div class="field"><label>日付</label><input type="date" value="${d.date||''}" ${minDate?`min="${minDate}"`:''} onchange="updateExtraDayForm(${i},'date',this.value)" style="font-size:16px;"></div>
+      <label class="done-toggle" style="margin-top:8px;"><input type="checkbox" ${d.noGame?'checked':''} onchange="updateExtraDayForm(${i},'noGame',this.checked)"> この日は試合がない（観光DAYなど）</label>
+      ${!d.noGame ? `
+      <div class="field" style="margin-top:8px;"><label>${d.dayIndex}日目の対戦相手</label><input value="${(d.opponent||'').replace(/"/g,'&quot;')}" placeholder="例）1日目と同じ相手なら空欄でOK" onchange="updateExtraDayForm(${i},'opponent',this.value)" style="font-size:16px;"></div>
+      <div class="field" style="margin-top:8px;"><label>${d.dayIndex}日目の会場</label><input value="${(d.venue||'').replace(/"/g,'&quot;')}" placeholder="例）1日目と同じ会場なら空欄でOK" onchange="updateExtraDayForm(${i},'venue',this.value)" style="font-size:16px;"></div>
+      ` : ''}
+    </div>`).join('');
 }
-function updateDay2MinDate(){
-  const date = document.getElementById('f-date').value;
-  const day2Input = document.getElementById('f-day2-date');
-  if(date){
-    day2Input.min = date;
-    // 1日目より前の日付が既に入っていたらクリアする
-    if(day2Input.value && day2Input.value <= date) day2Input.value = '';
+// 「日帰り」チェック時に、既に複数日程が登録されていないか確認する（矛盾防止）
+function checkDayTripConflict(){
+  const dayTripBox = document.getElementById('f-day-trip');
+  if(dayTripBox.checked && extraDaysFormState.length){
+    dayTripBox.checked = false;
+    showToast('複数日程が登録されているため「日帰り」にはできません', 2200);
   }
+}
+function addExtraDayForm(){
+  const nextIndex = extraDaysFormState.length ? Math.max(...extraDaysFormState.map(d=>d.dayIndex))+1 : 2;
+  extraDaysFormState.push({dayIndex: nextIndex, date:'', opponent:'', venue:'', noGame:false});
+  uncheckDayTripIfNeeded();
+  renderExtraDaysForm();
+}
+// 複数日程が1件でもある状態で「日帰り」がオンだと矛盾する（宿泊が誤って「不要」になってしまう）ため、
+// 日程を追加した瞬間に自動でオフにする
+function uncheckDayTripIfNeeded(){
+  const dayTripBox = document.getElementById('f-day-trip');
+  if(dayTripBox.checked){
+    dayTripBox.checked = false;
+    showToast('複数日程を追加したため「日帰り」を解除しました', 2200);
+  }
+}
+// 「基本的には２日間ある場合は同じ試合のケースがほとんど」という声を受けて、
+// 一番多いパターン（翌日も同じ相手・同じ会場）をワンタップで追加できるようにする
+function addNextDaySameOpponent(){
+  const baseDate = document.getElementById('f-date').value;
+  if(!baseDate){
+    document.getElementById('modal-save-msg').style.color = '#c0392b';
+    document.getElementById('modal-save-msg').textContent = '先に1日目の日付を入力してください。';
+    return;
+  }
+  // 最後に登録されている日程（無ければ1日目）の翌日を自動計算する
+  const lastDate = extraDaysFormState.length ? extraDaysFormState[extraDaysFormState.length-1].date || baseDate : baseDate;
+  const next = new Date(lastDate);
+  next.setDate(next.getDate() + 1);
+  const nextDateStr = next.toISOString().slice(0,10);
+  const nextIndex = extraDaysFormState.length ? Math.max(...extraDaysFormState.map(d=>d.dayIndex))+1 : 2;
+  // 対戦相手・会場は空欄のままにする＝1日目と同じものとして扱われる
+  extraDaysFormState.push({dayIndex: nextIndex, date: nextDateStr, opponent:'', venue:'', noGame:false});
+  uncheckDayTripIfNeeded();
+  renderExtraDaysForm();
+}
+function removeExtraDayForm(i){
+  extraDaysFormState.splice(i,1);
+  renderExtraDaysForm();
+}
+function updateExtraDayForm(i, field, val){
+  extraDaysFormState[i][field] = val;
+  if(field === 'noGame') renderExtraDaysForm(); // 表示切り替えのため再描画
+}
+// 次の指定曜日（0=日曜〜6=土曜）の日付を計算してセットする（日付ピッカーを開かずに済むように）
+function setQuickDate(targetDow){
+  const now = new Date();
+  const diff = (targetDow - now.getDay() + 7) % 7 || 7; // 今日と同じ曜日なら「次の」なので+7日
+  now.setDate(now.getDate() + diff);
+  const dateStr = now.toISOString().slice(0,10);
+  document.getElementById('f-date').value = dateStr;
+  updateDay2MinDate();
+}
+
+function updateDay2MinDate(){
+  // 1日目の日付を変更したら、既存の追加日程のmin属性を更新し、矛盾する日付をクリアする
+  const date = document.getElementById('f-date').value;
+  if(!date) return;
+  extraDaysFormState.forEach(d=>{ if(d.date && d.date <= date) d.date = ''; });
+  renderExtraDaysForm();
 }
 
 function toggleCustomSport(){
@@ -2584,22 +2849,17 @@ function fillModalFields(t){
   document.getElementById('f-time').value = t.time || '';
   document.getElementById('f-venue').value = t.venue || '';
   setCostValue(t.cost || '');
+  renderCostQuickFill(); // handleTeamSelectChange()内での判定より後に、確定した金額で再チェックする
+  document.getElementById('f-is-no-game').checked = !!t.isNoGame;
 
-  // 2日目の情報を復元
-  const day2Details = document.getElementById('f-day2-details');
-  if(t.day2){
-    document.getElementById('f-day2-date').value = t.day2.date || '';
-    document.getElementById('f-day2-opponent').value = t.day2.opponent || '';
-    document.getElementById('f-day2-venue').value = t.day2.venue || '';
-    document.getElementById('f-day2-no-game').checked = t.day2.noGame;
-    document.getElementById('f-day2-game-fields').style.display = t.day2.noGame ? 'none' : 'block';
-    day2Details.setAttribute('open', '');
-  }else{
-    ['f-day2-date','f-day2-opponent','f-day2-venue'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('f-day2-no-game').checked = false;
-    document.getElementById('f-day2-game-fields').style.display = 'block';
-    day2Details.removeAttribute('open');
-  }
+  // 複数日程の情報を復元
+  extraDaysFormState = (t.extraDays || []).map(d => ({
+    dayIndex: d.dayIndex, date: d.date, opponent: d.opponent, venue: d.venue, noGame: d.noGame
+  }));
+  renderExtraDaysForm();
+  const extraDaysDetails = document.getElementById('f-extra-days-details');
+  if(extraDaysFormState.length) extraDaysDetails.setAttribute('open', '');
+  else extraDaysDetails.removeAttribute('open');
 }
 
 function openModal(tripId){
@@ -2619,10 +2879,10 @@ function openModal(tripId){
     document.getElementById('modal-submit-btn').textContent = '登録する';
     ['f-venue','f-date','f-time'].forEach(id=>document.getElementById(id).value=''); setCostValue('');
     document.getElementById('f-day-trip').checked = false;
-    ['f-day2-date','f-day2-opponent','f-day2-venue'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('f-day2-no-game').checked = false;
-    document.getElementById('f-day2-game-fields').style.display = 'block';
-    document.getElementById('f-day2-details').removeAttribute('open');
+    document.getElementById('f-is-no-game').checked = false;
+    extraDaysFormState = [];
+    renderExtraDaysForm();
+    document.getElementById('f-extra-days-details').removeAttribute('open');
     document.getElementById('f-team-select').value=''; document.getElementById('f-match-select').value='';
     document.getElementById('f-team').value=''; document.getElementById('f-match').value='';
     document.getElementById('f-team').style.display='none'; document.getElementById('f-team-select').style.display='block';
@@ -2652,20 +2912,25 @@ async function submitTrip(keepOpen){
   const venue = document.getElementById('f-venue').value;
   const cost = parseInt(document.getElementById('f-cost').value) || 0;
   const isDayTrip = document.getElementById('f-day-trip').checked;
-  const day2Date = document.getElementById('f-day2-date').value;
-  const day2NoGame = document.getElementById('f-day2-no-game').checked;
-  const day2Opponent = document.getElementById('f-day2-opponent').value;
-  const day2Venue = document.getElementById('f-day2-venue').value;
+  const isNoGame = document.getElementById('f-is-no-game').checked;
 
   if(!date){
     document.getElementById('modal-save-msg').style.color = '#c0392b';
     document.getElementById('modal-save-msg').textContent = '日付を入力してください。';
     return;
   }
-  if(day2Date && day2Date <= date){
-    document.getElementById('modal-save-msg').style.color = '#c0392b';
-    document.getElementById('modal-save-msg').textContent = '2日目の日付は、1日目より後の日付にしてください。';
-    return;
+  // 追加日程のバリデーション：1日目より後の日付で、かつ日付が未入力の行が無いこと
+  for(const d of extraDaysFormState){
+    if(!d.date){
+      document.getElementById('modal-save-msg').style.color = '#c0392b';
+      document.getElementById('modal-save-msg').textContent = `${d.dayIndex}日目の日付を入力してください。`;
+      return;
+    }
+    if(d.date <= date){
+      document.getElementById('modal-save-msg').style.color = '#c0392b';
+      document.getElementById('modal-save-msg').textContent = `${d.dayIndex}日目の日付は、1日目より後の日付にしてください。`;
+      return;
+    }
   }
   document.getElementById('modal-save-msg').style.color = '';
 
@@ -2673,8 +2938,15 @@ async function submitTrip(keepOpen){
   submitBtn.disabled = true;
 
   // 新しいスタジアムへの遠征かどうかを判定（保存前に、これまでの過去訪問済み会場と比較）
-  const isNewVenue = !editingTripId && venue && venue.trim() &&
-    !trips.some(t => t.sport===sport && tripEndDate(t) < TODAY && (t.venue||'').trim() === venue.trim());
+  // 1日目が試合なしで会場未入力の場合、実際の新会場が追加日程側にあるケースも拾う
+  const candidateVenues = [venue, ...extraDaysFormState.map(d=>d.venue)].filter(v=>v && v.trim());
+  const isPastVisited = v => trips.some(t => {
+    if(t.sport!==sport || tripEndDate(t) >= TODAY) return false;
+    const allVenues = [t.venue, ...(t.extraDays||[]).map(d=>d.venue)].filter(Boolean).map(x=>x.trim());
+    return allVenues.includes(v.trim());
+  });
+  const newVenueFound = !editingTripId && candidateVenues.find(v => !isPastVisited(v));
+  const isNewVenue = !!newVenueFound;
 
   try{
     const { data, error } = await sb.rpc('upsert_trip', {
@@ -2687,24 +2959,40 @@ async function submitTrip(keepOpen){
       p_start_time: time || null,
       p_venue: venue || null,
       p_estimated_cost: cost,
-      p_day2_date: day2Date || null,
-      p_day2_opponent: day2Opponent || null,
-      p_day2_venue: day2Venue || null,
-      p_day2_no_game: day2NoGame
+      p_is_no_game: isNoGame
     });
     if(error) throw error;
     saveFavoriteTeam(sport, team); // この競技での応援チームとして記憶（次回モーダルで自動選択）
 
-    const day2 = day2Date ? {
-      date: day2Date, opponent: day2Opponent || '', venue: day2Venue || '', noGame: day2NoGame,
-      ticketBooked: false, ticketCost: 0, ticketMemo: '', ticketLink: ''
-    } : null;
+    const tripId = editingTripId || data;
+
+    // 追加日程を保存する。既存のチケット予約情報は、同じday_indexが残っていれば引き継ぐ
+    const prevTrip = editingTripId ? trips.find(x=>x.id===editingTripId) : null;
+    const prevExtraDays = prevTrip?.extraDays || [];
+    const newExtraDays = [];
+    for(const d of extraDaysFormState){
+      await sb.rpc('upsert_trip_day', {
+        p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_day_index: d.dayIndex,
+        p_match_date: d.date, p_opponent: d.opponent || null, p_venue: d.venue || null, p_is_no_game: d.noGame
+      });
+      const kept = prevExtraDays.find(pd => pd.dayIndex === d.dayIndex) || {};
+      newExtraDays.push({
+        dayIndex: d.dayIndex, date: d.date, opponent: d.opponent||'', venue: d.venue||'', noGame: d.noGame,
+        ticketBooked: kept.ticketBooked||false, ticketCost: kept.ticketCost||0, ticketMemo: kept.ticketMemo||'', ticketLink: kept.ticketLink||''
+      });
+    }
+    // 編集時、フォームから削除された日程はDBからも削除する
+    if(editingTripId){
+      for(const pd of prevExtraDays){
+        if(!extraDaysFormState.some(d=>d.dayIndex===pd.dayIndex)){
+          await sb.rpc('delete_trip_day', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_day_index: pd.dayIndex });
+        }
+      }
+    }
 
     if(editingTripId){
       const t = trips.find(x=>x.id===editingTripId);
-      // 2日目のチケット予約状況は既存のものを引き継ぐ（日付・対戦相手等の編集で消えないように）
-      const keptTicket = t.day2 ? { ticketBooked:t.day2.ticketBooked, ticketCost:t.day2.ticketCost, ticketMemo:t.day2.ticketMemo, ticketLink:t.day2.ticketLink } : {};
-      Object.assign(t, {sport, team, match, date, time, venue, cost, day2: day2 ? {...day2, ...keptTicket} : null});
+      Object.assign(t, {sport, team, match, date, time, venue, cost, isNoGame, extraDays: newExtraDays});
       closeModal();
       render();
       focusTrip(editingTripId);
@@ -2721,7 +3009,11 @@ async function submitTrip(keepOpen){
         const notNeeded = DEFAULT_NOT_NEEDED.includes(c.key);
         detail[c.key] = c.bookable ? {method:'',bookedDate:'',cost:0,memo:'',notNeeded} : {memo:'',notNeeded,link:''};
       });
-      trips.push({ id:newId, sport, team, match, date, time, venue, cost, day2, status, detail });
+      // 持ち物テンプレートがあれば、新しい遠征に自動でコピーする（すべて未チェックの状態で）
+      const initialPackingList = packingTemplate.map(text => ({ text, checked: false }));
+      const newTrip = { id:newId, sport, team, match, date, time, venue, cost, isNoGame, extraDays: newExtraDays, packingList: initialPackingList, status, detail };
+      trips.push(newTrip);
+      if(initialPackingList.length) await savePackingList(newId);
 
       for(const key of DEFAULT_NOT_NEEDED){
         await saveBookingDetail(newId, key, { notNeeded: true }, true);
@@ -2745,7 +3037,21 @@ async function submitTrip(keepOpen){
       if(keepOpen){
         ['f-date','f-time','f-venue'].forEach(id=>document.getElementById(id).value=''); setCostValue('');
         document.getElementById('f-match-select').value=''; document.getElementById('f-match').value='';
+        // 対戦相手が「手入力モード」のまま前の遠征から引き継がれないよう、リスト選択モードに戻す
+        document.getElementById('f-match-select').style.display = 'block';
+        document.getElementById('f-match').style.display = 'none';
+        document.getElementById('match-manual-toggle').textContent = '✏️ 手入力に切り替え';
         document.getElementById('f-day-trip').checked = false;
+        document.getElementById('f-is-no-game').checked = false;
+        extraDaysFormState = []; // 追加日程は前の遠征のものを引き継がないようリセットする
+        renderExtraDaysForm();
+        document.getElementById('f-extra-days-details').removeAttribute('open');
+        // HOME/AWAYボタンの状態と、対戦相手の「別リーグ」ピッカーの状態は、チームが変わらないため
+        // renderTeamDatalist()経由では自動リセットされない。ここで明示的にリセットする
+        homeAwayMode = null;
+        updateHomeAwayUI();
+        document.getElementById('venue-suggest-note').textContent = '';
+        handleTeamSelectChange(); // 対戦相手のリーグ選択をチームの既定リーグに戻し、選択肢も作り直す
         document.getElementById('modal-save-msg').textContent = `「${match}」を登録しました。続けて次の試合を入力できます。`;
         document.getElementById('f-match').focus();
       }else{
@@ -2761,7 +3067,7 @@ async function submitTrip(keepOpen){
           render();
           setTimeout(initCategoryBannerRotators, 50);
           focusTrip(newId);
-          showToast(`🆕 ${venue} は初めてのスタジアムです！終了後にスタンプが貯まります`, 3200);
+          showToast(`🆕 ${newVenueFound} は初めてのスタジアムです！終了後にスタンプが貯まります`, 3200);
         }, keepOpen ? 0 : 400);
       }
     }
@@ -2830,13 +3136,13 @@ function buildTripShareText(t){
   const catInfo = k => CATS.find(c=>c.key===k);
   const lines = [`【${t.team}】${t.match}`, `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time||''}　@${t.venue||'会場未定'}`];
   if(t.venue) lines.push(`🗺️ ${mapUrl(t.venue)}`);
-  if(t.day2){
-    if(t.day2.noGame){
-      lines.push(`📅 2日目：${fmtDate(t.day2.date).md}（${fmtDate(t.day2.date).dow}）は観光DAY`);
+  (t.extraDays||[]).forEach(d => {
+    if(d.noGame){
+      lines.push(`📅 ${d.dayIndex}日目：${fmtDate(d.date).md}（${fmtDate(d.date).dow}）は観光DAY`);
     }else{
-      lines.push(`📅 2日目：${fmtDate(t.day2.date).md}（${fmtDate(t.day2.date).dow}）vs ${t.day2.opponent||t.match}${t.day2.venue?` @${t.day2.venue}`:''}　チケット${t.day2.ticketBooked?'✅予約済み':'⬜️未予約'}`);
+      lines.push(`📅 ${d.dayIndex}日目：${fmtDate(d.date).md}（${fmtDate(d.date).dow}）vs ${d.opponent||t.match}${d.venue?` @${d.venue}`:''}　チケット${d.ticketBooked?'✅予約済み':'⬜️未予約'}`);
     }
-  }
+  });
   lines.push('');
   CATS.forEach(c=>{
     const d = t.detail[c.key];
@@ -2862,6 +3168,81 @@ async function shareTextOrCopy(text, title){
     showToast('共有用テキストの作成に失敗しました');
   }
 }
+// 会場名をコピーする（タクシーアプリ・カーナビ等への貼り付け用）
+async function copyVenueName(venue){
+  try{
+    await navigator.clipboard.writeText(venue);
+    showToast('✓ 会場名をコピーしました', 1500);
+  }catch(e){
+    showToast('コピーに失敗しました');
+  }
+}
+
+/* ---------- 持ち物リスト ---------- */
+async function savePackingList(tripId){
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  try{
+    const { error } = await sb.rpc('set_packing_list', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_packing_list: t.packingList });
+    if(error) throw error;
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認ください');
+  }
+}
+// この遠征の持ち物リストの中身（項目名のみ、チェック状態は含めない）を、
+// 手帳全体の標準テンプレートとして保存する。以後の新規遠征に自動でコピーされる
+async function saveAsPackingTemplate(tripId){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t || !t.packingList.length) return;
+  packingTemplate = t.packingList.map(i=>i.text);
+  try{
+    const { error } = await sb.rpc('set_packing_template', { p_edit_token: EDIT_TOKEN, p_packing_template: packingTemplate });
+    if(error) throw error;
+    showToast('✓ 持ち物テンプレートを更新しました。次回以降の遠征に自動で反映されます', 2600);
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認ください');
+  }
+}
+function addPackingItem(tripId, text){
+  if(!IS_EDITABLE || !text || !text.trim()) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const trimmed = text.trim();
+  if(t.packingList.some(i=>i.text===trimmed)){
+    showToast('すでに追加されています');
+    return;
+  }
+  t.packingList = [...t.packingList, { text: trimmed, checked: false }];
+  render();
+  savePackingList(tripId);
+}
+function addPackingItemFromInput(tripId){
+  const input = document.getElementById(`packing-input-${tripId}`);
+  if(!input) return;
+  addPackingItem(tripId, input.value);
+  input.value = '';
+  input.focus();
+}
+function togglePackingItem(tripId, idx){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t || !t.packingList[idx]) return;
+  t.packingList[idx] = { ...t.packingList[idx], checked: !t.packingList[idx].checked };
+  render();
+  savePackingList(tripId);
+}
+function removePackingItem(tripId, idx){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t.packingList = t.packingList.filter((_,i)=>i!==idx);
+  render();
+  savePackingList(tripId);
+}
+
 function shareTrip(tripId){
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
@@ -2914,14 +3295,15 @@ function renderCalendar(){
         byDate[td].push(t);
       }
     }
-    // 2日目がある場合、観光DAYでなければその日付のセルにも表示する（表示用に対戦相手だけ2日目のものへ差し替える）
-    if(t.day2 && t.day2.date && !t.day2.noGame){
-      const [dy,dm,dd] = t.day2.date.split('-').map(Number);
+    // 追加日程がある場合、観光DAYでなければその日付のセルにも表示する（表示用に対戦相手だけ差し替える）
+    (t.extraDays||[]).forEach(ed=>{
+      if(!ed.date || ed.noGame) return;
+      const [dy,dm,dd] = ed.date.split('-').map(Number);
       if(dy===y && dm-1===m){
         if(!byDate[dd]) byDate[dd] = [];
-        byDate[dd].push({ ...t, match: t.day2.opponent || t.match, isDay2: true });
+        byDate[dd].push({ ...t, match: ed.opponent || t.match, isDay2: true, dayIndexLabel: ed.dayIndex });
       }
-    }
+    });
     const saleDate = t.detail?.ticket?.saleDate;
     if(saleDate){
       const [sy,sm,sd] = saleDate.split('-').map(Number);
@@ -2967,7 +3349,7 @@ function renderCalendar(){
           <div class="cal-date" style="color:${color}; display:flex; align-items:center; gap:3px;">${c.d}${saleEvents.length?'<span title="チケット発売日" style="font-size:9px;">🔔</span>':''}</div>
           ${events.slice(0,3).map(t=>{
             const pct = completion(t);
-            return `<span class="cal-evt ${pct===100?'done':'pending'}">${t.isDay2?'②':''}${t.team}</span>`;
+            return `<span class="cal-evt ${pct===100?'done':'pending'}">${t.isDay2?`${circledNumber(t.dayIndexLabel)}`:''}${t.team}</span>`;
           }).join('')}
           ${events.length>3 ? `<span style="font-size:8.5px; color:var(--text-faint);">+${events.length-3}件</span>` : ''}
           ${(!events.length && saleEvents.length) ? saleEvents.slice(0,2).map(t=>`<span class="cal-evt" style="background:var(--butter,#E0B84A); color:#5a4213;">🎫 ${t.team}</span>`).join('') : ''}
@@ -3016,13 +3398,14 @@ function setCalTeamFilter(t){ calFilterTeam=t; renderCalendar(); }
 /* ---------- 日付タップ時のポップアップ（Googleカレンダー風） ---------- */
 function openCalPopup(y,m,d){
   const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  // 1日目の日付、または2日目（観光DAYでない場合）の日付が一致する遠征を集める
+  // 1日目の日付、または追加日程（観光DAYでない場合）の日付が一致する遠征を集める
   const events = getFilteredTrips()
-    .filter(t=>t.date===dateStr || (t.day2 && t.day2.date===dateStr && !t.day2.noGame))
+    .filter(t=>t.date===dateStr || (t.extraDays||[]).some(ed=>ed.date===dateStr && !ed.noGame))
     .map(t=>{
-      if(t.day2 && t.day2.date===dateStr){
-        // 2日目にヒットした場合は、表示内容を2日目のものに差し替える（IDは元のまま＝カードへのジャンプに使う）
-        return { ...t, match: t.day2.opponent || t.match, venue: t.day2.venue || t.venue, time: '', isDay2: true };
+      const hitDay = (t.extraDays||[]).find(ed=>ed.date===dateStr && !ed.noGame);
+      if(hitDay){
+        // 追加日程にヒットした場合は、表示内容をその日のものに差し替える（IDは元のまま＝カードへのジャンプに使う）
+        return { ...t, match: hitDay.opponent || t.match, venue: hitDay.venue || t.venue, time: '', isDay2: true, dayIndexLabel: hitDay.dayIndex };
       }
       return t;
     });
@@ -3046,7 +3429,7 @@ function openCalPopup(y,m,d){
       const pct = completion(t);
       return `
       <div class="cpop-trip">
-        <div class="cpop-team">${sportIcon(t.sport)} ${t.team}${t.isDay2?' <span style="font-size:10px; color:var(--sky,#93B5C6); font-weight:700;">2日目</span>':''}</div>
+        <div class="cpop-team">${sportIcon(t.sport)} ${t.team}${t.isDay2?` <span style="font-size:10px; color:var(--sky,#93B5C6); font-weight:700;">${t.dayIndexLabel}日目</span>`:''}</div>
         <div class="cpop-meta">${t.match||''}　${t.time||''}　${t.venue?'@ '+t.venue:''}</div>
         <div class="cpop-prog"><div class="cpop-prog-fill" style="width:${pct}%; background:${pct===100?'var(--sage)':'var(--rose)'};"></div></div>
         <div class="cpop-btns">
@@ -3192,16 +3575,23 @@ function normalizeTrip(raw){
     venue: raw.venue || '',
     cost: raw.estimated_cost || 0,
     journalMemo: raw.journal_memo || '',
-    day2: raw.day2_date ? {
-      date: raw.day2_date,
-      opponent: raw.day2_opponent || '',
-      venue: raw.day2_venue || '',
-      noGame: !!raw.day2_no_game,
-      ticketBooked: !!raw.day2_ticket_booked,
-      ticketCost: raw.day2_ticket_cost || 0,
-      ticketMemo: raw.day2_ticket_memo || '',
-      ticketLink: raw.day2_ticket_link || ''
-    } : null,
+    isNoGame: !!raw.is_no_game,
+    packingList: Array.isArray(raw.packing_list) ? raw.packing_list : [],
+    // 追加日程（2日目以降、何日でも）。day_index順に並べる
+    extraDays: (raw.extra_days || []).map(ed => ({
+      dayIndex: ed.day_index,
+      date: ed.match_date,
+      opponent: ed.opponent || '',
+      venue: ed.venue || '',
+      noGame: !!ed.is_no_game,
+      ticketBooked: !!ed.ticket_booked,
+      ticketCost: ed.ticket_cost || 0,
+      ticketMemo: ed.ticket_memo || '',
+      ticketLink: ed.ticket_link || '',
+      saleDate: ed.sale_date || '',
+      saleTime: ed.sale_time ? String(ed.sale_time).slice(0,5) : '',
+      notifyOnSale: !!ed.notify_on_sale
+    })),
     status, detail
   };
 }
@@ -3215,6 +3605,8 @@ async function fetchNotebook(token){
   EDIT_TOKEN = IS_EDITABLE ? token : null;
   SHARE_TOKEN = IS_EDITABLE ? (notebook.share_token || null) : null;
   budgetCap = notebook.budget_cap || 0;
+  packingTemplate = Array.isArray(notebook.packing_template) ? notebook.packing_template : [];
+  if(notebook.theme_color) applyThemeColor(notebook.theme_color);
   trips = (data.trips || []).map(normalizeTrip);
   // ホーム画面アイコンなど、URLのハッシュが失われるケースに備えてローカルに最終アクセストークンを保存
   Settings.set('lastToken', token);
@@ -3255,11 +3647,22 @@ function openSettingsPanel(){
       <div style="font-size:12.5px; font-weight:700; color:var(--rose-deep); margin-bottom:6px;">🔒 リンクのバックアップ、できていますか？</div>
       <div style="font-size:11.5px; color:var(--text); line-height:1.7;">このリンクは他の人には分からない、あなただけの合言葉のようなものです。誤って消してしまうと、運営側でも復元する手立てがありません。家族の誰か1人にも共有しておく、または🔗共有ボタンからQRコードを保存しておくことをおすすめします。</div>
     </div>` : ''}
+    ${IS_EDITABLE ? `
+    <div style="margin-bottom:18px;">
+      <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎨 テーマカラー</div>
+      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">手帳全体の色を変更できます（家族みんなに反映されます）。特定のチームカラーにしたい場合は、そのままメッセージで教えてください。正確な色を調べて追加します。</div>
+      <div class="theme-color-presets">
+        ${THEME_COLOR_PRESETS.map(c=>`<button type="button" class="theme-color-swatch" style="background:${c};" onclick="saveThemeColor('${c}')" title="${c}"></button>`).join('')}
+        <label class="theme-color-swatch theme-color-custom" title="自由に選ぶ">
+          🎨<input type="color" onchange="saveThemeColor(this.value)" style="opacity:0; position:absolute; width:1px; height:1px;">
+        </label>
+      </div>
+    </div>` : ''}
     <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📅 外部カレンダーに登録</div>
       <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">登録した試合日を、GoogleカレンダーやiPhoneの標準カレンダーに自動反映できます。下のリンクを「URLで購読」に登録すると、以後この手帳に試合を追加するたびに自動で反映されます。</div>
       <div class="sb-link" style="display:flex; gap:8px; align-items:center; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:6px 6px 6px 12px;">
-        <input id="ics-url-input" value="${icsUrl}" readonly onclick="this.select()" style="flex:1; border:none; background:transparent; font-family:var(--font-num); font-size:11px; color:var(--text-dim); min-width:0;">
+        <input id="ics-url-input" value="${icsUrl}" readonly onclick="this.select()" style="flex:1; border:none; background:transparent; font-family:var(--font-num); font-size:16px; color:var(--text-dim); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
         <button class="sb-copy" onclick="copyShareLink(document.getElementById('ics-url-input').value)" style="background:var(--rose); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font-display); white-space:nowrap;">コピー</button>
       </div>
       <details style="margin-top:8px;">
