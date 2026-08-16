@@ -698,6 +698,16 @@
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
 
     <div class="row">
+      <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
+      <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
+    </div>
+    <div class="date-quick-row">
+      <button type="button" class="date-quick-btn" onclick="openRangeCalendar()">📅 カレンダー</button>
+      <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
+      <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
+    </div>
+
+    <div class="row">
       <div class="field">
         <label>応援チーム</label>
         <div id="f-league-wrap" style="display:none; margin-bottom:8px;">
@@ -732,15 +742,6 @@
         <button type="button" class="ha-btn" id="btn-home" onclick="setHomeAway('HOME')">🏠 HOME（自チームの本拠地）</button>
         <button type="button" class="ha-btn" id="btn-away" onclick="setHomeAway('AWAY')">✈️ AWAY（相手の本拠地＝遠征）</button>
       </div>
-    </div>
-    <div class="row">
-      <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
-      <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
-    </div>
-    <div class="date-quick-row">
-      <button type="button" class="date-quick-btn" onclick="openRangeCalendar()">📅 カレンダー</button>
-      <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
-      <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
     </div>
     <div class="field">
       <label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label>
