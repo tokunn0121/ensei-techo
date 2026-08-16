@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root{
     --bg: #FBF6F0;
@@ -323,6 +324,13 @@
   .range-cal-day.range-cal-in-range{ background:var(--rose-wash); border-radius:0; }
   .range-cal-day.range-cal-selected{ background:var(--rose); color:#fff; font-weight:700; }
   .range-cal-open-btn{ display:block; width:100%; margin:12px 0; padding:12px; border-radius:12px; border:1.5px solid var(--rose); background:var(--rose-wash); color:var(--rose-deep); font-size:13px; font-weight:700; cursor:pointer; }
+  .modal-step-label{ font-family:var(--font-display); font-weight:900; font-size:12.5px; color:var(--text-faint); margin:20px 0 10px; padding-top:14px; border-top:1px solid var(--line); }
+  .modal-step-label:first-of-type{ border-top:none; padding-top:0; }
+  .date-summary-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--rose-wash); border:1.5px solid var(--rose); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
+  .date-summary-text{ font-size:13px; font-weight:700; color:var(--rose-deep); line-height:1.5; }
+  .date-summary-change{ font-size:11px; color:var(--rose-deep); text-decoration:underline; background:none; border:none; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+  .day-schedule-card{ background:var(--surface-2); border:1.5px solid var(--line); border-radius:12px; padding:12px; margin-bottom:8px; }
+  .day-schedule-head{ font-size:12px; font-weight:900; color:var(--rose-deep); margin-bottom:8px; }
   .progress-bar{ flex:1; height:7px; background:var(--surface-2); border-radius:6px; overflow:hidden; }
   .progress-fill{ height:100%; background: linear-gradient(90deg, var(--rose), var(--sage)); border-radius:6px; }
   .progress-label{ font-family:var(--font-num); font-weight:600; font-size:11.5px; color:var(--text-dim); white-space:nowrap; }
@@ -688,7 +696,6 @@
   <div class="modal">
     <h2 id="modal-title">新しい遠征を登録</h2>
     <p class="modal-sub" id="modal-sub">日程が決まったらまとめて登録できます。同じチームの試合は「登録して続けて追加」が便利です。</p>
-    <button type="button" class="range-cal-open-btn" onclick="openRangeCalendar()">📅 まず日程をカレンダーで選ぶ（複数日もタップだけでOK）</button>
     <div class="row">
       <div class="field"><label>競技</label>
         <select id="f-sport" onchange="toggleCustomSport()">
@@ -699,6 +706,26 @@
           <option>その他</option>
         </select>
       </div>
+    </div>
+    <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
+
+    <div class="modal-step-label">STEP 1　日程を選ぶ</div>
+    <button type="button" class="range-cal-open-btn" onclick="openRangeCalendar()">📅 カレンダーで日程を選ぶ（複数日もタップだけでOK）</button>
+    <div id="date-summary-bar" style="display:none;"></div>
+    <details class="station-details" id="manual-date-details">
+      <summary>日付を直接入力する</summary>
+      <div class="row" style="margin-top:8px;">
+        <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;" onchange="updateDay2MinDate(); renderDateSummaryBar();"></div>
+        <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
+      </div>
+      <div class="date-quick-row">
+        <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
+        <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
+      </div>
+    </details>
+
+    <div class="modal-step-label">STEP 2　チームを選ぶ</div>
+    <div class="row">
       <div class="field">
         <label>応援チーム</label>
         <div id="f-league-wrap" style="display:none; margin-bottom:8px;">
@@ -712,7 +739,6 @@
         <button type="button" id="team-manual-toggle" onclick="toggleTeamManual()" style="margin-top:6px; font-size:12px; padding:4px 10px; border-radius:6px; border:1px solid var(--line); background:none; color:var(--text-dim); cursor:pointer;">✏️ 手入力に切り替え</button>
       </div>
     </div>
-    <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
     <div class="field" id="f-opponent-section">
       <label>対戦相手</label>
       <div id="f-opponent-league-wrap" style="display:none; margin-bottom:8px;">
@@ -735,25 +761,19 @@
         <button type="button" class="ha-btn" id="btn-away" onclick="setHomeAway('AWAY')">✈️ AWAY（相手の本拠地＝遠征）</button>
       </div>
     </div>
-    <div class="row">
-      <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;" onchange="updateDay2MinDate()"></div>
-      <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
+
+    <div class="modal-step-label">STEP 3　各日のスケジュール</div>
+    <div class="day-schedule-card">
+      <div class="day-schedule-head" id="day1-schedule-head">1日目</div>
+      <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-is-no-game" onchange="toggleDay1NoGame()"> この日は試合がない（前泊・観光など）</label>
+      <div class="field" style="margin-top:8px;">
+        <label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label>
+        <input id="f-venue" list="f-venue-list" placeholder="例）LaLa arena TOKYO-BAY" style="font-size:16px;">
+        <datalist id="f-venue-list"></datalist>
+      </div>
     </div>
-    <div class="date-quick-row">
-      <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
-      <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
-    </div>
-    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-is-no-game" onchange="toggleDay1NoGame()"> この日は試合がない（前泊・観光など）</label>
-    <div class="field">
-      <label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label>
-      <input id="f-venue" list="f-venue-list" placeholder="例）LaLa arena TOKYO-BAY" style="font-size:16px;">
-      <datalist id="f-venue-list"></datalist>
-    </div>
-    <div class="field"><label>想定予算（円）</label><input id="f-cost-display" type="text" inputmode="numeric" placeholder="例）32,000" oninput="handleCostDisplayInput()" style="font-size:16px;"><input type="hidden" id="f-cost"></div>
-    <div id="cost-quick-fill"></div>
-    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-day-trip" onchange="checkDayTripConflict()"> 日帰り（宿泊は「対象外」として登録します）</label>
     <details class="station-details" id="f-extra-days-details">
-      <summary>📅 複数日程の遠征を追加（連戦など）</summary>
+      <summary>2日目以降を追加（連戦・複数都市など）</summary>
       <div class="extra-days-section" style="margin-top:10px;">
         <div id="f-extra-days-container"></div>
         <div style="display:flex; gap:8px;">
@@ -762,6 +782,10 @@
         </div>
       </div>
     </details>
+
+    <div class="field"><label>想定予算（円）</label><input id="f-cost-display" type="text" inputmode="numeric" placeholder="例）32,000" oninput="handleCostDisplayInput()" style="font-size:16px;"><input type="hidden" id="f-cost"></div>
+    <div id="cost-quick-fill"></div>
+    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-day-trip" onchange="checkDayTripConflict()"> 日帰り（宿泊は「対象外」として登録します）</label>
     <div class="save-msg" id="modal-save-msg"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">閉じる</button>
@@ -2152,7 +2176,7 @@ function renderGrid(){
       ? `<div class="empty-state">
           <div class="empty-icon">🎟️</div>
           <div class="empty-title">まだ遠征が登録されていません</div>
-          <div class="empty-desc">下の「＋ 新しい遠征を追加」から、最初の1件を登録してみましょう。<br>試合日・会場・予約状況をまとめて管理できます。</div>
+          <div class="empty-desc">下の「＋ 最初の遠征を追加する」ボタンから登録できます。<br>試合日・会場・予約状況をまとめて管理できます。</div>
           <button class="add-btn" onclick="openModal()" style="margin-top:14px;">＋ 最初の遠征を追加する</button>
         </div>`
       : `<div class="empty-state"><div class="empty-icon">🎟️</div><div class="empty-title">まだ遠征が登録されていません</div></div>`;
@@ -2937,6 +2961,10 @@ function renderExtraDaysForm(){
       <div class="field" style="margin-top:8px;"><label>${d.dayIndex}日目の会場</label><input value="${(d.venue||'').replace(/"/g,'&quot;')}" placeholder="例）1日目と同じ会場なら空欄でOK" onchange="updateExtraDayForm(${i},'venue',this.value)" style="font-size:16px;"></div>
       ` : ''}
     </div>`).join('');
+  renderDateSummaryBar();
+  // 複数日程が無い（単日の）場合は「1日目」ラベルを出さない（誤解を防ぐため）
+  const day1Head = document.getElementById('day1-schedule-head');
+  if(day1Head) day1Head.style.display = extraDaysFormState.length ? 'block' : 'none';
 }
 // 「日帰り」チェック時に、既に複数日程が登録されていないか確認する（矛盾防止）
 function checkDayTripConflict(){
@@ -2988,6 +3016,7 @@ function removeExtraDayForm(i){
 function updateExtraDayForm(i, field, val){
   extraDaysFormState[i][field] = val;
   if(field === 'noGame') renderExtraDaysForm(); // 表示切り替えのため再描画
+  else if(field === 'date') renderDateSummaryBar(); // 日付だけ変えた場合はサマリーバーのみ更新（フォーカスを保つ）
 }
 // 次の指定曜日（0=日曜〜6=土曜）の日付を計算してセットする（日付ピッカーを開かずに済むように）
 function setQuickDate(targetDow){
@@ -3009,6 +3038,33 @@ function toggleDay1NoGame(){
     el.style.opacity = noGame ? '0.4' : '1';
     el.style.pointerEvents = noGame ? 'none' : 'auto';
   });
+}
+
+// 選択中の日程を常に見える形で表示する（カレンダーで選んでも手入力でも、常にこのバーが最新の状態を反映する）
+function renderDateSummaryBar(){
+  const bar = document.getElementById('date-summary-bar');
+  if(!bar) return;
+  const dateVal = document.getElementById('f-date').value;
+  if(!dateVal){
+    bar.style.display = 'none';
+    return;
+  }
+  const {md, dow} = fmtDate(dateVal);
+  let text;
+  if(extraDaysFormState.length){
+    const sorted = [...extraDaysFormState].sort((a,b)=> (a.date||'') < (b.date||'') ? -1 : 1);
+    const lastDate = sorted[sorted.length-1].date;
+    if(lastDate){
+      const nights = Math.round((new Date(lastDate) - new Date(dateVal)) / 86400000);
+      text = `📅 ${md}(${dow})〜${fmtDate(lastDate).md}(${fmtDate(lastDate).dow})　${nights}泊${nights+1}日`;
+    }else{
+      text = `📅 ${md}(${dow})〜（一部日程の日付が未入力です）`;
+    }
+  }else{
+    text = `📅 ${md}(${dow})　日帰り`;
+  }
+  bar.style.display = 'flex';
+  bar.innerHTML = `<span class="date-summary-text">${text}</span><button type="button" class="date-summary-change" onclick="openRangeCalendar()">変更する</button>`;
 }
 
 function updateDay2MinDate(){
@@ -3101,8 +3157,10 @@ function openRangeCalendar(){
   const base = existingDate ? new Date(existingDate) : new Date();
   rangeCalYear = base.getFullYear();
   rangeCalMonth = base.getMonth();
-  rangeCalStart = null;
-  rangeCalEnd = null;
+  // 既に選択済みの日程があれば復元する（「変更する」で白紙に戻らないように）
+  rangeCalStart = existingDate || null;
+  const sortedExtra = [...extraDaysFormState].sort((a,b)=> (a.date||'') < (b.date||'') ? -1 : 1);
+  rangeCalEnd = (sortedExtra.length && sortedExtra[sortedExtra.length-1].date) ? sortedExtra[sortedExtra.length-1].date : null;
   renderRangeCalendar();
   document.getElementById('range-cal-overlay').style.display = 'block';
   document.getElementById('range-cal-popup').style.display = 'block';
@@ -3138,15 +3196,18 @@ function renderRangeCalendar(){
   const hint = document.getElementById('range-cal-hint');
   const confirmBtn = document.getElementById('range-cal-confirm');
   if(!rangeCalStart){
-    hint.textContent = '開始日をタップしてください';
+    hint.textContent = '日付をタップしてください';
     confirmBtn.disabled = true;
+    confirmBtn.textContent = 'この日程で決定';
   }else if(!rangeCalEnd){
-    hint.textContent = `開始日：${fmtDate(rangeCalStart).md}　終了日をタップ（単日なら同じ日をもう一度）`;
-    confirmBtn.disabled = true;
+    hint.textContent = `${fmtDate(rangeCalStart).md}(${fmtDate(rangeCalStart).dow})　複数日の場合は最終日もタップしてください`;
+    confirmBtn.disabled = false; // 開始日だけでも「単日」として確定できるようにする
+    confirmBtn.textContent = `この日（${fmtDate(rangeCalStart).md}）だけで決定`;
   }else{
     const nights = Math.round((new Date(rangeCalEnd) - new Date(rangeCalStart)) / 86400000);
     hint.textContent = `${fmtDate(rangeCalStart).md} 〜 ${fmtDate(rangeCalEnd).md}${nights?`（${nights}泊）`:'（日帰り）'}`;
     confirmBtn.disabled = false;
+    confirmBtn.textContent = 'この日程で決定';
   }
 }
 function pickRangeCalDate(dateStr){
@@ -3532,6 +3593,19 @@ async function saveAsPackingTemplate(tripId){
     const { error } = await sb.rpc('set_packing_template', { p_edit_token: EDIT_TOKEN, p_packing_template: packingTemplate });
     if(error) throw error;
     showToast('✓ 持ち物テンプレートを更新しました。次回以降の遠征に自動で反映されます', 2600);
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認ください');
+  }
+}
+// 設定パネルから、テンプレートの項目を個別に削除する
+async function removeFromPackingTemplate(idx){
+  if(!IS_EDITABLE) return;
+  packingTemplate = packingTemplate.filter((_,i)=>i!==idx);
+  try{
+    const { error } = await sb.rpc('set_packing_template', { p_edit_token: EDIT_TOKEN, p_packing_template: packingTemplate });
+    if(error) throw error;
+    openSettingsPanel(); // 表示を更新
   }catch(e){
     console.error(e);
     showToast('保存に失敗しました。通信環境をご確認ください');
@@ -4081,6 +4155,14 @@ function openSettingsPanel(){
       </div>
     </div>` : ''}
     <div style="margin-bottom:18px;">
+      <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎒 持ち物テンプレート</div>
+      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">新しい遠征を登録すると、ここに登録されている持ち物が自動でコピーされます。各遠征の持ち物リストにある「これをテンプレートとして保存」で更新できます。</div>
+      ${packingTemplate.length ? `
+      <div class="theme-color-presets" style="gap:6px;">
+        ${packingTemplate.map((item,idx)=>`<span class="packing-preset-chip" style="cursor:default;">${item}${IS_EDITABLE?` <button type="button" onclick="removeFromPackingTemplate(${idx})" style="border:none; background:none; color:var(--text-faint); cursor:pointer; padding:0 0 0 4px; font-size:11px;">×</button>`:''}</span>`).join('')}
+      </div>` : `<div style="font-size:11.5px; color:var(--text-faint);">まだテンプレートに登録された持ち物はありません。</div>`}
+    </div>
+    <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📅 外部カレンダーに登録</div>
       <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">登録した試合日を、GoogleカレンダーやiPhoneの標準カレンダーに自動反映できます。下のリンクを「URLで購読」に登録すると、以後この手帳に試合を追加するたびに自動で反映されます。</div>
       <div class="sb-link" style="display:flex; gap:8px; align-items:center; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:6px 6px 6px 12px;">
@@ -4211,7 +4293,8 @@ function closeSharePopup(){
   document.getElementById('share-popup').style.display = 'none';
 }
 
-// QRコードを表示/非表示（外部の無料QR生成サービスを画像として読み込むだけなので、新規ライブラリは不要）
+// QRコードを表示/非表示。ブラウザ内で完結して生成する（外部サービスにリンク＝トークンを送信しないため、
+// 万一その外部サービスのログが漏洩しても手帳への不正アクセスに繋がらない、より安全な方式）
 function toggleQrCode(kind, url){
   const box = document.getElementById(`qr-box-${kind}`);
   if(!box) return;
@@ -4221,13 +4304,17 @@ function toggleQrCode(kind, url){
     box.innerHTML = '';
     return;
   }
-  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}`;
   box.innerHTML = `
     <div style="text-align:center; background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:14px; margin-bottom:8px;">
-      <img src="${qrImgUrl}" width="220" height="220" alt="QRコード" style="max-width:100%; height:auto; border-radius:8px;">
+      <div id="qr-canvas-${kind}" style="display:inline-block;"></div>
       <div style="font-size:11px; color:var(--text-dim); margin-top:8px; line-height:1.6;">この画面をスクリーンショットして保存しておくと、<br>リンクを見失った時にカメラで読み取って復元できます</div>
     </div>`;
   box.style.display = 'block';
+  if(typeof QRCode !== 'undefined'){
+    new QRCode(document.getElementById(`qr-canvas-${kind}`), { text: url, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+  }else{
+    document.getElementById(`qr-canvas-${kind}`).innerHTML = '<div style="font-size:12px; color:var(--text-dim); padding:20px;">QRコードの読み込みに失敗しました。通信環境をご確認のうえ再度お試しください。</div>';
+  }
 }
 
 async function popupCopy(url, type){
