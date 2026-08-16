@@ -213,12 +213,8 @@
   .card-share-btn:hover{ border-color:var(--rose); background:var(--rose-wash); color:var(--rose-deep); }
   /* 遠征の思い出メモ */
   .journal-box{ margin-top:14px; padding:12px; background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:12px; }
-  .day2-box{ margin-bottom:12px; padding:12px; background:var(--sky-wash,#EBF3F6); border:1.5px solid var(--sky,#93B5C6); border-radius:12px; }
   .stay-info-hint{ font-size:11px; color:var(--text-dim); background:var(--surface-2); border-radius:8px; padding:8px 10px; margin-top:2px; }
   .soft-hint{ font-size:11px; color:#8a6d1f; background:var(--butter-wash,#FFF7E6); border:1px dashed var(--butter,#E0B84A); border-radius:8px; padding:8px 10px; margin-bottom:8px; line-height:1.6; }
-  .day2-title{ font-size:12.5px; font-weight:700; color:#3d5a68; }
-  .day2-box.day2-nogame{ font-size:12.5px; font-weight:700; color:#3d5a68; text-align:center; padding:14px; }
-  .hotel-override-box{ margin-top:10px; padding-top:10px; border-top:1px dashed var(--sky,#93B5C6); text-align:left; }
   /* 持ち物リスト */
   .packing-details{ margin-top:10px; }
   .packing-count{ font-weight:400; color:var(--text-faint); }
@@ -233,11 +229,6 @@
   .packing-presets{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
   .packing-preset-chip{ background:var(--surface-2); border:1.5px dashed var(--line); border-radius:999px; padding:5px 10px; font-size:11px; color:var(--text-dim); cursor:pointer; }
   .packing-template-btn{ display:block; width:100%; margin-top:10px; padding:9px; border-radius:8px; border:1.5px solid var(--sage); background:var(--sage-wash); color:#3d6b4a; font-size:11.5px; font-weight:700; cursor:pointer; }
-  /* 複数日程（モーダル入力欄） */
-  .extra-days-section{ margin-top:2px; }
-  .extra-day-block{ background:var(--surface-2); border:1.5px solid var(--sky,#93B5C6); border-radius:10px; padding:10px; margin-bottom:8px; }
-  .extra-day-block-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .extra-day-label{ font-size:11.5px; font-weight:700; color:#3d5a68; }
   .journal-label{ font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px; }
   .journal-textarea{ width:100%; min-height:56px; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:16px; font-family:var(--font-body); background:#fff; resize:vertical; }
   /* 訪問スタンプ */
@@ -304,9 +295,7 @@
   .itin-day{ position:relative; padding-bottom:14px; }
   .itin-day::before{ content:''; position:absolute; left:-19px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--rose); border:2px solid #fff; box-shadow:0 0 0 1px var(--rose); }
   .itin-day-head{ font-size:12.5px; font-weight:700; color:var(--text); }
-  .itin-day-badge{ font-size:11px; color:#3d5a68; background:var(--sky-wash,#EBF3F6); padding:2px 8px; border-radius:999px; }
   .itin-day-match{ font-size:13.5px; font-weight:700; margin-top:2px; }
-  .itin-connector{ height:2px; }
   .itin-section-title{ font-size:11.5px; font-weight:700; color:var(--text-faint); margin-bottom:8px; }
   .itin-list{ display:flex; flex-direction:column; gap:6px; }
   .itin-item{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; background:var(--surface-2); font-size:12px; }
@@ -632,11 +621,11 @@
 <div id="cal-popup-overlay" onclick="closeCalPopup()" style="display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.25);"></div>
 <div id="cal-popup" style="display:none; position:fixed; z-index:301; background:var(--surface); border-radius:20px; padding:20px; box-shadow:0 8px 40px rgba(0,0,0,0.2); width:min(360px,92vw); max-height:70vh; overflow-y:auto;"></div>
 
-<!-- 日程カレンダー範囲選択ポップアップ -->
+<!-- 日付カレンダー選択ポップアップ -->
 <div id="range-cal-overlay" onclick="if(event.target===this) closeRangeCalendar();" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.35);"></div>
 <div id="range-cal-popup" style="display:none; position:fixed; z-index:201; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--surface); border-radius:20px; padding:20px; box-shadow:0 8px 40px rgba(0,0,0,0.25); width:min(340px,90vw); max-height:85vh; overflow-y:auto;">
-  <div class="modal-title" style="margin-bottom:2px; font-size:16px;">📅 日程を選ぶ</div>
-  <div class="modal-sub" id="range-cal-hint" style="margin-bottom:10px;">開始日をタップしてください</div>
+  <div class="modal-title" style="margin-bottom:2px; font-size:16px;">📅 日付を選ぶ</div>
+  <div class="modal-sub" style="margin-bottom:10px;">日付をタップすると入力されます</div>
   <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
     <button type="button" class="cal-nav-btn" onclick="rangeCalNav(-1)">◀</button>
     <div id="range-cal-title" style="font-weight:700; font-size:14px;"></div>
@@ -644,8 +633,7 @@
   </div>
   <div id="range-cal-grid" class="range-cal-grid"></div>
   <div class="modal-actions" style="margin-top:16px;">
-    <button class="btn-secondary" onclick="closeRangeCalendar()">キャンセル</button>
-    <button class="btn-primary" id="range-cal-confirm" onclick="confirmRangeCalendar()" disabled>この日程で決定</button>
+    <button class="btn-secondary" onclick="closeRangeCalendar()" style="width:100%;">キャンセル</button>
   </div>
 </div>
 
@@ -695,7 +683,7 @@
 <div class="overlay" id="overlay" onclick="if(event.target===this) closeModal();">
   <div class="modal">
     <h2 id="modal-title">新しい遠征を登録</h2>
-    <p class="modal-sub" id="modal-sub">日程が決まったらまとめて登録できます。同じチームの試合は「登録して続けて追加」が便利です。</p>
+    <p class="modal-sub" id="modal-sub">同じチームの試合は「登録して続けて追加」が便利です。</p>
     <div class="row">
       <div class="field"><label>競技</label>
         <select id="f-sport" onchange="toggleCustomSport()">
@@ -709,22 +697,6 @@
     </div>
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
 
-    <div class="modal-step-label">STEP 1　日程を選ぶ</div>
-    <button type="button" class="range-cal-open-btn" onclick="openRangeCalendar()">📅 カレンダーで日程を選ぶ（複数日もタップだけでOK）</button>
-    <div id="date-summary-bar" style="display:none;"></div>
-    <details class="station-details" id="manual-date-details">
-      <summary>日付を直接入力する</summary>
-      <div class="row" style="margin-top:8px;">
-        <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;" onchange="updateDay2MinDate(); renderDateSummaryBar();"></div>
-        <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
-      </div>
-      <div class="date-quick-row">
-        <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
-        <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
-      </div>
-    </details>
-
-    <div class="modal-step-label">STEP 2　チームを選ぶ</div>
     <div class="row">
       <div class="field">
         <label>応援チーム</label>
@@ -761,31 +733,23 @@
         <button type="button" class="ha-btn" id="btn-away" onclick="setHomeAway('AWAY')">✈️ AWAY（相手の本拠地＝遠征）</button>
       </div>
     </div>
-
-    <div class="modal-step-label">STEP 3　各日のスケジュール</div>
-    <div class="day-schedule-card">
-      <div class="day-schedule-head" id="day1-schedule-head">1日目</div>
-      <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-is-no-game" onchange="toggleDay1NoGame()"> この日は試合がない（前泊・観光など）</label>
-      <div class="field" style="margin-top:8px;">
-        <label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label>
-        <input id="f-venue" list="f-venue-list" placeholder="例）LaLa arena TOKYO-BAY" style="font-size:16px;">
-        <datalist id="f-venue-list"></datalist>
-      </div>
+    <div class="row">
+      <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
+      <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
     </div>
-    <details class="station-details" id="f-extra-days-details">
-      <summary>2日目以降を追加（連戦・複数都市など）</summary>
-      <div class="extra-days-section" style="margin-top:10px;">
-        <div id="f-extra-days-container"></div>
-        <div style="display:flex; gap:8px;">
-          <button type="button" class="leg-add" style="flex:1;" onclick="addNextDaySameOpponent()">＋ 翌日も同じ相手と対戦</button>
-          <button type="button" class="leg-add" style="flex:1;" onclick="addExtraDayForm()">＋ 別日程を追加</button>
-        </div>
-      </div>
-    </details>
-
+    <div class="date-quick-row">
+      <button type="button" class="date-quick-btn" onclick="openRangeCalendar()">📅 カレンダー</button>
+      <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
+      <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
+    </div>
+    <div class="field">
+      <label>会場・遠征先 <span id="venue-suggest-note" style="font-weight:400; color:var(--text-faint); font-size:11.5px;"></span></label>
+      <input id="f-venue" list="f-venue-list" placeholder="例）LaLa arena TOKYO-BAY" style="font-size:16px;">
+      <datalist id="f-venue-list"></datalist>
+    </div>
     <div class="field"><label>想定予算（円）</label><input id="f-cost-display" type="text" inputmode="numeric" placeholder="例）32,000" oninput="handleCostDisplayInput()" style="font-size:16px;"><input type="hidden" id="f-cost"></div>
     <div id="cost-quick-fill"></div>
-    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-day-trip" onchange="checkDayTripConflict()"> 日帰り（宿泊は「対象外」として登録します）</label>
+    <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-day-trip"> 日帰り（宿泊は「対象外」として登録します）</label>
     <div class="save-msg" id="modal-save-msg"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">閉じる</button>
@@ -1548,34 +1512,9 @@ function fmtShort(iso){
   const d = new Date(iso);
   return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} に予約`;
 }
-// 遠征が実質的に終わる日付を返す（追加日程がある場合は一番最後の日程の日付、無ければ1日目の日付）
-// 「過去/今後」の判定はすべてこれを基準にする（1日目の日付だけで判定すると、まだ最終日を
-// 迎えていないのに「終了」扱いになってしまうため）
-// 追加日程を実際の日付順に並べ替えて返す（入力順・day_indexの順番に依存しないようにするため）
-function sortedExtraDays(t){
-  return [...(t.extraDays||[])].sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
-}
-
+// 遠征が実質的に終わる日付を返す（単日運用のため、常に試合日そのもの）
 function tripEndDate(t){
-  const sorted = sortedExtraDays(t);
-  if(sorted.length) return sorted[sorted.length-1].date;
   return t.date;
-}
-
-// 「あと◯日」表示に使う基準日：既に過ぎた日程をスキップし、まだ来ていない最初の日程の日付を返す
-function tripDisplayDate(t){
-  const allDates = [t.date, ...sortedExtraDays(t).map(d=>d.date)].sort();
-  const upcoming = allDates.find(d => d >= TODAY);
-  return upcoming || t.date;
-}
-
-// TODAY時点で「現在の日程」に該当する日を返す（過ぎた日をスキップして最初に見つかったもの）
-// 1日目自身の場合はnullを返す
-function currentExtraDay(t){
-  const sorted = sortedExtraDays(t);
-  if(!sorted.length) return null;
-  if(t.date >= TODAY) return null; // 1日目がまだ来ていなければ1日目が「現在」
-  return sorted.find(d => d.date >= TODAY) || sorted[sorted.length-1];
 }
 
 function daysUntil(iso){
@@ -1608,15 +1547,15 @@ function renderHero(){
   const box = document.getElementById('hero');
   if(!upcoming.length){ box.innerHTML=''; return; }
   const t = upcoming[0];
-  const d = daysUntil(tripDisplayDate(t));
+  const d = daysUntil(t.date);
   const pending = BOOKABLE_CATS.filter(k=>!t.status[k] && !t.detail[k]?.notNeeded);
   const catInfo = k => CATS.find(c=>c.key===k);
   box.innerHTML = `
     <div class="hero" onclick="focusTrip('${t.id}')">
       <div>
-        <div class="htitle">${currentExtraDay(t) ? `次の遠征（${currentExtraDay(t).dayIndex}日目）` : '次の遠征'}</div>
-        <div class="hmatch">${t.team} ${currentExtraDay(t) ? (currentExtraDay(t).opponent||t.match) : t.match}</div>
-        <div class="hmeta">${currentExtraDay(t) ? `${fmtDate(currentExtraDay(t).date).md}（${fmtDate(currentExtraDay(t).date).dow}）　${currentExtraDay(t).venue||t.venue||''}` : `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}`}</div>
+        <div class="htitle">次の遠征</div>
+        <div class="hmatch">${t.team} ${t.match}</div>
+        <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
         ${pending.length
           ? `<div class="hpending">${pending.map(k=>`<span>${catInfo(k).icon} ${catInfo(k).label}が未予約</span>`).join('')}</div>`
           : `<div class="hall-set">✓ 交通・チケット・宿泊はすべて予約済みです</div>`}
@@ -1773,12 +1712,7 @@ function statusSegment(t, c){
   const notNeeded = !!t.detail[c.key]?.notNeeded;
   const done = t.status[c.key];
   const state = notNeeded ? 'skip' : (done ? 'done' : 'pending');
-  // 宿泊を「対象外」から予約に切り替えようとしている時、単日の遠征なら矛盾が無いか優しく確認を促す
-  const dayTripHint = (c.key==='hotel' && notNeeded && !(t.extraDays&&t.extraDays.length))
-    ? `<div class="soft-hint">💡 この遠征は1日だけの日程です。宿泊が必要な場合は、上のモーダルから「＋ 別日程を追加」で日数を増やすと、より正確に管理できます</div>`
-    : '';
   return `
-    ${dayTripHint}
     <div class="status-segment">
       <button type="button" class="seg-btn ${state==='pending'?'active':''}" onclick="setCatState('${t.id}','${c.key}','pending')">未予約</button>
       <button type="button" class="seg-btn seg-done ${state==='done'?'active':''}" onclick="setCatState('${t.id}','${c.key}','done')">予約済み</button>
@@ -1810,7 +1744,6 @@ function memoPlaceholder(key){
   return map[key] || '詳細メモ';
 }
 
-// 2日目のミニセクション（観光DAYならバッジのみ、試合があればチケット予約トグルを出す）
 // よく使う持ち物のプリセット（タップだけで追加できるようにし、入力の手間を減らす）
 const PACKING_PRESETS = ['🎫 チケット', '🔋 モバイルバッテリー', '👕 ユニフォーム', '🧣 防寒具', '☂️ 雨具', '💊 常備薬', '📷 カメラ', '🎌 応援グッズ'];
 
@@ -1841,61 +1774,6 @@ function renderPackingListSection(t){
         ` : (list.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">持ち物リストはまだありません</div>` : '')}
       </div>
     </details>`;
-}
-
-function renderExtraDaysSection(t){
-  return sortedExtraDays(t).map(d => {
-    const {md, dow} = fmtDate(d.date);
-    const hotelBlock = renderExtraDayHotelBlock(t, d);
-    if(d.noGame){
-      return `<div class="day2-box day2-nogame">🏙 ${d.dayIndex}日目（${md}${dow}）は観光DAYです${hotelBlock}</div>`;
-    }
-    const opponent = d.opponent || t.match || '対戦未定';
-    const venue = d.venue || t.venue || '';
-    const booked = d.ticketBooked;
-    return `
-      <div class="day2-box">
-        <div class="day2-title">📅 ${d.dayIndex}日目（${md}${dow}）：vs ${opponent}${venue?` <span style="font-weight:400; color:var(--text-faint);">@ ${venue}</span>`:''}</div>
-        <div class="status-segment" style="margin-top:8px;">
-          <button type="button" class="seg-btn ${!booked?'active':''}" ${IS_EDITABLE?`onclick="setExtraDayTicket('${t.id}',${d.dayIndex},false)"`:'disabled'}>未予約</button>
-          <button type="button" class="seg-btn seg-done ${booked?'active':''}" ${IS_EDITABLE?`onclick="setExtraDayTicket('${t.id}',${d.dayIndex},true)"`:'disabled'}>予約済み</button>
-        </div>
-        ${booked ? `
-        <div class="field-row" style="margin-top:8px;">
-          <div class="field"><label>金額</label><input type="number" min="0" value="${d.ticketCost||''}" ${IS_EDITABLE?`onchange="updateExtraDayTicketField('${t.id}',${d.dayIndex},'ticketCost',this.value)"`:'disabled'} placeholder="円"></div>
-          <div class="field"><label>座席番号など</label><input value="${(d.ticketMemo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateExtraDayTicketField('${t.id}',${d.dayIndex},'ticketMemo',this.value)"`:'disabled'}></div>
-        </div>
-        <div class="field" style="margin-top:8px;"><label>予約リンク・確認番号</label><input value="${(d.ticketLink||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateExtraDayTicketField('${t.id}',${d.dayIndex},'ticketLink',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
-        ${renderLinkAction(d.ticketLink, '予約ページ')}
-        ` : ''}
-        ${hotelBlock}
-      </div>`;
-  }).join('');
-}
-
-// 1つの追加日程における「この日は宿泊先が別」のミニセクションを組み立てる
-function renderExtraDayHotelBlock(t, d){
-  // 最終日は「その日の夜に泊まる」想定が無い（遠征最終日＝帰る日）ため、宿泊上書きは表示しない
-  const isLast = sortedExtraDays(t)[sortedExtraDays(t).length-1]?.dayIndex === d.dayIndex;
-  if(isLast) return '';
-  return `
-    <div class="hotel-override-box">
-      <label class="done-toggle" style="width:100%;"><input type="checkbox" ${d.hotelOverride?'checked':''} ${IS_EDITABLE?`onchange="toggleExtraDayHotelOverride('${t.id}',${d.dayIndex},this.checked)"`:'disabled'}> 🏨 この日は宿泊先が別</label>
-      ${d.hotelOverride ? `
-        <div class="status-segment" style="margin-top:8px;">
-          <button type="button" class="seg-btn ${!d.hotelBooked?'active':''}" ${IS_EDITABLE?`onclick="setExtraDayHotelBooked('${t.id}',${d.dayIndex},false)"`:'disabled'}>未予約</button>
-          <button type="button" class="seg-btn seg-done ${d.hotelBooked?'active':''}" ${IS_EDITABLE?`onclick="setExtraDayHotelBooked('${t.id}',${d.dayIndex},true)"`:'disabled'}>予約済み</button>
-        </div>
-        <div class="field-row" style="margin-top:8px;">
-          <div class="field"><label>宿泊先</label><input value="${(d.hotelMethod||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateExtraDayHotelField('${t.id}',${d.dayIndex},'hotelMethod',this.value)"`:'disabled'} placeholder="例）楽天トラベル"></div>
-          <div class="field"><label>金額</label><input type="number" min="0" value="${d.hotelCost||''}" ${IS_EDITABLE?`onchange="updateExtraDayHotelField('${t.id}',${d.dayIndex},'hotelCost',this.value)"`:'disabled'} placeholder="円"></div>
-        </div>
-        <div class="field" style="margin-top:8px;"><label>ホテル名など</label><input value="${(d.hotelMemo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateExtraDayHotelField('${t.id}',${d.dayIndex},'hotelMemo',this.value)"`:'disabled'}></div>
-        <div class="field" style="margin-top:8px;"><label>予約リンク・確認番号</label><input value="${(d.hotelLink||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateExtraDayHotelField('${t.id}',${d.dayIndex},'hotelLink',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
-        ${renderLinkAction(d.hotelLink, '予約ページ')}
-        ${IS_EDITABLE ? `<button type="button" class="leg-add" onclick="copyPreviousDayHotel('${t.id}',${d.dayIndex})">↺ 前日の宿泊先をコピー</button>` : ''}
-      ` : ''}
-    </div>`;
 }
 
 function catPanelContent(t, c){
@@ -1969,13 +1847,7 @@ function catPanelContent(t, c){
 
   const stayInfoBlock = (c.key==='hotel') ? (()=>{
     const checkInMd = fmtDate(t.date).md, checkInDow = fmtDate(t.date).dow;
-    // 観光DAY（試合が無い日）でも宿泊自体は必要なはずなので、追加日程があれば一番最後の日を宿泊対象に含める
-    const hasExtra = t.extraDays && t.extraDays.length;
-    const checkOutDate = hasExtra ? tripEndDate(t) : t.date;
-    const checkOutMd = fmtDate(checkOutDate).md, checkOutDow = fmtDate(checkOutDate).dow;
-    // 泊数は実際の日付差から計算する（日程が連続しているとは限らない。例：8/21着・8/23発なら2泊）
-    const nights = hasExtra ? Math.round((new Date(checkOutDate) - new Date(t.date)) / (1000*60*60*24)) : 0;
-    return `<div class="stay-info-hint">🏨 宿泊対象：${checkInMd}(${checkInDow})${hasExtra?`〜${checkOutMd}(${checkOutDow})`:''}${nights?`（${nights}泊）`:'（日帰りの場合は不要かも）'}</div>`;
+    return `<div class="stay-info-hint">🏨 試合日：${checkInMd}(${checkInDow})（日帰りの場合は不要かも）</div>`;
   })() : '';
 
   if(!c.bookable){
@@ -2041,8 +1913,8 @@ function renderTicketCard(t, isPast){
   const slimRow = showSlim ? `
     <div class="ticket-compact-row" onclick="toggleExpand('${t.id}')">
       <div class="tcr-date">
-        <div class="tcr-d">${md}${(t.extraDays&&t.extraDays.length) ? '〜' : ''}</div>
-        <div class="tcr-dow">${(t.extraDays&&t.extraDays.length) ? `${fmtDate(tripEndDate(t)).md}` : dow}</div>
+        <div class="tcr-d">${md}</div>
+        <div class="tcr-dow">${dow}</div>
       </div>
       <div class="tcr-main">
         <div class="tcr-line1">
@@ -2050,7 +1922,7 @@ function renderTicketCard(t, isPast){
           <span class="tcr-pct" style="color:${pct===100?'var(--sage)':'var(--rose-deep)'};">${pct}%</span>
         </div>
         <div class="tcr-line2">
-          <span class="tcr-match">${t.isNoGame ? '🏙 観光DAY' : 'vs '+(t.match || '対戦未定')}</span>
+          <span class="tcr-match">vs ${t.match || '対戦未定'}</span>
           ${t.venue ? `<span class="tcr-venue">📍${t.venue}</span>` : ''}
         </div>
         ${pendingCount>0 ? `<div class="tcr-pending">⚠️ 未予約${pendingCount}件</div>` : `<div class="tcr-ok">✓ 準備OK</div>`}
@@ -2064,7 +1936,7 @@ function renderTicketCard(t, isPast){
       <div class="head">
         <div>
           <span class="sport-tag">${sportIcon(t.sport)} ${t.team}</span>
-          <div class="matchup">${t.isNoGame ? '🏙 観光DAY（試合なし）' : t.match}</div>
+          <div class="matchup">${t.match}</div>
           <div class="venue-row">
             <span class="venue">${t.venue}</span>
             ${t.venue ? `<a class="map-badge" href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ 地図を見る</a>` : ''}
@@ -2074,12 +1946,9 @@ function renderTicketCard(t, isPast){
           ${nextAction ? `<div class="next-action" onclick="focusTrip('${t.id}','${nextAction.key}')">👉 次は${nextAction.icon}${nextAction.label}の予約${pendingCount>1?`<span style="opacity:0.75;">（他${pendingCount-1}件）</span>`:''}</div>` : ''}
         </div>
         <div class="date-block">
-          ${(t.extraDays&&t.extraDays.length) ? `
-          <div class="d" style="font-size:15px;">${md}〜${fmtDate(tripEndDate(t)).md}</div>
-          <div class="dow">${dow}〜${fmtDate(tripEndDate(t)).dow}曜</div>` : `
           <div class="d">${md}</div>
           <div class="dow">${dow}曜日</div>
-          <div class="t">${t.time || ''}</div>`}
+          <div class="t">${t.time || ''}</div>
           ${IS_EDITABLE ? `
           <div class="card-actions">
             <button class="icon-btn" title="編集" onclick="openModal('${t.id}')">✏️</button>
@@ -2094,20 +1963,18 @@ function renderTicketCard(t, isPast){
           <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
           <div class="progress-label">${pct}% 準備完了</div>
         </div>
-        ${(IS_EDITABLE && !isPast && (BOOKABLE_CATS.some(k=>!t.status[k] && !t.detail[k]?.notNeeded) || (t.extraDays||[]).some(d=>(!d.noGame && !d.ticketBooked) || (d.hotelOverride && !d.hotelBooked)))) ? `<button type="button" class="bulk-done-btn" onclick="bulkMarkDone('${t.id}')">✓ 未予約をすべて「予約済み」にする</button>` : ''}
+        ${(IS_EDITABLE && !isPast && BOOKABLE_CATS.some(k=>!t.status[k] && !t.detail[k]?.notNeeded)) ? `<button type="button" class="bulk-done-btn" onclick="bulkMarkDone('${t.id}')">✓ 未予約をすべて「予約済み」にする</button>` : ''}
         <div class="cost-row">
           <span class="label">${BOOKABLE_CATS.some(k=>t.detail[k]?.cost) ? '実績金額' : '想定予算'}</span>
           <span class="val">¥${tripSpend(t).toLocaleString()}</span>
         </div>
-        ${(t.extraDays&&t.extraDays.length) ? renderExtraDaysSection(t) : ''}
         <div class="cat-strip">
           ${CATS.map(c=>{
             const done = t.status[c.key];
             const notNeeded = !!t.detail[c.key]?.notNeeded;
             const isActive = activeCat[t.id] === c.key;
             const statusClass = notNeeded ? 'chip-not-needed' : (done ? 'chip-done' : 'chip-pending');
-            const hasExtraGame = (t.extraDays||[]).some(d=>!d.noGame);
-            const chipLabel = (c.key==='ticket' && hasExtraGame && !t.isNoGame) ? `${c.label}(1日目)` : c.label;
+            const chipLabel = c.label;
             return `<button type="button" class="cat-chip ${statusClass} ${isActive?'is-active':''}" onclick="toggleCat('${t.id}','${c.key}')">
               <span class="cat-chip-icon">${c.icon}</span>
               <span class="cat-chip-label">${chipLabel}</span>
@@ -2121,7 +1988,7 @@ function renderTicketCard(t, isPast){
           return `
           <div class="cat-active-panel">
             <div class="cat-active-header">
-              <span class="cat-active-title">${c.icon} ${(c.key==='ticket' && (t.extraDays||[]).some(d=>!d.noGame) && !t.isNoGame) ? `${c.label}(1日目)` : c.label}</span>
+              <span class="cat-active-title">${c.icon} ${c.label}</span>
               <span class="status-dot ${notNeeded?'not-needed':done?'done':'pending'}"></span>
               <span class="status-text ${notNeeded?'not-needed':''}">${notNeeded?'対象外':done?'予約済み':'未予約'}</span>
               <button type="button" class="cat-active-close" onclick="toggleCat('${t.id}','${c.key}')">✕</button>
@@ -2148,8 +2015,7 @@ function renderGrid(){
   const filtered = trips.filter(t =>
     (sportFilter==='ALL' || t.sport===sportFilter) &&
     (!q || t.team.toLowerCase().includes(q) || (t.match||'').toLowerCase().includes(q) || (t.venue||'').toLowerCase().includes(q)
-      || (t.journalMemo||'').toLowerCase().includes(q)
-      || (t.extraDays||[]).some(d=>(d.opponent||'').toLowerCase().includes(q) || (d.venue||'').toLowerCase().includes(q)))
+      || (t.journalMemo||'').toLowerCase().includes(q))
   );
   const upcoming = filtered.filter(t=>tripEndDate(t) >= TODAY);
   const past = filtered.filter(t=>tripEndDate(t) < TODAY).sort((a,b)=> new Date(b.date) - new Date(a.date));
@@ -2236,110 +2102,6 @@ async function setBudgetCap(val){
     console.error(e);
     showToast('予算の保存に失敗しました。通信環境をご確認ください');
   }
-}
-
-// 追加日程のチケット予約状況を更新する（set_trip_day_ticket RPCを使う）
-async function saveExtraDayTicket(tripId, dayIndex){
-  const t = trips.find(x=>x.id===tripId);
-  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  try{
-    const { error } = await sb.rpc('set_trip_day_ticket', {
-      p_edit_token: EDIT_TOKEN,
-      p_trip_id: tripId,
-      p_day_index: dayIndex,
-      p_booked: !!d.ticketBooked,
-      p_cost: d.ticketCost || null,
-      p_memo: d.ticketMemo || null,
-      p_link: d.ticketLink || null
-    });
-    if(error) throw error;
-    showToast('✓ 保存しました', 1200);
-  }catch(e){
-    console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
-  }
-}
-function setExtraDayTicket(tripId, dayIndex, booked){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  d.ticketBooked = booked;
-  render();
-  setTimeout(initCategoryBannerRotators, 50);
-  saveExtraDayTicket(tripId, dayIndex);
-}
-function updateExtraDayTicketField(tripId, dayIndex, field, val){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  d[field] = field==='ticketCost' ? Math.max(0, parseInt(val)||0) : (field==='ticketLink' ? extractUrl(val) : val);
-  saveExtraDayTicket(tripId, dayIndex);
-}
-
-/* ---------- 追加日程ごとの宿泊先上書き（マルチシティの遠征など） ---------- */
-async function saveExtraDayHotel(tripId, dayIndex){
-  const t = trips.find(x=>x.id===tripId);
-  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  try{
-    const { error } = await sb.rpc('set_trip_day_hotel', {
-      p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_day_index: dayIndex,
-      p_override: !!d.hotelOverride, p_booked: !!d.hotelBooked,
-      p_method: d.hotelMethod || null, p_cost: d.hotelCost || null,
-      p_memo: d.hotelMemo || null, p_link: d.hotelLink || null
-    });
-    if(error) throw error;
-    showToast('✓ 保存しました', 1200);
-  }catch(e){
-    console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
-  }
-}
-function toggleExtraDayHotelOverride(tripId, dayIndex, override){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  d.hotelOverride = override;
-  render();
-  setTimeout(initCategoryBannerRotators, 50);
-  saveExtraDayHotel(tripId, dayIndex);
-}
-function setExtraDayHotelBooked(tripId, dayIndex, booked){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  d.hotelBooked = booked;
-  render();
-  saveExtraDayHotel(tripId, dayIndex);
-}
-function updateExtraDayHotelField(tripId, dayIndex, field, val){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  const d = t?.extraDays?.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  d[field] = field==='hotelCost' ? Math.max(0, parseInt(val)||0) : (field==='hotelLink' ? extractUrl(val) : val);
-  saveExtraDayHotel(tripId, dayIndex);
-}
-// 前日（無ければ1日目）の宿泊先情報をコピーする（連泊が多い場合の入力の手間を省く）
-function copyPreviousDayHotel(tripId, dayIndex){
-  if(!IS_EDITABLE) return;
-  const t = trips.find(x=>x.id===tripId);
-  if(!t) return;
-  const sorted = sortedExtraDays(t);
-  const myIdx = sorted.findIndex(d=>d.dayIndex===dayIndex);
-  const prevDay = myIdx > 0 ? sorted[myIdx-1] : null;
-  const source = (prevDay && prevDay.hotelOverride) ? prevDay : { hotelMethod: t.detail.hotel?.method||'', hotelCost: t.detail.hotel?.cost||0, hotelMemo: t.detail.hotel?.memo||'', hotelLink: t.detail.hotel?.link||'' };
-  const d = t.extraDays.find(x=>x.dayIndex===dayIndex);
-  if(!d) return;
-  d.hotelMethod = source.hotelMethod||''; d.hotelCost = source.hotelCost||0; d.hotelMemo = source.hotelMemo||''; d.hotelLink = source.hotelLink||'';
-  render();
-  saveExtraDayHotel(tripId, dayIndex);
-  showToast('✓ 前日の宿泊先をコピーしました', 1500);
 }
 
 async function setTripJournal(tripId, memo){
@@ -2495,25 +2257,13 @@ async function bulkMarkDone(tripId){
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
   const targets = BOOKABLE_CATS.filter(k=>!t.status[k] && !t.detail[k]?.notNeeded);
-  // 追加日程のチケット・宿泊上書きも「未予約」の対象に含める
-  const extraTicketTargets = (t.extraDays||[]).filter(d=>!d.noGame && !d.ticketBooked);
-  const extraHotelTargets = (t.extraDays||[]).filter(d=>d.hotelOverride && !d.hotelBooked);
-  const totalCount = targets.length + extraTicketTargets.length + extraHotelTargets.length;
-  if(!totalCount) return;
-  if(!confirm(`${totalCount}件のカテゴリをまとめて「予約済み」にします。よろしいですか？`)) return;
+  if(!targets.length) return;
+  if(!confirm(`${targets.length}件のカテゴリをまとめて「予約済み」にします。よろしいですか？`)) return;
   for(const key of targets){
     await saveBookingDetail(tripId, key, { is_booked: true }, true);
   }
-  for(const d of extraTicketTargets){
-    d.ticketBooked = true;
-    await saveExtraDayTicket(tripId, d.dayIndex);
-  }
-  for(const d of extraHotelTargets){
-    d.hotelBooked = true;
-    await saveExtraDayHotel(tripId, d.dayIndex);
-  }
   render();
-  showToast(`✓ ${totalCount}件を予約済みにしました`);
+  showToast(`✓ ${targets.length}件を予約済みにしました`);
 }
 
 // 「店名＋電話番号＋住所＋URL」のようにまとめてコピペされた場合でも、URL部分だけを自動で抜き出して保存する
@@ -2636,8 +2386,14 @@ function duplicateTrip(tripId){
   else{tSel2.style.display='none'; tInp2.style.display='block'; tInp2.value=t.team||'';}
   document.getElementById('f-venue').value = t.venue;
   setCostValue(t.cost || '');
+  // 連戦（2日目・3日目）で複製するケースが多いため、翌日の日付を初期値として入れておく（自由に変更可能）
+  if(t.date){
+    const next = new Date(t.date);
+    next.setDate(next.getDate() + 1);
+    document.getElementById('f-date').value = next.toISOString().slice(0,10);
+  }
   document.getElementById('modal-save-msg').style.color = '';
-  document.getElementById('modal-save-msg').textContent = `「${t.match}」の情報を引き継ぎました。日付と対戦カードを入力してください。`;
+  document.getElementById('modal-save-msg').textContent = `「${t.match}」の情報を引き継ぎました（日付は翌日を仮入力しています。必要に応じて変更してください）。`;
 }
 
 /* ---------- 支出サマリー（予算上限に代わる、月別・期間別の実績表示。プレッシャーを与えない中立的な集計のみ） ---------- */
@@ -2650,9 +2406,7 @@ let spendingRangeEnd = '';
 // まだ何も入力していない場合のみ「想定予算」欄の概算値で代用する
 function tripSpend(t){
   const catSum = BOOKABLE_CATS.reduce((s,k)=> s + (t.detail[k]?.cost || 0), 0);
-  const extraTicketSum = (t.extraDays||[]).reduce((s,d)=> s + (d.ticketCost || 0), 0);
-  const extraHotelSum = (t.extraDays||[]).reduce((s,d)=> s + (d.hotelOverride ? (d.hotelCost || 0) : 0), 0);
-  return (catSum > 0 ? catSum : (t.cost || 0)) + extraTicketSum + extraHotelSum;
+  return catSum > 0 ? catSum : (t.cost || 0);
 }
 
 function renderSpendingSummary(){
@@ -2876,11 +2630,6 @@ async function saveThemeColor(hex){
   }
 }
 
-// 日程番号を丸数字で表示する（②③④…20を超えたら数字のまま）
-function circledNumber(n){
-  const map = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮','⑯','⑰','⑱','⑲','⑳'];
-  return map[n-1] || `(${n})`;
-}
 
 // 競技ごとのplaceholderサンプル（モーダルを開いた時に競技に合わせて切り替わる）
 const SPORT_PLACEHOLDERS = {
@@ -2942,82 +2691,6 @@ function applyPlaceholders(sport){
   document.getElementById('f-cost-display').placeholder  = ph.cost;
 }
 
-// 複数日程（2日目以降）の入力状態。モーダルを開いている間だけ保持する
-let extraDaysFormState = []; // [{dayIndex, date, opponent, venue, noGame}, ...]
-
-function renderExtraDaysForm(){
-  const container = document.getElementById('f-extra-days-container');
-  const minDate = document.getElementById('f-date').value;
-  container.innerHTML = extraDaysFormState.map((d, i) => `
-    <div class="extra-day-block">
-      <div class="extra-day-block-top">
-        <span class="extra-day-label">${d.dayIndex}日目</span>
-        <button type="button" class="leg-remove" onclick="removeExtraDayForm(${i})">×</button>
-      </div>
-      <div class="field"><label>日付</label><input type="date" value="${d.date||''}" ${minDate?`min="${minDate}"`:''} onchange="updateExtraDayForm(${i},'date',this.value)" style="font-size:16px;"></div>
-      <label class="done-toggle" style="margin-top:8px;"><input type="checkbox" ${d.noGame?'checked':''} onchange="updateExtraDayForm(${i},'noGame',this.checked)"> この日は試合がない（観光DAYなど）</label>
-      ${!d.noGame ? `
-      <div class="field" style="margin-top:8px;"><label>${d.dayIndex}日目の対戦相手</label><input value="${(d.opponent||'').replace(/"/g,'&quot;')}" placeholder="例）1日目と同じ相手なら空欄でOK" onchange="updateExtraDayForm(${i},'opponent',this.value)" style="font-size:16px;"></div>
-      <div class="field" style="margin-top:8px;"><label>${d.dayIndex}日目の会場</label><input value="${(d.venue||'').replace(/"/g,'&quot;')}" placeholder="例）1日目と同じ会場なら空欄でOK" onchange="updateExtraDayForm(${i},'venue',this.value)" style="font-size:16px;"></div>
-      ` : ''}
-    </div>`).join('');
-  renderDateSummaryBar();
-  // 複数日程が無い（単日の）場合は「1日目」ラベルを出さない（誤解を防ぐため）
-  const day1Head = document.getElementById('day1-schedule-head');
-  if(day1Head) day1Head.style.display = extraDaysFormState.length ? 'block' : 'none';
-}
-// 「日帰り」チェック時に、既に複数日程が登録されていないか確認する（矛盾防止）
-function checkDayTripConflict(){
-  const dayTripBox = document.getElementById('f-day-trip');
-  if(dayTripBox.checked && extraDaysFormState.length){
-    dayTripBox.checked = false;
-    showToast('複数日程が登録されているため「日帰り」にはできません', 2200);
-  }
-}
-function addExtraDayForm(){
-  const nextIndex = extraDaysFormState.length ? Math.max(...extraDaysFormState.map(d=>d.dayIndex))+1 : 2;
-  extraDaysFormState.push({dayIndex: nextIndex, date:'', opponent:'', venue:'', noGame:false});
-  uncheckDayTripIfNeeded();
-  renderExtraDaysForm();
-}
-// 複数日程が1件でもある状態で「日帰り」がオンだと矛盾する（宿泊が誤って「不要」になってしまう）ため、
-// 日程を追加した瞬間に自動でオフにする
-function uncheckDayTripIfNeeded(){
-  const dayTripBox = document.getElementById('f-day-trip');
-  if(dayTripBox.checked){
-    dayTripBox.checked = false;
-    showToast('複数日程を追加したため「日帰り」を解除しました', 2200);
-  }
-}
-// 「基本的には２日間ある場合は同じ試合のケースがほとんど」という声を受けて、
-// 一番多いパターン（翌日も同じ相手・同じ会場）をワンタップで追加できるようにする
-function addNextDaySameOpponent(){
-  const baseDate = document.getElementById('f-date').value;
-  if(!baseDate){
-    document.getElementById('modal-save-msg').style.color = '#c0392b';
-    document.getElementById('modal-save-msg').textContent = '先に1日目の日付を入力してください。';
-    return;
-  }
-  // 最後に登録されている日程（無ければ1日目）の翌日を自動計算する
-  const lastDate = extraDaysFormState.length ? extraDaysFormState[extraDaysFormState.length-1].date || baseDate : baseDate;
-  const next = new Date(lastDate);
-  next.setDate(next.getDate() + 1);
-  const nextDateStr = next.toISOString().slice(0,10);
-  const nextIndex = extraDaysFormState.length ? Math.max(...extraDaysFormState.map(d=>d.dayIndex))+1 : 2;
-  // 対戦相手・会場は空欄のままにする＝1日目と同じものとして扱われる
-  extraDaysFormState.push({dayIndex: nextIndex, date: nextDateStr, opponent:'', venue:'', noGame:false});
-  uncheckDayTripIfNeeded();
-  renderExtraDaysForm();
-}
-function removeExtraDayForm(i){
-  extraDaysFormState.splice(i,1);
-  renderExtraDaysForm();
-}
-function updateExtraDayForm(i, field, val){
-  extraDaysFormState[i][field] = val;
-  if(field === 'noGame') renderExtraDaysForm(); // 表示切り替えのため再描画
-  else if(field === 'date') renderDateSummaryBar(); // 日付だけ変えた場合はサマリーバーのみ更新（フォーカスを保つ）
-}
 // 次の指定曜日（0=日曜〜6=土曜）の日付を計算してセットする（日付ピッカーを開かずに済むように）
 function setQuickDate(targetDow){
   const now = new Date();
@@ -3025,54 +2698,6 @@ function setQuickDate(targetDow){
   now.setDate(now.getDate() + diff);
   const dateStr = now.toISOString().slice(0,10);
   document.getElementById('f-date').value = dateStr;
-  updateDay2MinDate();
-}
-
-// 「この日は試合がない」を選ぶと、その日には無関係な入力欄（対戦相手・試合開始時刻）を
-// グレーアウトして「今は何を入力すべきか」を一目でわかるようにする
-function toggleDay1NoGame(){
-  const noGame = document.getElementById('f-is-no-game').checked;
-  const opponentSection = document.getElementById('f-opponent-section');
-  const timeWrap = document.getElementById('f-time-wrap');
-  [opponentSection, timeWrap].forEach(el=>{
-    el.style.opacity = noGame ? '0.4' : '1';
-    el.style.pointerEvents = noGame ? 'none' : 'auto';
-  });
-}
-
-// 選択中の日程を常に見える形で表示する（カレンダーで選んでも手入力でも、常にこのバーが最新の状態を反映する）
-function renderDateSummaryBar(){
-  const bar = document.getElementById('date-summary-bar');
-  if(!bar) return;
-  const dateVal = document.getElementById('f-date').value;
-  if(!dateVal){
-    bar.style.display = 'none';
-    return;
-  }
-  const {md, dow} = fmtDate(dateVal);
-  let text;
-  if(extraDaysFormState.length){
-    const sorted = [...extraDaysFormState].sort((a,b)=> (a.date||'') < (b.date||'') ? -1 : 1);
-    const lastDate = sorted[sorted.length-1].date;
-    if(lastDate){
-      const nights = Math.round((new Date(lastDate) - new Date(dateVal)) / 86400000);
-      text = `📅 ${md}(${dow})〜${fmtDate(lastDate).md}(${fmtDate(lastDate).dow})　${nights}泊${nights+1}日`;
-    }else{
-      text = `📅 ${md}(${dow})〜（一部日程の日付が未入力です）`;
-    }
-  }else{
-    text = `📅 ${md}(${dow})　日帰り`;
-  }
-  bar.style.display = 'flex';
-  bar.innerHTML = `<span class="date-summary-text">${text}</span><button type="button" class="date-summary-change" onclick="openRangeCalendar()">変更する</button>`;
-}
-
-function updateDay2MinDate(){
-  // 1日目の日付を変更したら、既存の追加日程のmin属性を更新し、矛盾する日付をクリアする
-  const date = document.getElementById('f-date').value;
-  if(!date) return;
-  extraDaysFormState.forEach(d=>{ if(d.date && d.date <= date) d.date = ''; });
-  renderExtraDaysForm();
 }
 
 function toggleCustomSport(){
@@ -3131,36 +2756,20 @@ function fillModalFields(t){
   else{mSel3.style.display='none'; mInp3.style.display='block'; mInp3.value=t.match||''; if(matchToggleBtn) matchToggleBtn.textContent='← リストに戻る';}
 
   document.getElementById('f-date').value = t.date || '';
-  updateDay2MinDate();
   document.getElementById('f-time').value = t.time || '';
   document.getElementById('f-venue').value = t.venue || '';
   setCostValue(t.cost || '');
-  renderCostQuickFill(); // handleTeamSelectChange()内での判定より後に、確定した金額で再チェックする
-  document.getElementById('f-is-no-game').checked = !!t.isNoGame;
-  toggleDay1NoGame();
-
-  // 複数日程の情報を復元
-  extraDaysFormState = (t.extraDays || []).map(d => ({
-    dayIndex: d.dayIndex, date: d.date, opponent: d.opponent, venue: d.venue, noGame: d.noGame
-  }));
-  renderExtraDaysForm();
-  const extraDaysDetails = document.getElementById('f-extra-days-details');
-  if(extraDaysFormState.length) extraDaysDetails.setAttribute('open', '');
-  else extraDaysDetails.removeAttribute('open');
+  renderCostQuickFill();
 }
 
-/* ---------- 日程カレンダー範囲選択（レンタカー予約サイト風のUI） ---------- */
-let rangeCalYear, rangeCalMonth, rangeCalStart = null, rangeCalEnd = null;
+/* ---------- 日付カレンダー選択 ---------- */
+let rangeCalYear, rangeCalMonth;
 
 function openRangeCalendar(){
   const existingDate = document.getElementById('f-date').value;
   const base = existingDate ? new Date(existingDate) : new Date();
   rangeCalYear = base.getFullYear();
   rangeCalMonth = base.getMonth();
-  // 既に選択済みの日程があれば復元する（「変更する」で白紙に戻らないように）
-  rangeCalStart = existingDate || null;
-  const sortedExtra = [...extraDaysFormState].sort((a,b)=> (a.date||'') < (b.date||'') ? -1 : 1);
-  rangeCalEnd = (sortedExtra.length && sortedExtra[sortedExtra.length-1].date) ? sortedExtra[sortedExtra.length-1].date : null;
   renderRangeCalendar();
   document.getElementById('range-cal-overlay').style.display = 'block';
   document.getElementById('range-cal-popup').style.display = 'block';
@@ -3180,76 +2789,22 @@ function renderRangeCalendar(){
   const firstDow = new Date(rangeCalYear, rangeCalMonth, 1).getDay();
   const daysInMonth = new Date(rangeCalYear, rangeCalMonth+1, 0).getDate();
   const dowLabels = ['日','月','火','水','木','金','土'];
+  const selectedDate = document.getElementById('f-date').value;
   let html = dowLabels.map(d=>`<div class="cal-dow">${d}</div>`).join('');
   for(let i=0;i<firstDow;i++) html += `<div></div>`;
   for(let d=1; d<=daysInMonth; d++){
     const dateStr = `${rangeCalYear}-${String(rangeCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isPast = dateStr < TODAY;
     let cls = 'range-cal-day';
-    if(rangeCalStart && dateStr === rangeCalStart) cls += ' range-cal-selected';
-    if(rangeCalEnd && dateStr === rangeCalEnd) cls += ' range-cal-selected';
-    if(rangeCalStart && rangeCalEnd && dateStr > rangeCalStart && dateStr < rangeCalEnd) cls += ' range-cal-in-range';
+    if(dateStr === selectedDate) cls += ' range-cal-selected';
     html += `<button type="button" class="${cls}" ${isPast?'disabled':''} onclick="pickRangeCalDate('${dateStr}')">${d}</button>`;
   }
   document.getElementById('range-cal-grid').innerHTML = html;
-
-  const hint = document.getElementById('range-cal-hint');
-  const confirmBtn = document.getElementById('range-cal-confirm');
-  if(!rangeCalStart){
-    hint.textContent = '日付をタップしてください';
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'この日程で決定';
-  }else if(!rangeCalEnd){
-    hint.textContent = `${fmtDate(rangeCalStart).md}(${fmtDate(rangeCalStart).dow})　複数日の場合は最終日もタップしてください`;
-    confirmBtn.disabled = false; // 開始日だけでも「単日」として確定できるようにする
-    confirmBtn.textContent = `この日（${fmtDate(rangeCalStart).md}）だけで決定`;
-  }else{
-    const nights = Math.round((new Date(rangeCalEnd) - new Date(rangeCalStart)) / 86400000);
-    hint.textContent = `${fmtDate(rangeCalStart).md} 〜 ${fmtDate(rangeCalEnd).md}${nights?`（${nights}泊）`:'（日帰り）'}`;
-    confirmBtn.disabled = false;
-    confirmBtn.textContent = 'この日程で決定';
-  }
 }
+// 日付をタップした瞬間に確定して閉じる（複数日は「複製」機能で別カードを作る方針のため、単日選択のみ）
 function pickRangeCalDate(dateStr){
-  if(!rangeCalStart || (rangeCalStart && rangeCalEnd)){
-    rangeCalStart = dateStr;
-    rangeCalEnd = null;
-  }else if(dateStr === rangeCalStart){
-    rangeCalEnd = dateStr; // 同じ日を2回タップ＝単日
-  }else if(dateStr < rangeCalStart){
-    rangeCalEnd = rangeCalStart;
-    rangeCalStart = dateStr;
-  }else{
-    rangeCalEnd = dateStr;
-  }
-  renderRangeCalendar();
-}
-function confirmRangeCalendar(){
-  if(!rangeCalStart) return;
-  document.getElementById('f-date').value = rangeCalStart;
-  updateDay2MinDate();
-
-  // 開始日〜終了日の間（単日以外）を、追加日程として自動で埋める
-  extraDaysFormState = [];
-  if(rangeCalEnd && rangeCalEnd !== rangeCalStart){
-    let cur = new Date(rangeCalStart);
-    const end = new Date(rangeCalEnd);
-    let idx = 2;
-    while(true){
-      cur.setDate(cur.getDate()+1);
-      const curStr = cur.toISOString().slice(0,10);
-      extraDaysFormState.push({ dayIndex: idx++, date: curStr, opponent:'', venue:'', noGame:false });
-      if(curStr >= end.toISOString().slice(0,10)) break;
-    }
-  }
-  renderExtraDaysForm();
-  if(extraDaysFormState.length) document.getElementById('f-extra-days-details').setAttribute('open','');
+  document.getElementById('f-date').value = dateStr;
   closeRangeCalendar();
-
-  // レンタカー予約サイトのように、日程確定後は自然にチーム選択へ誘導する
-  const teamSelect = document.getElementById('f-team-select');
-  teamSelect.scrollIntoView({behavior:'smooth', block:'center'});
-  setTimeout(()=>{ teamSelect.focus(); }, 350);
 }
 
 function openModal(tripId){
@@ -3264,16 +2819,11 @@ function openModal(tripId){
     fillModalFields(t);
   }else{
     document.getElementById('modal-title').textContent = '新しい遠征を登録';
-    document.getElementById('modal-sub').textContent = '日程が決まったらまとめて登録できます。同じチームの試合は「登録して続けて追加」が便利です。';
+    document.getElementById('modal-sub').textContent = '同じチームの試合は「登録して続けて追加」が便利です。';
     document.getElementById('modal-keepopen-btn').style.display = 'inline-block';
     document.getElementById('modal-submit-btn').textContent = '登録する';
     ['f-venue','f-date','f-time'].forEach(id=>document.getElementById(id).value=''); setCostValue('');
     document.getElementById('f-day-trip').checked = false;
-    document.getElementById('f-is-no-game').checked = false;
-    toggleDay1NoGame();
-    extraDaysFormState = [];
-    renderExtraDaysForm();
-    document.getElementById('f-extra-days-details').removeAttribute('open');
     document.getElementById('f-team-select').value=''; document.getElementById('f-match-select').value='';
     document.getElementById('f-team').value=''; document.getElementById('f-match').value='';
     document.getElementById('f-team').style.display='none'; document.getElementById('f-team-select').style.display='block';
@@ -3303,25 +2853,11 @@ async function submitTrip(keepOpen){
   const venue = document.getElementById('f-venue').value;
   const cost = parseInt(document.getElementById('f-cost').value) || 0;
   const isDayTrip = document.getElementById('f-day-trip').checked;
-  const isNoGame = document.getElementById('f-is-no-game').checked;
 
   if(!date){
     document.getElementById('modal-save-msg').style.color = '#c0392b';
     document.getElementById('modal-save-msg').textContent = '日付を入力してください。';
     return;
-  }
-  // 追加日程のバリデーション：1日目より後の日付で、かつ日付が未入力の行が無いこと
-  for(const d of extraDaysFormState){
-    if(!d.date){
-      document.getElementById('modal-save-msg').style.color = '#c0392b';
-      document.getElementById('modal-save-msg').textContent = `${d.dayIndex}日目の日付を入力してください。`;
-      return;
-    }
-    if(d.date <= date){
-      document.getElementById('modal-save-msg').style.color = '#c0392b';
-      document.getElementById('modal-save-msg').textContent = `${d.dayIndex}日目の日付は、1日目より後の日付にしてください。`;
-      return;
-    }
   }
   document.getElementById('modal-save-msg').style.color = '';
 
@@ -3329,15 +2865,8 @@ async function submitTrip(keepOpen){
   submitBtn.disabled = true;
 
   // 新しいスタジアムへの遠征かどうかを判定（保存前に、これまでの過去訪問済み会場と比較）
-  // 1日目が試合なしで会場未入力の場合、実際の新会場が追加日程側にあるケースも拾う
-  const candidateVenues = [venue, ...extraDaysFormState.map(d=>d.venue)].filter(v=>v && v.trim());
-  const isPastVisited = v => trips.some(t => {
-    if(t.sport!==sport || tripEndDate(t) >= TODAY) return false;
-    const allVenues = [t.venue, ...(t.extraDays||[]).map(d=>d.venue)].filter(Boolean).map(x=>x.trim());
-    return allVenues.includes(v.trim());
-  });
-  const newVenueFound = !editingTripId && candidateVenues.find(v => !isPastVisited(v));
-  const isNewVenue = !!newVenueFound;
+  const isNewVenue = !editingTripId && venue && venue.trim() &&
+    !trips.some(t => t.sport===sport && tripEndDate(t) < TODAY && (t.venue||'').trim() === venue.trim());
 
   try{
     const { data, error } = await sb.rpc('upsert_trip', {
@@ -3349,41 +2878,16 @@ async function submitTrip(keepOpen){
       p_match_date: date,
       p_start_time: time || null,
       p_venue: venue || null,
-      p_estimated_cost: cost,
-      p_is_no_game: isNoGame
+      p_estimated_cost: cost
     });
     if(error) throw error;
     saveFavoriteTeam(sport, team); // この競技での応援チームとして記憶（次回モーダルで自動選択）
 
     const tripId = editingTripId || data;
 
-    // 追加日程を保存する。既存のチケット予約情報は、同じday_indexが残っていれば引き継ぐ
-    const prevTrip = editingTripId ? trips.find(x=>x.id===editingTripId) : null;
-    const prevExtraDays = prevTrip?.extraDays || [];
-    const newExtraDays = [];
-    for(const d of extraDaysFormState){
-      await sb.rpc('upsert_trip_day', {
-        p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_day_index: d.dayIndex,
-        p_match_date: d.date, p_opponent: d.opponent || null, p_venue: d.venue || null, p_is_no_game: d.noGame
-      });
-      const kept = prevExtraDays.find(pd => pd.dayIndex === d.dayIndex) || {};
-      newExtraDays.push({
-        dayIndex: d.dayIndex, date: d.date, opponent: d.opponent||'', venue: d.venue||'', noGame: d.noGame,
-        ticketBooked: kept.ticketBooked||false, ticketCost: kept.ticketCost||0, ticketMemo: kept.ticketMemo||'', ticketLink: kept.ticketLink||''
-      });
-    }
-    // 編集時、フォームから削除された日程はDBからも削除する
-    if(editingTripId){
-      for(const pd of prevExtraDays){
-        if(!extraDaysFormState.some(d=>d.dayIndex===pd.dayIndex)){
-          await sb.rpc('delete_trip_day', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_day_index: pd.dayIndex });
-        }
-      }
-    }
-
     if(editingTripId){
       const t = trips.find(x=>x.id===editingTripId);
-      Object.assign(t, {sport, team, match, date, time, venue, cost, isNoGame, extraDays: newExtraDays});
+      Object.assign(t, {sport, team, match, date, time, venue, cost});
       closeModal();
       render();
       focusTrip(editingTripId);
@@ -3402,7 +2906,7 @@ async function submitTrip(keepOpen){
       });
       // 持ち物テンプレートがあれば、新しい遠征に自動でコピーする（すべて未チェックの状態で）
       const initialPackingList = packingTemplate.map(text => ({ text, checked: false }));
-      const newTrip = { id:newId, sport, team, match, date, time, venue, cost, isNoGame, extraDays: newExtraDays, packingList: initialPackingList, status, detail };
+      const newTrip = { id:newId, sport, team, match, date, time, venue, cost, packingList: initialPackingList, status, detail };
       trips.push(newTrip);
       if(initialPackingList.length) await savePackingList(newId);
 
@@ -3433,11 +2937,6 @@ async function submitTrip(keepOpen){
         document.getElementById('f-match').style.display = 'none';
         document.getElementById('match-manual-toggle').textContent = '✏️ 手入力に切り替え';
         document.getElementById('f-day-trip').checked = false;
-        document.getElementById('f-is-no-game').checked = false;
-        toggleDay1NoGame();
-        extraDaysFormState = []; // 追加日程は前の遠征のものを引き継がないようリセットする
-        renderExtraDaysForm();
-        document.getElementById('f-extra-days-details').removeAttribute('open');
         // HOME/AWAYボタンの状態と、対戦相手の「別リーグ」ピッカーの状態は、チームが変わらないため
         // renderTeamDatalist()経由では自動リセットされない。ここで明示的にリセットする
         homeAwayMode = null;
@@ -3528,13 +3027,6 @@ function buildTripShareText(t){
   const catInfo = k => CATS.find(c=>c.key===k);
   const lines = [`【${t.team}】${t.match}`, `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time||''}　@${t.venue||'会場未定'}`];
   if(t.venue) lines.push(`🗺️ ${mapUrl(t.venue)}`);
-  (t.extraDays||[]).forEach(d => {
-    if(d.noGame){
-      lines.push(`📅 ${d.dayIndex}日目：${fmtDate(d.date).md}（${fmtDate(d.date).dow}）は観光DAY`);
-    }else{
-      lines.push(`📅 ${d.dayIndex}日目：${fmtDate(d.date).md}（${fmtDate(d.date).dow}）vs ${d.opponent||t.match}${d.venue?` @${d.venue}`:''}　チケット${d.ticketBooked?'✅予約済み':'⬜️未予約'}`);
-    }
-  });
   lines.push('');
   CATS.forEach(c=>{
     const d = t.detail[c.key];
@@ -3654,10 +3146,6 @@ function openItinerary(tripId){
   if(!t) return;
   const body = document.getElementById('itinerary-body');
 
-  // 日ごとのイベントを組み立てる（1日目＋追加日程）
-  const days = [{ dayIndex:1, date:t.date, opponent:t.match, venue:t.venue, noGame:t.isNoGame, time:t.time }]
-    .concat(sortedExtraDays(t).map(d=>({ dayIndex:d.dayIndex, date:d.date, opponent:d.opponent||t.match, venue:d.venue||t.venue, noGame:d.noGame, time:'' })));
-
   const catInfo = k => CATS.find(c=>c.key===k);
   const missingItems = [];
   const tripLevelRows = CATS.filter(c=>{
@@ -3674,31 +3162,12 @@ function openItinerary(tripId){
     return `<div class="itin-item ${done?'itin-done':'itin-pending'}"><span class="itin-item-icon">${c.icon}</span><span class="itin-item-label">${c.label}</span><span class="itin-item-detail">${detail || (done?'':'未入力')}</span></div>`;
   }).join('');
 
-  const dayBlocks = days.map(d=>{
-    const {md, dow} = fmtDate(d.date);
-    const ed = d.dayIndex > 1 ? t.extraDays.find(x=>x.dayIndex===d.dayIndex) : null;
-    let hotelInfo = '';
-    if(ed && ed.hotelOverride){
-      if(!ed.hotelBooked) missingItems.push(`${d.dayIndex}日目宿泊`);
-      hotelInfo = `<div class="itin-item ${ed.hotelBooked?'itin-done':'itin-pending'}"><span class="itin-item-icon">🏨</span><span class="itin-item-label">宿泊（この日は別）</span><span class="itin-item-detail">${ed.hotelBooked?(ed.hotelMethod||`¥${Number(ed.hotelCost||0).toLocaleString()}`):'未入力'}</span></div>`;
-    }
-    if(d.noGame){
-      return `<div class="itin-day"><div class="itin-day-head">${md}（${dow}） <span class="itin-day-badge">🏙 観光DAY</span></div>${hotelInfo}</div>`;
-    }
-    let ticketInfo = '';
-    if(d.dayIndex > 1){
-      const booked = ed?.ticketBooked;
-      if(!booked) missingItems.push(`${d.dayIndex}日目チケット`);
-      ticketInfo = `<div class="itin-item ${booked?'itin-done':'itin-pending'}"><span class="itin-item-icon">🎫</span><span class="itin-item-label">チケット</span><span class="itin-item-detail">${booked?`¥${Number(ed.ticketCost||0).toLocaleString()}`:'未入力'}</span></div>`;
-    }
-    return `
+  const {md, dow} = fmtDate(t.date);
+  const dayBlocks = `
       <div class="itin-day">
-        <div class="itin-day-head">${md}（${dow}）${d.time?` ${d.time}〜`:''}</div>
-        <div class="itin-day-match">${d.opponent||'対戦未定'}${d.venue?` @ ${d.venue}`:''}</div>
-        ${ticketInfo}
-        ${hotelInfo}
+        <div class="itin-day-head">${md}（${dow}）${t.time?` ${t.time}〜`:''}</div>
+        <div class="itin-day-match">${t.match||'対戦未定'}${t.venue?` @ ${t.venue}`:''}</div>
       </div>`;
-  }).join('<div class="itin-connector"></div>');
 
   body.innerHTML = `
     <div class="itin-header">
@@ -3767,15 +3236,6 @@ function renderCalendar(){
         byDate[td].push(t);
       }
     }
-    // 追加日程がある場合、観光DAYでなければその日付のセルにも表示する（表示用に対戦相手だけ差し替える）
-    (t.extraDays||[]).forEach(ed=>{
-      if(!ed.date || ed.noGame) return;
-      const [dy,dm,dd] = ed.date.split('-').map(Number);
-      if(dy===y && dm-1===m){
-        if(!byDate[dd]) byDate[dd] = [];
-        byDate[dd].push({ ...t, match: ed.opponent || t.match, isDay2: true, dayIndexLabel: ed.dayIndex });
-      }
-    });
     const saleDate = t.detail?.ticket?.saleDate;
     if(saleDate){
       const [sy,sm,sd] = saleDate.split('-').map(Number);
@@ -3821,7 +3281,7 @@ function renderCalendar(){
           <div class="cal-date" style="color:${color}; display:flex; align-items:center; gap:3px;">${c.d}${saleEvents.length?'<span title="チケット発売日" style="font-size:9px;">🔔</span>':''}</div>
           ${events.slice(0,3).map(t=>{
             const pct = completion(t);
-            return `<span class="cal-evt ${pct===100?'done':'pending'}">${t.isDay2?`${circledNumber(t.dayIndexLabel)}`:''}${t.team}</span>`;
+            return `<span class="cal-evt ${pct===100?'done':'pending'}">${t.team}</span>`;
           }).join('')}
           ${events.length>3 ? `<span style="font-size:8.5px; color:var(--text-faint);">+${events.length-3}件</span>` : ''}
           ${(!events.length && saleEvents.length) ? saleEvents.slice(0,2).map(t=>`<span class="cal-evt" style="background:var(--butter,#E0B84A); color:#5a4213;">🎫 ${t.team}</span>`).join('') : ''}
@@ -3870,17 +3330,7 @@ function setCalTeamFilter(t){ calFilterTeam=t; renderCalendar(); }
 /* ---------- 日付タップ時のポップアップ（Googleカレンダー風） ---------- */
 function openCalPopup(y,m,d){
   const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  // 1日目の日付、または追加日程（観光DAYでない場合）の日付が一致する遠征を集める
-  const events = getFilteredTrips()
-    .filter(t=>t.date===dateStr || (t.extraDays||[]).some(ed=>ed.date===dateStr && !ed.noGame))
-    .map(t=>{
-      const hitDay = (t.extraDays||[]).find(ed=>ed.date===dateStr && !ed.noGame);
-      if(hitDay){
-        // 追加日程にヒットした場合は、表示内容をその日のものに差し替える（IDは元のまま＝カードへのジャンプに使う）
-        return { ...t, match: hitDay.opponent || t.match, venue: hitDay.venue || t.venue, time: '', isDay2: true, dayIndexLabel: hitDay.dayIndex };
-      }
-      return t;
-    });
+  const events = getFilteredTrips().filter(t=>t.date===dateStr);
   const saleEvents = getFilteredTrips().filter(t=>t.detail?.ticket?.saleDate===dateStr);
   const popup = document.getElementById('cal-popup');
   const dow = ['日','月','火','水','木','金','土'][new Date(y,m,d).getDay()];
@@ -3901,7 +3351,7 @@ function openCalPopup(y,m,d){
       const pct = completion(t);
       return `
       <div class="cpop-trip">
-        <div class="cpop-team">${sportIcon(t.sport)} ${t.team}${t.isDay2?` <span style="font-size:10px; color:var(--sky,#93B5C6); font-weight:700;">${t.dayIndexLabel}日目</span>`:''}</div>
+        <div class="cpop-team">${sportIcon(t.sport)} ${t.team}</div>
         <div class="cpop-meta">${t.match||''}　${t.time||''}　${t.venue?'@ '+t.venue:''}</div>
         <div class="cpop-prog"><div class="cpop-prog-fill" style="width:${pct}%; background:${pct===100?'var(--sage)':'var(--rose)'};"></div></div>
         <div class="cpop-btns">
@@ -4065,29 +3515,7 @@ function normalizeTrip(raw){
     venue: raw.venue || '',
     cost: raw.estimated_cost || 0,
     journalMemo: raw.journal_memo || '',
-    isNoGame: !!raw.is_no_game,
     packingList: Array.isArray(raw.packing_list) ? raw.packing_list : [],
-    // 追加日程（2日目以降、何日でも）。day_index順に並べる
-    extraDays: (raw.extra_days || []).map(ed => ({
-      dayIndex: ed.day_index,
-      date: ed.match_date,
-      opponent: ed.opponent || '',
-      venue: ed.venue || '',
-      noGame: !!ed.is_no_game,
-      ticketBooked: !!ed.ticket_booked,
-      ticketCost: ed.ticket_cost || 0,
-      ticketMemo: ed.ticket_memo || '',
-      ticketLink: ed.ticket_link || '',
-      saleDate: ed.sale_date || '',
-      saleTime: ed.sale_time ? String(ed.sale_time).slice(0,5) : '',
-      notifyOnSale: !!ed.notify_on_sale,
-      hotelOverride: !!ed.hotel_override,
-      hotelBooked: !!ed.hotel_booked,
-      hotelMethod: ed.hotel_method || '',
-      hotelCost: ed.hotel_cost || 0,
-      hotelMemo: ed.hotel_memo || '',
-      hotelLink: ed.hotel_link || ''
-    })),
     status, detail
   };
 }
@@ -4146,7 +3574,7 @@ function openSettingsPanel(){
     ${IS_EDITABLE ? `
     <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎨 テーマカラー</div>
-      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">手帳全体の色を変更できます（家族みんなに反映されます）。特定のチームカラーにしたい場合は、そのままメッセージで教えてください。正確な色を調べて追加します。</div>
+      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">手帳全体の色を変更できます（家族みんなに反映されます）。</div>
       <div class="theme-color-presets">
         ${THEME_COLOR_PRESETS.map(c=>`<button type="button" class="theme-color-swatch" style="background:${c};" onclick="saveThemeColor('${c}')" title="${c}"></button>`).join('')}
         <label class="theme-color-swatch theme-color-custom" title="自由に選ぶ">
