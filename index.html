@@ -304,20 +304,6 @@
   .itin-item-detail{ flex:1; text-align:right; color:var(--text-dim); }
   .itin-item.itin-pending .itin-item-detail{ color:#c0392b; }
   .itin-item.itin-done .itin-item-detail{ color:#3d6b4a; }
-  /* 日程カレンダー範囲選択 */
-  .cal-nav-btn{ background:var(--surface-2); border:1.5px solid var(--line); border-radius:8px; width:36px; height:36px; font-size:14px; color:var(--text-dim); cursor:pointer; }
-  .range-cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
-  .range-cal-grid .cal-dow{ text-align:center; font-size:10px; color:var(--text-faint); font-weight:700; padding-bottom:4px; }
-  .range-cal-day{ aspect-ratio:1; border:none; border-radius:8px; background:var(--surface-2); font-family:var(--font-num); font-size:12.5px; color:var(--text); cursor:pointer; min-height:36px; }
-  .range-cal-day:disabled{ color:var(--text-faint); background:transparent; cursor:default; }
-  .range-cal-day.range-cal-in-range{ background:var(--rose-wash); border-radius:0; }
-  .range-cal-day.range-cal-selected{ background:var(--rose); color:#fff; font-weight:700; }
-  .range-cal-open-btn{ display:block; width:100%; margin:12px 0; padding:12px; border-radius:12px; border:1.5px solid var(--rose); background:var(--rose-wash); color:var(--rose-deep); font-size:13px; font-weight:700; cursor:pointer; }
-  .modal-step-label{ font-family:var(--font-display); font-weight:900; font-size:12.5px; color:var(--text-faint); margin:20px 0 10px; padding-top:14px; border-top:1px solid var(--line); }
-  .modal-step-label:first-of-type{ border-top:none; padding-top:0; }
-  .date-summary-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--rose-wash); border:1.5px solid var(--rose); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
-  .date-summary-text{ font-size:13px; font-weight:700; color:var(--rose-deep); line-height:1.5; }
-  .date-summary-change{ font-size:11px; color:var(--rose-deep); text-decoration:underline; background:none; border:none; cursor:pointer; white-space:nowrap; flex-shrink:0; }
   .day-schedule-card{ background:var(--surface-2); border:1.5px solid var(--line); border-radius:12px; padding:12px; margin-bottom:8px; }
   .day-schedule-head{ font-size:12px; font-weight:900; color:var(--rose-deep); margin-bottom:8px; }
   .progress-bar{ flex:1; height:7px; background:var(--surface-2); border-radius:6px; overflow:hidden; }
@@ -363,8 +349,6 @@
   .cat-panel .field input:focus{ outline:2px solid var(--rose); }
   .done-toggle{ display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--sage); background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; min-height:38px; }
   .done-toggle input[type="checkbox"]{ width:16px; height:16px; flex-shrink:0; accent-color: var(--sage); }
-  .date-quick-row{ display:flex; gap:8px; margin-top:-6px; margin-bottom:2px; }
-  .date-quick-btn{ flex:1; background:var(--surface-2); border:1.5px dashed var(--line); border-radius:8px; padding:7px; font-size:11.5px; color:var(--text-dim); cursor:pointer; }
   .quick-fill-chip{ display:block; width:100%; background:var(--rose-wash); border:1.5px dashed var(--rose); border-radius:8px; padding:8px 10px; font-size:11.5px; color:var(--rose-deep); font-weight:700; cursor:pointer; margin-top:-2px; }
   /* 予約状態の3択セグメントコントロール（未予約／予約済み／不要） */
   .status-segment{ display:flex; gap:4px; background:var(--surface-2); border-radius:10px; padding:4px; }
@@ -621,22 +605,6 @@
 <div id="cal-popup-overlay" onclick="closeCalPopup()" style="display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.25);"></div>
 <div id="cal-popup" style="display:none; position:fixed; z-index:301; background:var(--surface); border-radius:20px; padding:20px; box-shadow:0 8px 40px rgba(0,0,0,0.2); width:min(360px,92vw); max-height:70vh; overflow-y:auto;"></div>
 
-<!-- 日付カレンダー選択ポップアップ -->
-<div id="range-cal-overlay" onclick="if(event.target===this) closeRangeCalendar();" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.35);"></div>
-<div id="range-cal-popup" style="display:none; position:fixed; z-index:201; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--surface); border-radius:20px; padding:20px; box-shadow:0 8px 40px rgba(0,0,0,0.25); width:min(340px,90vw); max-height:85vh; overflow-y:auto;">
-  <div class="modal-title" style="margin-bottom:2px; font-size:16px;">📅 日付を選ぶ</div>
-  <div class="modal-sub" style="margin-bottom:10px;">日付をタップすると入力されます</div>
-  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-    <button type="button" class="cal-nav-btn" onclick="rangeCalNav(-1)">◀</button>
-    <div id="range-cal-title" style="font-weight:700; font-size:14px;"></div>
-    <button type="button" class="cal-nav-btn" onclick="rangeCalNav(1)">▶</button>
-  </div>
-  <div id="range-cal-grid" class="range-cal-grid"></div>
-  <div class="modal-actions" style="margin-top:16px;">
-    <button class="btn-secondary" onclick="closeRangeCalendar()" style="width:100%;">キャンセル</button>
-  </div>
-</div>
-
 <!-- 旅のしおり（タイムライン）モーダル -->
 <div class="overlay" id="itinerary-overlay" onclick="if(event.target===this) closeItinerary();">
   <div class="modal">
@@ -685,6 +653,10 @@
     <h2 id="modal-title">新しい遠征を登録</h2>
     <p class="modal-sub" id="modal-sub">同じチームの試合は「登録して続けて追加」が便利です。</p>
     <div class="row">
+      <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
+      <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
+    </div>
+    <div class="row">
       <div class="field"><label>競技</label>
         <select id="f-sport" onchange="toggleCustomSport()">
           <option>バスケットボール</option>
@@ -696,16 +668,6 @@
       </div>
     </div>
     <div class="field" id="f-sport-custom-wrap" style="display:none;"><label>競技名を入力</label><input id="f-sport-custom" placeholder="例）卓球、eスポーツ など" style="font-size:16px;"></div>
-
-    <div class="row">
-      <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
-      <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
-    </div>
-    <div class="date-quick-row">
-      <button type="button" class="date-quick-btn" onclick="openRangeCalendar()">📅 カレンダー</button>
-      <button type="button" class="date-quick-btn" onclick="setQuickDate(6)">次の土曜日</button>
-      <button type="button" class="date-quick-btn" onclick="setQuickDate(0)">次の日曜日</button>
-    </div>
 
     <div class="row">
       <div class="field">
@@ -748,8 +710,6 @@
       <input id="f-venue" list="f-venue-list" placeholder="例）LaLa arena TOKYO-BAY" style="font-size:16px;">
       <datalist id="f-venue-list"></datalist>
     </div>
-    <div class="field"><label>想定予算（円）</label><input id="f-cost-display" type="text" inputmode="numeric" placeholder="例）32,000" oninput="handleCostDisplayInput()" style="font-size:16px;"><input type="hidden" id="f-cost"></div>
-    <div id="cost-quick-fill"></div>
     <label class="done-toggle" style="margin-top:2px;"><input type="checkbox" id="f-day-trip"> 日帰り（宿泊は「対象外」として登録します）</label>
     <div class="save-msg" id="modal-save-msg"></div>
     <div class="modal-actions">
@@ -1256,24 +1216,6 @@ function handleTeamSelectChange(){
   }
   renderOpponentOptionsForLeague();
   handleTeamInput();
-  renderCostQuickFill();
-}
-
-// 想定予算欄に「前回と同じ金額」のクイック入力チップを出す（既に金額が入っている場合は出さない）
-function renderCostQuickFill(){
-  const box = document.getElementById('cost-quick-fill');
-  if(!box) return;
-  const costVal = document.getElementById('f-cost').value;
-  if(costVal){ box.innerHTML = ''; return; }
-  const sport = document.getElementById('f-sport').value;
-  const team = getTeamValue();
-  if(!team){ box.innerHTML = ''; return; }
-  const candidates = trips
-    .filter(t => t.sport===sport && t.team===team && t.id !== editingTripId && t.cost)
-    .sort((a,b) => new Date(b.date) - new Date(a.date));
-  if(!candidates.length){ box.innerHTML = ''; return; }
-  const lastCost = candidates[0].cost;
-  box.innerHTML = `<button type="button" class="quick-fill-chip" onclick="setCostValue(${lastCost}); document.getElementById('cost-quick-fill').innerHTML='';">↺ 前回と同じ「¥${lastCost.toLocaleString()}」を使う</button>`;
 }
 
 function toggleOpponentLeaguePicker(){
@@ -2386,7 +2328,6 @@ function duplicateTrip(tripId){
   if(tOpt){tSel2.value=t.team; tSel2.style.display='block'; tInp2.style.display='none'; handleTeamSelectChange();}
   else{tSel2.style.display='none'; tInp2.style.display='block'; tInp2.value=t.team||'';}
   document.getElementById('f-venue').value = t.venue;
-  setCostValue(t.cost || '');
   // 連戦（2日目・3日目）で複製するケースが多いため、翌日の日付を初期値として入れておく（自由に変更可能）
   if(t.date){
     const next = new Date(t.date);
@@ -2666,39 +2607,11 @@ const SPORT_PLACEHOLDERS = {
   },
 };
 
-// 金額のカンマ表示（見た目の入力欄=f-cost-display、実際の値=隠しinput f-cost）
-function handleCostDisplayInput(){
-  const disp = document.getElementById('f-cost-display');
-  const raw = document.getElementById('f-cost');
-  const digits = disp.value.replace(/[^0-9]/g,'');
-  raw.value = digits;
-  const cursorAtEnd = disp.selectionStart === disp.value.length;
-  disp.value = digits ? Number(digits).toLocaleString() : '';
-  if(cursorAtEnd) disp.setSelectionRange(disp.value.length, disp.value.length);
-}
-function setCostValue(val){
-  const raw = document.getElementById('f-cost');
-  const disp = document.getElementById('f-cost-display');
-  const num = parseInt(val) || 0;
-  raw.value = num || '';
-  disp.value = num ? num.toLocaleString() : '';
-}
-
 function applyPlaceholders(sport){
   const ph = SPORT_PLACEHOLDERS[sport] || SPORT_PLACEHOLDERS['その他'];
   document.getElementById('f-team').placeholder  = ph.team;
   document.getElementById('f-match').placeholder = ph.match;
   document.getElementById('f-venue').placeholder = ph.venue;
-  document.getElementById('f-cost-display').placeholder  = ph.cost;
-}
-
-// 次の指定曜日（0=日曜〜6=土曜）の日付を計算してセットする（日付ピッカーを開かずに済むように）
-function setQuickDate(targetDow){
-  const now = new Date();
-  const diff = (targetDow - now.getDay() + 7) % 7 || 7; // 今日と同じ曜日なら「次の」なので+7日
-  now.setDate(now.getDate() + diff);
-  const dateStr = now.toISOString().slice(0,10);
-  document.getElementById('f-date').value = dateStr;
 }
 
 function toggleCustomSport(){
@@ -2759,53 +2672,6 @@ function fillModalFields(t){
   document.getElementById('f-date').value = t.date || '';
   document.getElementById('f-time').value = t.time || '';
   document.getElementById('f-venue').value = t.venue || '';
-  setCostValue(t.cost || '');
-  renderCostQuickFill();
-}
-
-/* ---------- 日付カレンダー選択 ---------- */
-let rangeCalYear, rangeCalMonth;
-
-function openRangeCalendar(){
-  const existingDate = document.getElementById('f-date').value;
-  const base = existingDate ? new Date(existingDate) : new Date();
-  rangeCalYear = base.getFullYear();
-  rangeCalMonth = base.getMonth();
-  renderRangeCalendar();
-  document.getElementById('range-cal-overlay').style.display = 'block';
-  document.getElementById('range-cal-popup').style.display = 'block';
-}
-function closeRangeCalendar(){
-  document.getElementById('range-cal-overlay').style.display = 'none';
-  document.getElementById('range-cal-popup').style.display = 'none';
-}
-function rangeCalNav(delta){
-  rangeCalMonth += delta;
-  if(rangeCalMonth < 0){ rangeCalMonth = 11; rangeCalYear--; }
-  if(rangeCalMonth > 11){ rangeCalMonth = 0; rangeCalYear++; }
-  renderRangeCalendar();
-}
-function renderRangeCalendar(){
-  document.getElementById('range-cal-title').textContent = `${rangeCalYear}年${rangeCalMonth+1}月`;
-  const firstDow = new Date(rangeCalYear, rangeCalMonth, 1).getDay();
-  const daysInMonth = new Date(rangeCalYear, rangeCalMonth+1, 0).getDate();
-  const dowLabels = ['日','月','火','水','木','金','土'];
-  const selectedDate = document.getElementById('f-date').value;
-  let html = dowLabels.map(d=>`<div class="cal-dow">${d}</div>`).join('');
-  for(let i=0;i<firstDow;i++) html += `<div></div>`;
-  for(let d=1; d<=daysInMonth; d++){
-    const dateStr = `${rangeCalYear}-${String(rangeCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isPast = dateStr < TODAY;
-    let cls = 'range-cal-day';
-    if(dateStr === selectedDate) cls += ' range-cal-selected';
-    html += `<button type="button" class="${cls}" ${isPast?'disabled':''} onclick="pickRangeCalDate('${dateStr}')">${d}</button>`;
-  }
-  document.getElementById('range-cal-grid').innerHTML = html;
-}
-// 日付をタップした瞬間に確定して閉じる（複数日は「複製」機能で別カードを作る方針のため、単日選択のみ）
-function pickRangeCalDate(dateStr){
-  document.getElementById('f-date').value = dateStr;
-  closeRangeCalendar();
 }
 
 function openModal(tripId){
@@ -2823,7 +2689,7 @@ function openModal(tripId){
     document.getElementById('modal-sub').textContent = '同じチームの試合は「登録して続けて追加」が便利です。';
     document.getElementById('modal-keepopen-btn').style.display = 'inline-block';
     document.getElementById('modal-submit-btn').textContent = '登録する';
-    ['f-venue','f-date','f-time'].forEach(id=>document.getElementById(id).value=''); setCostValue('');
+    ['f-venue','f-date','f-time'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('f-day-trip').checked = false;
     document.getElementById('f-team-select').value=''; document.getElementById('f-match-select').value='';
     document.getElementById('f-team').value=''; document.getElementById('f-match').value='';
@@ -2852,7 +2718,9 @@ async function submitTrip(keepOpen){
   const date = document.getElementById('f-date').value;
   const time = document.getElementById('f-time').value;
   const venue = document.getElementById('f-venue').value;
-  const cost = parseInt(document.getElementById('f-cost').value) || 0;
+  // 想定予算欄はモーダルから削除したため、編集時は既存の値をそのまま維持し、新規作成時は0にする
+  const existingTripForCost = editingTripId ? trips.find(x=>x.id===editingTripId) : null;
+  const cost = existingTripForCost ? existingTripForCost.cost : 0;
   const isDayTrip = document.getElementById('f-day-trip').checked;
 
   if(!date){
@@ -2931,7 +2799,7 @@ async function submitTrip(keepOpen){
       }
 
       if(keepOpen){
-        ['f-date','f-time','f-venue'].forEach(id=>document.getElementById(id).value=''); setCostValue('');
+        ['f-date','f-time','f-venue'].forEach(id=>document.getElementById(id).value='');
         document.getElementById('f-match-select').value=''; document.getElementById('f-match').value='';
         // 対戦相手が「手入力モード」のまま前の遠征から引き継がれないよう、リスト選択モードに戻す
         document.getElementById('f-match-select').style.display = 'block';
