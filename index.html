@@ -837,6 +837,7 @@ let searchQuery = '';
 let sortMode = 'date'; // 'date'（試合日順） | 'progress'（準備が遅れている順）
 let cardViewMode = Settings.get('cardViewMode', null); // 'detailed'（詳細カード） | 'compact'（コンパクトリスト） | null（未設定＝件数に応じて自動判定）
 let expandedTrips = new Set(); // コンパクト表示時に、手動で展開した遠征のID
+let focusExpandTripId = null; // ジャンプ時だけその場で開く一時的なID（expandedTripsには記録しない＝次の描画で自然に畳まれる）
 let historyCatFilter = 'ALL';
 let activeCat = {}; // { tripId: 現在開いているカテゴリキー } 1遠征につき1カテゴリのみ開く（タブ切り替え式）
 let packingListOpen = new Set(); // 持ち物リストを手動で開いた遠征のID（render()で毎回<details>が作り直されても、開閉状態を維持するため）
@@ -1557,9 +1558,10 @@ function renderAlerts(){
 function focusTrip(tripId, key){
   if(key){
     activeCat[tripId] = key;
-    expandedTrips.add(tripId); // コンパクト表示で折りたたまれていても、強制的に展開して中身を見せる
   }
+  focusExpandTripId = tripId; // この1回の描画だけ強制的に展開する
   render();
+  focusExpandTripId = null; // 描画済みのHTMLはそのまま残るが、次回以降の描画では記録に残らないため自然に畳まれる
   setTimeout(()=>{
     const el = document.getElementById('trip-'+tripId);
     if(el){
@@ -1926,7 +1928,7 @@ function renderTicketCard(t, isPast){
   const urgencyClass = isPast ? '' : (pct===100 ? 'ticket-ready' : (pct<50 ? 'ticket-urgent' : ''));
 
   const isCompact = cardViewMode === 'compact';
-  const isExpanded = expandedTrips.has(t.id);
+  const isExpanded = expandedTrips.has(t.id) || focusExpandTripId === t.id;
   const showSlim = isCompact && !isExpanded;
   const showFull = !isCompact || isExpanded;
 
@@ -2981,7 +2983,6 @@ async function submitTrip(keepOpen){
       if(isNewVenue && !isDayTrip){
         setTimeout(()=>{
           activeCat[newId] = 'transport_outbound';
-          expandedTrips.add(newId); // コンパクト表示中でも展開して見せる
           render();
           setTimeout(initCategoryBannerRotators, 50);
           focusTrip(newId);
