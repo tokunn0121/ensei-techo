@@ -146,6 +146,8 @@
   .filters::-webkit-scrollbar{ display:none; }
   .chip{ font-family: var(--font-num); font-weight:600; font-size:12.5px; color:var(--text-dim); background: var(--surface); border:1px solid var(--line); padding:9px 16px; border-radius:999px; cursor:pointer; user-select:none; transition:.15s; flex-shrink:0; min-height:38px; display:flex; align-items:center; }
   .chip.active, .chip:hover{ color:#fff; border-color:var(--rose); background:var(--rose); }
+  .chip-sub{ font-size:11.5px; padding:7px 13px; min-height:32px; opacity:0.9; }
+  .chip-sub.active, .chip-sub:hover{ background:var(--sky,#93B5C6); border-color:var(--sky,#93B5C6); }
 
   /* 並び替え＋表示密度：役割が違うことが一目でわかるよう、チップとは異なる見た目にする */
   .control-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 5vw 6px; flex-wrap:wrap; }
@@ -230,6 +232,11 @@
   .packing-preset-chip{ background:var(--surface-2); border:1.5px dashed var(--line); border-radius:999px; padding:5px 10px; font-size:11px; color:var(--text-dim); cursor:pointer; }
   .packing-template-btn{ display:block; width:100%; margin-top:10px; padding:9px; border-radius:8px; border:1.5px solid var(--sage); background:var(--sage-wash); color:#3d6b4a; font-size:11.5px; font-weight:700; cursor:pointer; }
   .journal-label{ font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px; }
+  .result-segment{ display:flex; gap:6px; }
+  .result-btn{ flex:1; padding:9px 4px; border-radius:10px; border:1.5px solid var(--line); background:#fff; font-size:11.5px; font-weight:700; color:var(--text-dim); cursor:pointer; }
+  .result-btn.result-win.active{ background:var(--sage); border-color:var(--sage); color:#fff; }
+  .result-btn.result-loss.active{ background:var(--rose); border-color:var(--rose); color:#fff; }
+  .result-btn.result-draw.active{ background:var(--text-faint); border-color:var(--text-faint); color:#fff; }
   .journal-textarea{ width:100%; min-height:56px; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:16px; font-family:var(--font-body); background:#fff; resize:vertical; }
   /* 訪問スタンプ */
   .memo-nudge{ background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:12.5px; color:#8a6d1f; font-weight:700; cursor:pointer; line-height:1.6; }
@@ -241,6 +248,10 @@
   .stamp-completion-fill{ height:100%; background:var(--rose); border-radius:4px; }
   .stamp-completion-num{ font-family:var(--font-num); font-size:12px; font-weight:700; color:var(--rose-deep); }
   .stamp-summary{ font-size:12.5px; color:var(--text-dim); margin-bottom:12px; }
+  .stamp-results{ background:var(--surface-2); border-radius:10px; padding:10px 12px; margin-bottom:12px; }
+  .stamp-result-row{ display:flex; align-items:center; justify-content:space-between; padding:4px 0; font-size:12.5px; }
+  .stamp-result-team{ font-weight:700; }
+  .stamp-result-score{ font-family:var(--font-num); color:var(--rose-deep); font-weight:700; }
   .stamp-summary b{ color:var(--text); font-family:var(--font-num); }
   .stamp-venue-list{ display:flex; flex-direction:column; gap:8px; }
   .stamp-venue-row{ background:var(--surface-2); border-radius:10px; padding:10px 12px; }
@@ -285,6 +296,7 @@
 
   .progress-row{ display:flex; align-items:center; gap:10px; }
   .bulk-done-btn{ display:block; width:100%; margin-top:10px; padding:9px; border-radius:8px; border:1.5px dashed var(--sage); background:var(--sage-wash); color:#3d6b4a; font-size:11.5px; font-weight:700; cursor:pointer; }
+  .usual-pattern-btn{ display:block; width:100%; margin-top:10px; padding:10px; border-radius:8px; border:1.5px solid var(--rose); background:var(--rose-wash); color:var(--rose-deep); font-size:12px; font-weight:700; cursor:pointer; }
   /* 旅のしおり（タイムライン） */
   .itin-header{ margin-bottom:16px; }
   .itin-team{ font-family:var(--font-display); font-weight:900; font-size:16px; margin-bottom:8px; }
@@ -388,6 +400,11 @@
   .spending-row:last-child{ border-bottom:none; }
   .spending-row b{ font-family:var(--font-num); color:var(--text); }
   .spending-total{ text-align:center; font-size:13.5px; margin-top:4px; color:var(--text-dim); }
+  .spending-cat-row{ display:flex; align-items:center; gap:10px; padding:8px 0; }
+  .spending-cat-label{ font-size:12px; font-weight:700; width:80px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .spending-cat-bar-wrap{ flex:1; height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden; }
+  .spending-cat-bar{ height:100%; background:var(--rose); border-radius:999px; }
+  .spending-cat-amount{ font-family:var(--font-num); font-size:12px; color:var(--text-dim); width:70px; text-align:right; flex-shrink:0; }
   /* テーマカラー選択 */
   .theme-color-presets{ display:flex; flex-wrap:wrap; gap:10px; }
   .theme-color-swatch{ width:40px; height:40px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; flex-shrink:0; }
@@ -528,6 +545,12 @@
 <div id="settings-popup" style="display:none; position:fixed; z-index:201; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--surface); border-radius:20px; padding:22px 20px 18px; box-shadow:0 8px 40px rgba(0,0,0,0.18); width:min(400px, 90vw); max-height:80vh; overflow-y:auto;">
   <div style="font-family:var(--font-display); font-weight:900; font-size:16px; margin-bottom:14px;">⚙️ 設定・カレンダー連携</div>
   <div id="settings-popup-body"></div>
+  <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--line);">
+    <div style="font-size:10px; color:var(--text-faint); text-align:center; margin-bottom:6px;">広告【PR】</div>
+    <!-- MAF Rakuten Widget FROM HERE -->
+    <script type="text/javascript">MafRakutenWidgetParam=function() { return{ size:'468x160',design:'slide',recommend:'on',auto_mode:'on',a_id:'5713296', border:'off'};};</script><script type="text/javascript" src="https://dn.msmstatic.com/site/rakuten/widget.js"></script>
+    <!-- MAF Rakuten Widget TO HERE -->
+  </div>
   <button onclick="closeSettingsPanel()" style="width:100%; margin-top:14px; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:none; font-family:var(--font-display); font-weight:700; font-size:14px; cursor:pointer; color:var(--text-dim);">閉じる</button>
 </div>
 
@@ -547,14 +570,20 @@
 
 <div id="landing-screen" style="display:none; padding:60px 5vw; max-width:520px; margin:0 auto; text-align:center;">
   <h2 style="font-family:var(--font-display); font-size:22px; margin-bottom:10px;">遠征手帳へようこそ</h2>
-  <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:22px; line-height:1.7;">ログイン不要。ボタンひとつで手帳を作成し、発行されたリンクを家族に共有するだけで、みんなで遠征の予約状況を管理できます。</p>
+  <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:22px; line-height:1.7;">ログイン不要。リンクを家族に共有するだけで、みんなで遠征を管理できます。</p>
   <button class="add-btn" id="landing-create-btn" onclick="createNewNotebook()">新しい遠征手帳を作る</button>
 </div>
 
 <div id="error-screen" style="display:none; padding:60px 5vw; max-width:520px; margin:0 auto; text-align:center;">
   <h2 style="font-family:var(--font-display); font-size:20px; margin-bottom:10px; color:var(--rose-deep);">手帳が見つかりませんでした</h2>
-  <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:22px;">リンクが正しいかご確認ください。リンクが壊れている場合は、新しく手帳を作成できます。</p>
+  <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:22px;">リンクをご確認ください。または新しく手帳を作成できます。</p>
   <button class="add-btn" onclick="createNewNotebook()">新しい遠征手帳を作る</button>
+</div>
+
+<div id="network-error-screen" style="display:none; padding:60px 5vw; max-width:520px; margin:0 auto; text-align:center;">
+  <h2 style="font-family:var(--font-display); font-size:20px; margin-bottom:10px; color:var(--rose-deep);">読み込みに失敗しました</h2>
+  <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:22px;">通信環境が不安定な可能性があります。データは消えていません。もう一度お試しください。</p>
+  <button class="add-btn" onclick="initApp()">もう一度読み込む</button>
 </div>
 
 <div id="app-main" style="display:none;">
@@ -578,6 +607,7 @@
     <button type="button" id="search-clear-btn" class="search-clear" onclick="clearSearchQuery()" style="display:none;">✕</button>
   </div>
   <div class="filters" id="filters"></div>
+  <div class="filters" id="team-filter-row" style="display:none; padding-top:0;"></div>
   <div class="control-row" id="control-row"></div>
   <div class="grid" id="grid"></div>
 </div>
@@ -620,9 +650,9 @@
 <div class="overlay" id="schedule-import-overlay" onclick="if(event.target===this) closeScheduleImport();">
   <div class="modal">
     <div class="modal-title" id="modal-title-si">スケジュールをまとめて入力</div>
-    <div class="modal-sub">公式サイトやLINEメモなどからコピーしたスケジュールテキストを貼り付けると、AIが試合を自動検出して登録します。</div>
+    <div class="modal-sub">スケジュールのテキストを貼り付けると、AIが試合を自動検出します。</div>
     <div style="background:var(--butter-wash,#FFF7E6); border:1px solid var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:11.5px; color:#8a6d1f; line-height:1.7;">
-      ⚠️ この機能はサーバー側の追加設定（Edge Function・AI利用料）が済んでいる場合のみ動作します。未設定の場合は「解析に失敗しました」と表示されます。
+      ⚠️ サーバー側の追加設定が必要な機能です。未設定の場合は「失敗」と表示されます。
     </div>
     <div class="field" style="margin-top:14px;">
       <label>スケジュールテキスト（コピペでOK）</label>
@@ -675,7 +705,6 @@
         <div id="f-league-wrap" style="display:none; margin-bottom:8px;">
           <select id="f-league-select" onchange="handleLeagueSelectChange()" style="font-size:16px;"></select>
         </div>
-        <input type="text" id="f-team-search" placeholder="🔍 チーム名で絞り込み" autocomplete="off" oninput="filterTeamOptions(this.value)" style="font-size:16px; margin-bottom:6px;">
       <select id="f-team-select" onchange="handleTeamSelectChange()" style="font-size:16px; display:block;">
           <option value="">チームを選択してください</option>
         </select>
@@ -803,6 +832,7 @@ Settings.migrateLegacyKeys();
 let notebook = null;      // { id, title, budget_cap, is_editable, share_token }
 let trips = [];
 let sportFilter = 'ALL';
+let teamFilter = 'ALL'; // 選択中の競技の中で、さらにチーム単位で絞り込む（複数チームを応援している場合用）
 let searchQuery = '';
 let sortMode = 'date'; // 'date'（試合日順） | 'progress'（準備が遅れている順）
 let cardViewMode = Settings.get('cardViewMode', null); // 'detailed'（詳細カード） | 'compact'（コンパクトリスト） | null（未設定＝件数に応じて自動判定）
@@ -1059,9 +1089,6 @@ function renderTeamDatalist(){
   const teams = TEAM_DATA[sport] || [];
   const noTeamData = teams.length === 0; // 「その他」競技などチーム候補が無い場合
   const leagues = [...new Set(teams.map(t=>t.league).filter(Boolean))]; // 元の配列順を保つ（B1→B2→B3等）
-  teamSearchQuery = '';
-  const searchInput = document.getElementById('f-team-search');
-  if(searchInput) searchInput.value = '';
 
   const leagueWrap = document.getElementById('f-league-wrap');
   const leagueSel = document.getElementById('f-league-select');
@@ -1086,7 +1113,6 @@ function renderTeamDatalist(){
   if(noTeamData){
     // チーム候補が無い競技は、プルダウンを出さず最初から手入力欄を表示する
     document.getElementById('f-team-select').style.display = 'none';
-    document.getElementById('f-team-search').style.display = 'none';
     document.getElementById('f-team').style.display = 'block';
     document.getElementById('team-manual-toggle').style.display = 'none';
     document.getElementById('f-match-select').style.display = 'none';
@@ -1094,7 +1120,6 @@ function renderTeamDatalist(){
     document.getElementById('match-manual-toggle').style.display = 'none';
   }else{
     document.getElementById('f-team-select').style.display = 'block';
-    document.getElementById('f-team-search').style.display = 'block';
     document.getElementById('f-team').style.display = 'none';
     document.getElementById('team-manual-toggle').style.display = 'inline-block';
     document.getElementById('team-manual-toggle').textContent = '✏️ 手入力に切り替え';
@@ -1121,39 +1146,21 @@ function renderTeamDatalist(){
 }
 
 // リーグ選択(または「その他」等リーグの無い競技)に応じて、チーム/対戦相手のプルダウン中身を作り直す
-let teamSearchQuery = ''; // チーム選択のインクリメンタルサーチ用クエリ
-
 function renderTeamOptionsForLeague(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
   const leagueSel = document.getElementById('f-league-select');
   const currentLeague = (leagueSel && leagueSel.style.display !== 'none' && document.getElementById('f-league-wrap').style.display !== 'none') ? leagueSel.value : null;
-  let filtered;
-  if(teamSearchQuery.trim()){
-    // 検索中はリーグを覚えていなくても見つけられるよう、全リーグを横断して探す
-    const q = teamSearchQuery.trim().toLowerCase();
-    filtered = teams.filter(t=>t.name.toLowerCase().includes(q));
-    // 検索結果がちょうど1件で、かつ現在のリーグと異なる場合は、そのチームのリーグに自動で合わせる
-    if(filtered.length === 1 && leagueSel && filtered[0].league && filtered[0].league !== currentLeague){
-      leagueSel.value = filtered[0].league;
-    }
-  }else{
-    filtered = currentLeague ? teams.filter(t=>t.league===currentLeague) : teams;
-  }
+  const filtered = currentLeague ? teams.filter(t=>t.league===currentLeague) : teams;
 
   const tSel = document.getElementById('f-team-select');
   const prevTeamVal = tSel.value;
-  tSel.innerHTML = (filtered.length ? '<option value="">チームを選択してください</option>' : '<option value="">該当するチームがありません</option>') +
+  tSel.innerHTML = '<option value="">チームを選択してください</option>' +
     filtered.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
   // 同じリーグ内に選択中のチームがまだ存在すれば維持する
   if(filtered.some(t=>t.name===prevTeamVal)) tSel.value = prevTeamVal;
 
   handleTeamSelectChange();
-}
-// チーム名でのインクリメンタルサーチ（入力するたびにチーム選択肢を絞り込む）
-function filterTeamOptions(query){
-  teamSearchQuery = query;
-  renderTeamOptionsForLeague();
 }
 
 function handleLeagueSelectChange(){
@@ -1163,15 +1170,14 @@ function handleLeagueSelectChange(){
 
 function toggleTeamManual(){
   const sel = document.getElementById('f-team-select');
-  const search = document.getElementById('f-team-search');
   const inp = document.getElementById('f-team');
   const btn = document.getElementById('team-manual-toggle');
   const isManual = inp.style.display !== 'none';
   if(isManual){
-    sel.style.display = 'block'; search.style.display = 'block'; inp.style.display = 'none';
+    sel.style.display = 'block'; inp.style.display = 'none';
     btn.textContent = '✏️ 手入力に切り替え';
   }else{
-    sel.style.display = 'none'; search.style.display = 'none'; inp.style.display = 'block';
+    sel.style.display = 'none'; inp.style.display = 'block';
     inp.focus(); btn.textContent = '← リストに戻る';
   }
 }
@@ -1534,7 +1540,7 @@ function renderAlerts(){
   const shown = items.slice(0,6);
   box.innerHTML = `
     <h3>⚠️ 確認が必要な項目（${items.length}件）</h3>
-    <div class="sub">タップするとその遠征カードにジャンプします（試合日まで1ヶ月以内のもののみ表示）</div>
+    <div class="sub">タップでカードへジャンプします（1ヶ月以内のみ表示）</div>
     ${shown.map(it=>{
       const c = catInfo(it.key);
       const d = daysUntil(it.trip.date);
@@ -1599,15 +1605,50 @@ function renderRecent(){
       <div class="l"><span class="cat">${c.icon} ${c.label}</span>${e.trip.match}（${fmtDate(e.trip.date).md}）— ${e.method||'方法未記入'}</div>
       <div class="r">${fmtShort(e.bookedDate)}</div>
     </div>`;
-  }).join('') : `<div class="empty">まだ予約記録がありません。カードのカテゴリをタップして予約先と予約日を記録しましょう。</div>`;
+  }).join('') : `<div class="empty">まだ予約記録がありません。カードから予約先・予約日を記録できます。</div>`;
   document.getElementById('recent').innerHTML = `<h3>最近予約したもの<button class="share-all-btn" onclick="shareAll()">📤 まとめて共有</button></h3>${html}`;
 }
 
+// 登録実績から最もよく使われている競技を返す（新規モーダルのデフォルト選択に使う）。登録が無ければnull
+function getMostUsedSport(){
+  if(!trips.length) return null;
+  const counts = {};
+  trips.forEach(t => { counts[t.sport] = (counts[t.sport]||0) + 1; });
+  return Object.entries(counts).sort((a,b) => b[1]-a[1])[0][0];
+}
+
 function renderFilters(){
-  const sports = ['ALL', ...new Set(trips.map(t=>t.sport))];
+  // 特定の競技を決め打ちで優先せず、実際に登録件数が多い競技を先頭に並べる（応援している競技が自然と前に来る）
+  const sportCounts = {};
+  trips.forEach(t => { sportCounts[t.sport] = (sportCounts[t.sport]||0) + 1; });
+  const sportsByUsage = Object.keys(sportCounts).sort((a,b) => sportCounts[b]-sportCounts[a]);
+  const sports = ['ALL', ...sportsByUsage];
   document.getElementById('filters').innerHTML = sports.map(s=>
     `<div class="chip ${sportFilter===s?'active':''}" onclick="setFilter('${s}')">${s==='ALL'?'すべて':s}</div>`
   ).join('');
+
+  // 選んでいる競技の中に複数チームがある場合だけ、チーム別の絞り込みも出す（複数チームを応援している方向け）
+  const teamFilterRow = document.getElementById('team-filter-row');
+  if(teamFilterRow){
+    if(sportFilter !== 'ALL'){
+      const teamCounts = {};
+      trips.filter(t=>t.sport===sportFilter).forEach(t=>{ teamCounts[t.team] = (teamCounts[t.team]||0) + 1; });
+      const teamsByUsage = Object.keys(teamCounts).sort((a,b)=>teamCounts[b]-teamCounts[a]);
+      if(teamsByUsage.length > 1){
+        teamFilterRow.style.display = 'flex';
+        teamFilterRow.innerHTML = ['ALL', ...teamsByUsage].map(tm=>
+          `<div class="chip chip-sub ${teamFilter===tm?'active':''}" onclick="setTeamFilter('${tm.replace(/'/g,"\\'")}')">${tm==='ALL'?'すべてのチーム':tm}</div>`
+        ).join('');
+      }else{
+        teamFilterRow.style.display = 'none';
+        teamFilterRow.innerHTML = '';
+      }
+    }else{
+      teamFilterRow.style.display = 'none';
+      teamFilterRow.innerHTML = '';
+    }
+  }
+
   const controlRow = document.getElementById('control-row');
   if(controlRow){
     controlRow.innerHTML = `
@@ -1625,7 +1666,8 @@ function renderFilters(){
     `;
   }
 }
-function setFilter(s){ sportFilter = s; render(); }
+function setFilter(s){ sportFilter = s; teamFilter = 'ALL'; render(); }
+function setTeamFilter(tm){ teamFilter = tm; render(); }
 function setSearchQuery(v){
   searchQuery = v;
   const clearBtn = document.getElementById('search-clear-btn');
@@ -1677,6 +1719,42 @@ function getLastUsedValue(sport, team, categoryKey, field){
   return null;
 }
 
+// 同じチームの直近の遠征から、交通(往路・復路)・宿泊の「いつもの設定」をまとめて取得する
+// （1項目ずつの「前回と同じ」チップとは違い、複数カテゴリを横断してまとめて一括適用するために使う）
+function getUsualTripPattern(sport, team, excludeTripId){
+  const candidates = trips
+    .filter(t => t.sport===sport && t.team===team && t.id !== excludeTripId)
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  if(!candidates.length) return null;
+  const pattern = {};
+  ['transport_outbound','transport_return','hotel'].forEach(key=>{
+    for(const t of candidates){
+      const d = t.detail[key];
+      if(d && d.method && !d.notNeeded){
+        pattern[key] = { method: d.method, cost: d.cost||0 };
+        break;
+      }
+    }
+  });
+  return Object.keys(pattern).length ? pattern : null;
+}
+// 「いつもの設定」をワンタップでまとめて反映する（未入力のカテゴリだけを対象にし、既に入力済みのものは上書きしない）
+async function applyUsualPattern(tripId){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const pattern = getUsualTripPattern(t.sport, t.team, tripId);
+  if(!pattern) return;
+  const targets = Object.entries(pattern).filter(([key]) => !t.detail[key]?.method);
+  if(!targets.length) return;
+  const labelOf = key => CATS.find(c=>c.key===key).label;
+  if(!confirm(`前回までの「${t.team}」の遠征をもとに、${targets.map(([key])=>labelOf(key)).join('・')}をまとめて入力します。よろしいですか？`)) return;
+  for(const [key, val] of targets){
+    await saveBookingDetail(tripId, key, { method: val.method, cost: val.cost, is_booked: false }, true);
+  }
+  showToast('✓ いつもの設定を一括反映しました', 2000);
+}
+
 function memoPlaceholder(key){
   const map = {
     ticket: '座席番号など',
@@ -1713,7 +1791,7 @@ function renderPackingListSection(t){
         <div class="packing-presets">
           ${presetsToShow.map(p=>`<button type="button" class="packing-preset-chip" onclick="addPackingItem('${t.id}','${p.replace(/'/g,"\\'")}')">＋ ${p}</button>`).join('')}
         </div>` : ''}
-        ${list.length ? `<button type="button" class="packing-template-btn" onclick="saveAsPackingTemplate('${t.id}')">📋 これをテンプレートとして保存（次回以降の遠征に自動反映）</button>` : ''}
+        ${list.length ? `<button type="button" class="packing-template-btn" onclick="saveAsPackingTemplate('${t.id}')">📋 テンプレートとして保存</button>` : ''}
         ` : (list.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">持ち物リストはまだありません</div>` : '')}
       </div>
     </details>`;
@@ -1760,7 +1838,7 @@ function catPanelContent(t, c){
         <div class="field"><label>着駅</label><input value="${(d.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
       </div>
       <div class="legs-box">
-        <div class="legs-label">乗り継ぎがある場合の内訳（新幹線＋特急など。それぞれ別に予約できます）</div>
+        <div class="legs-label">乗り継ぎの内訳（新幹線＋特急など、別々に予約可能）</div>
         ${(d.legs||[]).map((leg,i)=>{
           const legBooked = !!(leg.bookedDate);
           return `
@@ -1906,6 +1984,14 @@ function renderTicketCard(t, isPast){
           <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
           <div class="progress-label">${pct}% 準備完了</div>
         </div>
+        ${(() => {
+          if(!IS_EDITABLE || isPast) return '';
+          const pattern = getUsualTripPattern(t.sport, t.team, t.id);
+          if(!pattern) return '';
+          const hasTarget = Object.keys(pattern).some(key => !t.detail[key]?.method);
+          if(!hasTarget) return '';
+          return `<button type="button" class="usual-pattern-btn" onclick="applyUsualPattern('${t.id}')">⚡ いつもの交通・宿泊で一括入力</button>`;
+        })()}
         ${(IS_EDITABLE && !isPast && BOOKABLE_CATS.some(k=>!t.status[k] && !t.detail[k]?.notNeeded)) ? `<button type="button" class="bulk-done-btn" onclick="bulkMarkDone('${t.id}')">✓ 未予約をすべて「予約済み」にする</button>` : ''}
         <div class="cost-row">
           <span class="label">${BOOKABLE_CATS.some(k=>t.detail[k]?.cost) ? '実績金額' : '想定予算'}</span>
@@ -1942,10 +2028,16 @@ function renderTicketCard(t, isPast){
         ${renderPackingListSection(t)}
         ${isPast ? `
         <div class="journal-box">
-          <div class="journal-label">📝 この遠征の思い出</div>
+          <div class="journal-label">🏆 観戦記録</div>
+          <div class="result-segment">
+            <button type="button" class="result-btn result-win ${t.result==='win'?'active':''}" ${IS_EDITABLE?`onclick="setTripResult('${t.id}','win')"`:'disabled'}>🏆 勝ち</button>
+            <button type="button" class="result-btn result-loss ${t.result==='loss'?'active':''}" ${IS_EDITABLE?`onclick="setTripResult('${t.id}','loss')"`:'disabled'}>💧 負け</button>
+            <button type="button" class="result-btn result-draw ${t.result==='draw'?'active':''}" ${IS_EDITABLE?`onclick="setTripResult('${t.id}','draw')"`:'disabled'}>➖ 引き分け</button>
+          </div>
+          <div class="journal-label" style="margin-top:12px;">📝 この遠征の思い出</div>
           <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)"`:'disabled'}>${(t.journalMemo||'').replace(/</g,'&lt;')}</textarea>
         </div>` : ''}
-        <button class="card-share-btn" onclick="openItinerary('${t.id}')" style="margin-bottom:8px;">📋 旅のしおりを見る（タイムライン）</button>
+        <button class="card-share-btn" onclick="openItinerary('${t.id}')" style="margin-bottom:8px;">📋 旅のしおりを見る</button>
         <button class="card-share-btn" onclick="shareTrip('${t.id}')">📤 家族に共有する</button>
       </div>` : '';
 
@@ -1957,6 +2049,7 @@ function renderGrid(){
   const q = searchQuery.trim().toLowerCase();
   const filtered = trips.filter(t =>
     (sportFilter==='ALL' || t.sport===sportFilter) &&
+    (teamFilter==='ALL' || t.team===teamFilter) &&
     (!q || t.team.toLowerCase().includes(q) || (t.match||'').toLowerCase().includes(q) || (t.venue||'').toLowerCase().includes(q)
       || (t.journalMemo||'').toLowerCase().includes(q))
   );
@@ -2044,6 +2137,23 @@ async function setBudgetCap(val){
   }catch(e){
     console.error(e);
     showToast('予算の保存に失敗しました。通信環境をご確認ください');
+  }
+}
+
+// 観戦記録（勝敗）を記録する。同じボタンをもう一度押すと記録を取り消す
+async function setTripResult(tripId, result){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const newResult = (t.result === result) ? null : result;
+  t.result = newResult;
+  render();
+  try{
+    const { error } = await sb.rpc('set_trip_result', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_result: newResult });
+    if(error) throw error;
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認ください');
   }
 }
 
@@ -2231,7 +2341,7 @@ function renderLinkAction(value, label){
     const url = /^https?:\/\//i.test(v) ? v : `https://${v}`;
     return `<a href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="link-open-btn">🔗 ${label}を開く</a>`;
   }
-  return `<button type="button" onclick="event.stopPropagation(); copyVenueName('${v.replace(/'/g,"\\'")}')" class="link-open-btn" style="border:none; width:100%; cursor:pointer;">📋 予約番号をコピー（${v}）</button>`;
+  return `<button type="button" onclick="event.stopPropagation(); copyTextToClipboard('${v.replace(/'/g,"\\'")}', '✓ 予約番号をコピーしました')" class="link-open-btn" style="border:none; width:100%; cursor:pointer;">📋 予約番号をコピー（${v}）</button>`;
 }
 
 function updateLinkField(tripId, key, val){
@@ -2339,7 +2449,7 @@ function duplicateTrip(tripId){
 }
 
 /* ---------- 支出サマリー（予算上限に代わる、月別・期間別の実績表示。プレッシャーを与えない中立的な集計のみ） ---------- */
-let spendingRangeMode = 'monthly'; // 'monthly'（月別一覧） | 'custom'（期間指定）
+let spendingRangeMode = 'monthly'; // 'monthly'（月別一覧） | 'custom'（期間指定） | 'category'（カテゴリ別）
 let spendingRangeStart = '';
 let spendingRangeEnd = '';
 
@@ -2359,6 +2469,7 @@ function renderSpendingSummary(){
     <div class="spending-tabs">
       <div class="spending-tab ${spendingRangeMode==='monthly'?'active':''}" onclick="setSpendingMode('monthly')">月別</div>
       <div class="spending-tab ${spendingRangeMode==='custom'?'active':''}" onclick="setSpendingMode('custom')">期間を指定</div>
+      <div class="spending-tab ${spendingRangeMode==='category'?'active':''}" onclick="setSpendingMode('category')">カテゴリ別</div>
     </div>`;
 
   if(spendingRangeMode === 'custom'){
@@ -2372,6 +2483,32 @@ function renderSpendingSummary(){
           <div class="field"><label>終了日</label><input type="date" value="${spendingRangeEnd}" onchange="setSpendingRange('end',this.value)"></div>
         </div>
         <div class="spending-total">この期間の合計：<b>¥${total.toLocaleString()}</b></div>
+      </div>`;
+    return;
+  }
+
+  if(spendingRangeMode === 'category'){
+    // カテゴリ別の内訳（実際に入力された金額のみを集計。想定予算のみの遠征は「その他」扱いにせず除外する）
+    const byCategory = {};
+    CATS.forEach(c=>{ byCategory[c.key] = 0; });
+    trips.forEach(t=>{
+      CATS.forEach(c=>{
+        byCategory[c.key] += (t.detail[c.key]?.cost || 0);
+      });
+    });
+    const grandTotal = Object.values(byCategory).reduce((a,b)=>a+b, 0);
+    wrap.innerHTML = tabsHtml + `
+      <div class="spending-box">
+        ${grandTotal ? CATS.filter(c=>byCategory[c.key] > 0).sort((a,b)=>byCategory[b.key]-byCategory[a.key]).map(c=>{
+          const pct = Math.round(byCategory[c.key] / grandTotal * 100);
+          return `
+          <div class="spending-cat-row">
+            <div class="spending-cat-label">${c.icon} ${c.label}</div>
+            <div class="spending-cat-bar-wrap"><div class="spending-cat-bar" style="width:${pct}%"></div></div>
+            <div class="spending-cat-amount">¥${byCategory[c.key].toLocaleString()}</div>
+          </div>`;
+        }).join('') : `<div style="font-size:12.5px; color:var(--text-faint); text-align:center; padding:8px 0;">まだ金額が入力されたカテゴリがありません</div>`}
+        ${grandTotal ? `<div class="spending-total">全期間の合計（実績）：<b>¥${grandTotal.toLocaleString()}</b></div>` : ''}
       </div>`;
     return;
   }
@@ -2415,7 +2552,7 @@ function renderHistory(){
   if(historyCatFilter!=='ALL') entries = entries.filter(e=>e.key===historyCatFilter);
   const list = document.getElementById('history-list');
   if(!entries.length){
-    list.innerHTML = `<div class="history-empty">予約履歴がまだありません。遠征カードのカテゴリから予約先と予約日を記録すると、ここに新しい順で並びます。</div>`;
+    list.innerHTML = `<div class="history-empty">予約履歴がまだありません。記録すると新しい順で並びます。</div>`;
     return;
   }
   const catInfo = k => CATS.find(c=>c.key===k);
@@ -2423,7 +2560,7 @@ function renderHistory(){
     const c = catInfo(e.key);
     const g = fmtDate(e.trip.date);
     return `
-    <div class="hrow">
+    <div class="hrow" onclick="switchTab('cards'); focusTrip('${e.trip.id}','${e.key}');" style="cursor:pointer;">
       <div class="hcat">${c.icon}</div>
       <div class="hmain">
         <div class="m1">${e.trip.match}<span style="color:var(--text-dim); font-weight:400;"> ／ ${c.label}</span></div>
@@ -2441,6 +2578,9 @@ function renderHistory(){
 function renderStamps(){
   const wrap = document.getElementById('stamps-wrap');
   const pastTrips = trips.filter(t => tripEndDate(t) < TODAY && t.venue && t.venue.trim());
+  // 観戦記録（勝敗）は、会場の記入有無に関わらず全ての過去の遠征を対象にする
+  // （会場を入れ忘れていても、勝敗を記録した意味がきちんと反映されるように）
+  const allPastTrips = trips.filter(t => tripEndDate(t) < TODAY);
 
   if(!pastTrips.length){
     wrap.innerHTML = `<div class="empty-state">
@@ -2460,7 +2600,10 @@ function renderStamps(){
   // B.LEAGUE PREMIER（バスケ最上位）のみ全会場データが揃っているため、制覇率バッジの対象にする
   const b1Arenas = [...new Set((TEAM_DATA['バスケットボール']||[]).filter(x=>x.league==='B.LEAGUE PREMIER' && x.arena).map(x=>x.arena))];
 
-  const sections = Object.entries(bySport).map(([sport, sportTrips])=>{
+  // 特定の競技を決め打ちで優先せず、訪問件数が多い競技セクションを先頭に並べる
+  const sportsOrderedByCount = Object.keys(bySport).sort((a,b) => bySport[b].length - bySport[a].length);
+  const sections = sportsOrderedByCount.map((sport)=>{
+    const sportTrips = bySport[sport];
     const venueCounts = {};
     sportTrips.forEach(t=>{
       const v = t.venue.trim();
@@ -2481,11 +2624,26 @@ function renderStamps(){
         </div>`;
     }
 
+    // チーム別の観戦成績（記録が1件でもあるチームだけ表示。会場が未入力でも対象にする）
+    const byTeamResult = {};
+    allPastTrips.filter(t=>t.sport===sport).forEach(t=>{
+      if(!t.result) return;
+      if(!byTeamResult[t.team]) byTeamResult[t.team] = { win:0, loss:0, draw:0 };
+      byTeamResult[t.team][t.result]++;
+    });
+    const resultBlock = Object.keys(byTeamResult).length ? `
+      <div class="stamp-results">
+        ${Object.entries(byTeamResult).map(([team, r])=>
+          `<div class="stamp-result-row"><span class="stamp-result-team">${team}</span><span class="stamp-result-score">${r.win}勝${r.loss}敗${r.draw?r.draw+'分':''}</span></div>`
+        ).join('')}
+      </div>` : '';
+
     return `
       <div class="stamp-sport-section">
         <div class="stamp-sport-title">${sportIcon(sport)} ${sport}</div>
         ${completionBadge}
         <div class="stamp-summary">通算 <b>${totalVisits}</b>回遠征 ・ <b>${venues.length}</b>会場を訪問</div>
+        ${resultBlock}
         <div class="stamp-venue-list">
           ${venues.map(([venue,count])=>{
             const trip = sportTrips.find(t=>t.venue.trim()===venue && t.journalMemo);
@@ -2695,7 +2853,7 @@ function openModal(tripId){
     document.getElementById('f-team').value=''; document.getElementById('f-match').value='';
     document.getElementById('f-team').style.display='none'; document.getElementById('f-team-select').style.display='block';
     document.getElementById('f-match').style.display='none'; document.getElementById('f-match-select').style.display='block';
-    document.getElementById('f-sport').value = 'バスケットボール';
+    document.getElementById('f-sport').value = getMostUsedSport() || 'バスケットボール';
     document.getElementById('f-sport-custom-wrap').style.display = 'none';
     renderTeamDatalist();
   }
@@ -2910,6 +3068,64 @@ function buildTripShareText(t){
   lines.push('', '― 遠征手帳より');
   return lines.join('\n');
 }
+// 全遠征の内容をテキストファイルとしてダウンロードする（手元に残せる個人用バックアップ）
+// 全遠征を表計算ソフトで開けるCSV形式でダウンロードする
+function exportAllDataCSV(){
+  if(!trips.length){
+    showToast('まだ遠征が登録されていません');
+    return;
+  }
+  const sorted = [...trips].sort((a,b)=> new Date(a.date) - new Date(b.date));
+  const header = ['日付','曜日','競技','応援チーム','対戦相手','会場','進捗(%)','実績/想定金額(円)','状態'];
+  const rows = sorted.map(t=>{
+    const {md, dow} = fmtDate(t.date);
+    const isPast = tripEndDate(t) < TODAY;
+    const csvEscape = (v) => `"${String(v||'').replace(/"/g,'""')}"`;
+    return [t.date, dow+'曜', t.sport, t.team, t.match, t.venue, completion(t), tripSpend(t), isPast?'終了':'今後'].map(csvEscape).join(',');
+  });
+  const csv = '\uFEFF' + [header.map(h=>`"${h}"`).join(','), ...rows].join('\n'); // BOM付きでExcelでも文字化けしないように
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `遠征手帳_${TODAY}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✓ CSVファイルを保存しました', 1800);
+}
+
+function exportAllData(){
+  if(!trips.length){
+    showToast('まだ遠征が登録されていません');
+    return;
+  }
+  const sorted = [...trips].sort((a,b)=> new Date(a.date) - new Date(b.date));
+  const lines = [
+    `${notebook?.title || '遠征手帳'}　全データ`,
+    `書き出し日：${fmtDate(TODAY).md}（${fmtDate(TODAY).dow}）`,
+    `遠征件数：${sorted.length}件`,
+    '='.repeat(30), ''
+  ];
+  sorted.forEach((t, i)=>{
+    lines.push(`【${i+1}件目】`);
+    lines.push(buildTripShareText(t));
+    lines.push('', '-'.repeat(30), '');
+  });
+  const text = lines.join('\n');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `遠征手帳_${TODAY}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✓ ファイルを保存しました', 1800);
+}
+
 async function shareTextOrCopy(text, title){
   if(navigator.share){
     try{ await navigator.share({ title, text }); return; }catch(e){ /* user cancelled or unsupported, fall through to copy */ }
@@ -2921,14 +3137,18 @@ async function shareTextOrCopy(text, title){
     showToast('共有用テキストの作成に失敗しました');
   }
 }
-// 会場名をコピーする（タクシーアプリ・カーナビ等への貼り付け用）
-async function copyVenueName(venue){
+// クリップボードへのコピーを行う汎用関数（トーストの文言を呼び出し元で指定できる）
+async function copyTextToClipboard(text, toastMsg){
   try{
-    await navigator.clipboard.writeText(venue);
-    showToast('✓ 会場名をコピーしました', 1500);
+    await navigator.clipboard.writeText(text);
+    showToast(toastMsg || '✓ コピーしました', 1500);
   }catch(e){
     showToast('コピーに失敗しました');
   }
+}
+// 会場名をコピーする（タクシーアプリ・カーナビ等への貼り付け用）
+async function copyVenueName(venue){
+  copyTextToClipboard(venue, '✓ 会場名をコピーしました');
 }
 
 /* ---------- 持ち物リスト ---------- */
@@ -2988,9 +3208,11 @@ function addPackingItem(tripId, text){
 function addPackingItemFromInput(tripId){
   const input = document.getElementById(`packing-input-${tripId}`);
   if(!input) return;
-  addPackingItem(tripId, input.value);
-  input.value = '';
-  input.focus();
+  const text = input.value;
+  addPackingItem(tripId, text); // この中でrender()が走り、入力欄のDOM要素自体が作り直される
+  // render()後は古いinput参照がDOMから外れているため、改めて取得し直す必要がある
+  const freshInput = document.getElementById(`packing-input-${tripId}`);
+  if(freshInput){ freshInput.value = ''; freshInput.focus(); }
 }
 function togglePackingItem(tripId, idx){
   if(!IS_EDITABLE) return;
@@ -3385,6 +3607,7 @@ function normalizeTrip(raw){
     cost: raw.estimated_cost || 0,
     journalMemo: raw.journal_memo || '',
     packingList: Array.isArray(raw.packing_list) ? raw.packing_list : [],
+    result: raw.result || null, // 'win' | 'loss' | 'draw' | null(未記録)
     status, detail
   };
 }
@@ -3438,8 +3661,16 @@ function openSettingsPanel(){
     ${IS_EDITABLE ? `
     <div style="margin-bottom:18px; background:var(--rose-wash); border:1.5px solid var(--rose); border-radius:12px; padding:14px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--rose-deep); margin-bottom:6px;">🔒 リンクのバックアップ、できていますか？</div>
-      <div style="font-size:11.5px; color:var(--text); line-height:1.7;">このリンクは他の人には分からない、あなただけの合言葉のようなものです。誤って消してしまうと、運営側でも復元する手立てがありません。家族の誰か1人にも共有しておく、または🔗共有ボタンからQRコードを保存しておくことをおすすめします。</div>
+      <div style="font-size:11.5px; color:var(--text); line-height:1.7;">このリンクはあなただけの合言葉です。消えると復元できません。家族にも共有するか、QRコードを保存しておきましょう。</div>
     </div>` : ''}
+    <div style="margin-bottom:18px;">
+      <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📤 データのバックアップ</div>
+      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">登録した遠征の内容をテキストファイルとして保存できます。手元の記録用にどうぞ。</div>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="add-btn" style="flex:1; padding:11px; font-size:12px;" onclick="exportAllData()">📤 テキストで保存</button>
+        <button type="button" class="add-btn" style="flex:1; padding:11px; font-size:12px;" onclick="exportAllDataCSV()">📊 CSVで保存</button>
+      </div>
+    </div>
     ${IS_EDITABLE ? `
     <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎨 テーマカラー</div>
@@ -3453,7 +3684,7 @@ function openSettingsPanel(){
     </div>` : ''}
     <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎒 持ち物テンプレート</div>
-      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">新しい遠征を登録すると、ここに登録されている持ち物が自動でコピーされます。各遠征の持ち物リストにある「これをテンプレートとして保存」で更新できます。</div>
+      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">新しい遠征に自動でコピーされます。持ち物リストの「テンプレートとして保存」で更新できます。</div>
       ${packingTemplate.length ? `
       <div class="theme-color-presets" style="gap:6px;">
         ${packingTemplate.map((item,idx)=>`<span class="packing-preset-chip" style="cursor:default;">${item}${IS_EDITABLE?` <button type="button" onclick="removeFromPackingTemplate(${idx})" style="border:none; background:none; color:var(--text-faint); cursor:pointer; padding:0 0 0 4px; font-size:11px;">×</button>`:''}</span>`).join('')}
@@ -3461,7 +3692,7 @@ function openSettingsPanel(){
     </div>
     <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📅 外部カレンダーに登録</div>
-      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">登録した試合日を、GoogleカレンダーやiPhoneの標準カレンダーに自動反映できます。下のリンクを「URLで購読」に登録すると、以後この手帳に試合を追加するたびに自動で反映されます。</div>
+      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">試合日をGoogleカレンダーやiPhoneに自動反映できます。下のリンクを「URLで購読」に登録してください。</div>
       <div class="sb-link" style="display:flex; gap:8px; align-items:center; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:6px 6px 6px 12px;">
         <input id="ics-url-input" value="${icsUrl}" readonly onclick="this.select()" style="flex:1; border:none; background:transparent; font-family:var(--font-num); font-size:16px; color:var(--text-dim); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
         <button class="sb-copy" onclick="copyShareLink(document.getElementById('ics-url-input').value)" style="background:var(--rose); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font-display); white-space:nowrap;">コピー</button>
@@ -3480,7 +3711,7 @@ function openSettingsPanel(){
         <div style="display:flex; align-items:center; justify-content:space-between; background:var(--surface-2); border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:12.5px;">
           <span>${sportIcon(sport)} ${sport}：<b>${team}</b></span>
           <button onclick="clearFavoriteTeamUI('${sport.replace(/'/g,"\\'")}')" style="background:none; border:none; color:var(--text-faint); font-size:11px; cursor:pointer; text-decoration:underline;">忘れる</button>
-        </div>`).join('') : `<div style="font-size:11.5px; color:var(--text-faint);">まだ記憶しているチームはありません。遠征を登録すると、次回から競技ごとに自動選択されます。</div>`}
+        </div>`).join('') : `<div style="font-size:11.5px; color:var(--text-faint);">まだありません。遠征を登録すると自動で記憶されます。</div>`}
     </div>
     <div style="border-top:1px solid var(--line); padding-top:14px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📱 その他</div>
@@ -3652,8 +3883,8 @@ function applyEditableUI(){
 function renderShareBanner(){ /* ポップアップ方式に移行したため空関数 */ }
 
 function showScreen(name){
-  ['loading-screen','landing-screen','error-screen','app-main'].forEach(id=>{
-    document.getElementById(id).style.display = (id===name) ? (name==='app-main' ? 'block' : 'block') : 'none';
+  ['loading-screen','landing-screen','error-screen','network-error-screen','app-main'].forEach(id=>{
+    document.getElementById(id).style.display = (id===name) ? 'block' : 'none';
   });
 }
 
@@ -3798,8 +4029,16 @@ async function initApp(){
         return;
       }catch(e){
         console.error(e);
-        // 保存されていたトークンが無効になっていた場合はクリアしてランディングへ
-        Settings.remove('lastToken');
+        // サーバーが明確に「トークンが無効」と返した場合のみ、保存済みトークンを削除する。
+        // 単なる通信エラーの可能性がある場合は、大切なリンクを誤って消さないよう残しておく
+        const isConfirmedInvalid = e && e.message && e.message.includes('invalid token');
+        if(isConfirmedInvalid){
+          Settings.remove('lastToken');
+          showScreen('landing-screen');
+        }else{
+          showScreen('network-error-screen');
+        }
+        return;
       }
     }
     showScreen('landing-screen');
@@ -3810,7 +4049,8 @@ async function initApp(){
     await startApp();
   }catch(e){
     console.error(e);
-    showScreen('error-screen');
+    const isConfirmedInvalid = e && e.message && e.message.includes('invalid token');
+    showScreen(isConfirmedInvalid ? 'error-screen' : 'network-error-screen');
   }
 }
 initApp();
