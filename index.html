@@ -297,25 +297,6 @@
   .progress-row{ display:flex; align-items:center; gap:10px; }
   .bulk-done-btn{ display:block; width:100%; margin-top:10px; padding:9px; border-radius:8px; border:1.5px dashed var(--sage); background:var(--sage-wash); color:#3d6b4a; font-size:11.5px; font-weight:700; cursor:pointer; }
   .usual-pattern-btn{ display:block; width:100%; margin-top:10px; padding:10px; border-radius:8px; border:1.5px solid var(--rose); background:var(--rose-wash); color:var(--rose-deep); font-size:12px; font-weight:700; cursor:pointer; }
-  /* 旅のしおり（タイムライン） */
-  .itin-header{ margin-bottom:16px; }
-  .itin-team{ font-family:var(--font-display); font-weight:900; font-size:16px; margin-bottom:8px; }
-  .itin-alert{ font-size:12px; font-weight:700; color:#c0392b; background:#FBEEEE; border-radius:8px; padding:8px 12px; }
-  .itin-alert-ok{ color:#3d6b4a; background:var(--sage-wash); }
-  .itin-timeline{ position:relative; padding-left:20px; margin-bottom:20px; }
-  .itin-timeline::before{ content:''; position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:var(--line); }
-  .itin-day{ position:relative; padding-bottom:14px; }
-  .itin-day::before{ content:''; position:absolute; left:-19px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--rose); border:2px solid #fff; box-shadow:0 0 0 1px var(--rose); }
-  .itin-day-head{ font-size:12.5px; font-weight:700; color:var(--text); }
-  .itin-day-match{ font-size:13.5px; font-weight:700; margin-top:2px; }
-  .itin-section-title{ font-size:11.5px; font-weight:700; color:var(--text-faint); margin-bottom:8px; }
-  .itin-list{ display:flex; flex-direction:column; gap:6px; }
-  .itin-item{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; background:var(--surface-2); font-size:12px; }
-  .itin-item-icon{ flex-shrink:0; }
-  .itin-item-label{ font-weight:700; flex-shrink:0; }
-  .itin-item-detail{ flex:1; text-align:right; color:var(--text-dim); }
-  .itin-item.itin-pending .itin-item-detail{ color:#c0392b; }
-  .itin-item.itin-done .itin-item-detail{ color:#3d6b4a; }
   .day-schedule-card{ background:var(--surface-2); border:1.5px solid var(--line); border-radius:12px; padding:12px; margin-bottom:8px; }
   .day-schedule-head{ font-size:12px; font-weight:900; color:var(--rose-deep); margin-bottom:8px; }
   .progress-bar{ flex:1; height:7px; background:var(--surface-2); border-radius:6px; overflow:hidden; }
@@ -634,17 +615,6 @@
 <!-- カレンダー日付ポップアップ -->
 <div id="cal-popup-overlay" onclick="closeCalPopup()" style="display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.25);"></div>
 <div id="cal-popup" style="display:none; position:fixed; z-index:301; background:var(--surface); border-radius:20px; padding:20px; box-shadow:0 8px 40px rgba(0,0,0,0.2); width:min(360px,92vw); max-height:70vh; overflow-y:auto;"></div>
-
-<!-- 旅のしおり（タイムライン）モーダル -->
-<div class="overlay" id="itinerary-overlay" onclick="if(event.target===this) closeItinerary();">
-  <div class="modal">
-    <div class="modal-title">📋 旅のしおり</div>
-    <div id="itinerary-body"></div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeItinerary()">閉じる</button>
-    </div>
-  </div>
-</div>
 
 <!-- スケジュールまとめ入力モーダル -->
 <div class="overlay" id="schedule-import-overlay" onclick="if(event.target===this) closeScheduleImport();">
@@ -2039,7 +2009,6 @@ function renderTicketCard(t, isPast){
           <div class="journal-label" style="margin-top:12px;">📝 この遠征の思い出</div>
           <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)"`:'disabled'}>${(t.journalMemo||'').replace(/</g,'&lt;')}</textarea>
         </div>` : ''}
-        <button class="card-share-btn" onclick="openItinerary('${t.id}')" style="margin-bottom:8px;">📋 旅のしおりを見る</button>
         <button class="card-share-btn" onclick="shareTrip('${t.id}')">📤 家族に共有する</button>
       </div>` : '';
 
@@ -3230,50 +3199,6 @@ function removePackingItem(tripId, idx){
   t.packingList = t.packingList.filter((_,i)=>i!==idx);
   render();
   savePackingList(tripId);
-}
-
-/* ---------- 旅のしおり（タイムライン）プレビュー ---------- */
-function openItinerary(tripId){
-  const t = trips.find(x=>x.id===tripId);
-  if(!t) return;
-  const body = document.getElementById('itinerary-body');
-
-  const catInfo = k => CATS.find(c=>c.key===k);
-  const missingItems = [];
-  const tripLevelRows = CATS.filter(c=>{
-    const d = t.detail[c.key];
-    if(d && d.notNeeded) return false;
-    if(c.bookable && !t.status[c.key]) missingItems.push(c.label);
-    return true;
-  }).map(c=>{
-    const d = t.detail[c.key];
-    const done = t.status[c.key];
-    let detail = '';
-    if(c.bookable) detail = [d.method, d.cost?`¥${Number(d.cost).toLocaleString()}`:''].filter(Boolean).join(' ・ ');
-    else detail = d.memo || '';
-    return `<div class="itin-item ${done?'itin-done':'itin-pending'}"><span class="itin-item-icon">${c.icon}</span><span class="itin-item-label">${c.label}</span><span class="itin-item-detail">${detail || (done?'':'未入力')}</span></div>`;
-  }).join('');
-
-  const {md, dow} = fmtDate(t.date);
-  const dayBlocks = `
-      <div class="itin-day">
-        <div class="itin-day-head">${md}（${dow}）${t.time?` ${t.time}〜`:''}</div>
-        <div class="itin-day-match">${t.match||'対戦未定'}${t.venue?` @ ${t.venue}`:''}</div>
-      </div>`;
-
-  body.innerHTML = `
-    <div class="itin-header">
-      <div class="itin-team">${sportIcon(t.sport)} ${t.team}</div>
-      ${missingItems.length ? `<div class="itin-alert">⚠️ 未手配：${missingItems.join('・')}</div>` : `<div class="itin-alert itin-alert-ok">✓ すべて手配済みです</div>`}
-    </div>
-    <div class="itin-timeline">${dayBlocks}</div>
-    <div class="itin-section-title">交通・宿泊・その他</div>
-    <div class="itin-list">${tripLevelRows}</div>
-  `;
-  document.getElementById('itinerary-overlay').classList.add('open');
-}
-function closeItinerary(){
-  document.getElementById('itinerary-overlay').classList.remove('open');
 }
 
 function shareTrip(tripId){
