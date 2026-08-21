@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>遠征手帳 — アウェイ観戦管理</title>
+<meta name="description" content="ログイン不要。試合日・交通・宿泊・チケットの予約状況を、家族や友人とリンク1本で共有しながら管理できる遠征手帳です。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="遠征手帳 — アウェイ観戦管理">
+<meta property="og:description" content="ログイン不要。試合日・交通・宿泊・チケットの予約状況を、家族や友人とリンク1本で共有しながら管理できます。">
+<meta property="og:image" content="https://ensei-techo.vercel.app/icon-512.png">
+<meta property="og:site_name" content="遠征手帳">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="遠征手帳 — アウェイ観戦管理">
+<meta name="twitter:description" content="ログイン不要。試合日・交通・宿泊・チケットの予約状況を、家族や友人とリンク1本で共有しながら管理できます。">
+<meta name="twitter:image" content="https://ensei-techo.vercel.app/icon-512.png">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" href="/icon-192.png" type="image/png">
@@ -31,8 +41,8 @@
     --sky: #93B5C6;
     --butter: #EFC078;
     --text: #4A3F3A;
-    --text-dim: #9C8F87;
-    --text-faint: #CBBFB7;
+    --text-dim: #82715F;
+    --text-faint: #A18F86;
     --font-display: 'Zen Maru Gothic', sans-serif;
     --font-body: 'Zen Maru Gothic', sans-serif;
     --font-num: 'Quicksand', sans-serif;
@@ -118,6 +128,7 @@
   .alert-row:hover .a-title{ color:var(--rose-deep); }
   .alert-row .a-l{ display:flex; align-items:center; gap:9px; }
   .alert-row .a-cat{ font-size:16px; }
+  .alert-row-sale .a-days{ color:#8a6d1f; font-weight:700; }
   .alert-row .a-days{ font-family:var(--font-num); font-weight:600; font-size:12px; color:var(--rose-deep); background:var(--rose-wash); padding:3px 9px; border-radius:999px; }
   .alerts .all-clear{ color:var(--sage); font-size:13px; padding:6px 0; font-weight:600; }
   .alerts .more{ font-size:11.5px; color:var(--text-faint); padding-top:6px; }
@@ -221,6 +232,18 @@
   .packing-details{ margin-top:10px; }
   .packing-count{ font-weight:400; color:var(--text-faint); }
   .packing-item{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
+  .att-row{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
+  .att-row:last-of-type{ border-bottom:none; }
+  .att-name{ flex:1; font-size:13px; font-weight:700; }
+  .att-status-badge{ font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; }
+  .att-status-badge.att-going{ background:var(--sage-wash); color:#3d6b4a; }
+  .att-status-badge.att-maybe{ background:#FFF3E0; color:#8a5a1f; }
+  .att-status-badge.att-notgoing{ background:var(--surface-2); color:var(--text-faint); }
+  .att-add-row select, .att-add-row input{ width:100%; background:var(--surface-2); border:1.5px solid var(--line); border-radius:8px; padding:9px 10px; font-size:16px; margin-top:6px; }
+  .att-add-btn{ flex:1; border:1.5px solid var(--line); border-radius:8px; padding:8px 4px; font-size:11.5px; font-weight:700; cursor:pointer; background:#fff; }
+  .att-add-btn.att-going{ border-color:var(--sage); color:#3d6b4a; }
+  .att-add-btn.att-maybe{ border-color:#e0b84a; color:#8a5a1f; }
+  .att-add-btn.att-notgoing{ border-color:var(--line); color:var(--text-faint); }
   .packing-item:last-of-type{ border-bottom:none; }
   .packing-item input[type="checkbox"]{ width:18px; height:18px; flex-shrink:0; accent-color: var(--sage); }
   .packing-item-text{ flex:1; font-size:13px; }
@@ -396,7 +419,8 @@
   .spending-box .field label{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
   .spending-total b{ font-family:var(--font-num); font-size:16px; color:var(--rose-deep); }
   .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 22px; border-radius:999px; font-size:13px; z-index:200; box-shadow:0 8px 20px rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition:opacity .25s; }
-  .toast.show{ opacity:1; }
+  .toast.show{ opacity:1; pointer-events:auto; }
+  .toast-action-btn{ background:none; border:1px solid rgba(255,255,255,0.5); color:#fff; border-radius:999px; padding:4px 12px; font-size:12px; font-weight:700; cursor:pointer; margin-left:4px; }
   .pr-btn{ flex:1; min-width:120px; text-decoration:none; font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--text); background:#fff; border:1.5px solid var(--line); padding:10px 8px; border-radius:10px; text-align:center; position:relative; display:block; transition:.15s; }
   .pr-btn:hover{ border-color:var(--rose); color:var(--rose-deep); background:var(--rose-wash); }
   .pr-badge{ position:absolute; top:-7px; right:-6px; background:var(--butter); color:#5a4213; font-family:var(--font-num); font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:8px; white-space:nowrap; }
@@ -448,8 +472,8 @@
     .stub{ padding:16px; }
     .head{ padding:16px; }
     .card-share-btn{ padding:14px; font-size:13.5px; min-height:44px; }
-    .icon-btn{ width:38px; height:38px; font-size:14px; }
-    .card-actions{ gap:6px; }
+    .icon-btn{ width:40px; height:40px; font-size:14px; }
+    .card-actions{ gap:8px; }
     .done-toggle{ min-height:38px; }
     .cat-panel .field input{ min-height:44px; }
     .pr-btn{ min-height:44px; display:flex; align-items:center; justify-content:center; }
@@ -493,6 +517,8 @@
   .past-toggle button:hover{ border-color:var(--rose); color:var(--rose-deep); }
   .past-grid{ opacity:0.72; }
   .past-badge{ display:inline-block; font-size:10px; font-weight:700; color:#fff; background:var(--text-faint); padding:2px 8px; border-radius:999px; margin-top:8px; }
+  .cancelled-badge{ display:inline-block; font-size:10px; font-weight:700; color:#fff; background:#c0392b; padding:2px 8px; border-radius:999px; margin-top:8px; margin-left:6px; }
+  .ticket.is-cancelled{ opacity:0.6; }
 
   @media (max-width: 480px){
     .grid{ grid-template-columns: 1fr; }
@@ -526,11 +552,13 @@
 <div id="settings-popup" style="display:none; position:fixed; z-index:201; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--surface); border-radius:20px; padding:22px 20px 18px; box-shadow:0 8px 40px rgba(0,0,0,0.18); width:min(400px, 90vw); max-height:80vh; overflow-y:auto;">
   <div style="font-family:var(--font-display); font-weight:900; font-size:16px; margin-bottom:14px;">⚙️ 設定・カレンダー連携</div>
   <div id="settings-popup-body"></div>
-  <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--line);">
+  <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--line); overflow:hidden; border-radius:10px;">
     <div style="font-size:10px; color:var(--text-faint); text-align:center; margin-bottom:6px;">広告【PR】</div>
+    <div style="width:100%; overflow:hidden;">
     <!-- MAF Rakuten Widget FROM HERE -->
     <script type="text/javascript">MafRakutenWidgetParam=function() { return{ size:'468x160',design:'slide',recommend:'on',auto_mode:'on',a_id:'5713296', border:'off'};};</script><script type="text/javascript" src="https://dn.msmstatic.com/site/rakuten/widget.js"></script>
     <!-- MAF Rakuten Widget TO HERE -->
+    </div>
   </div>
   <button onclick="closeSettingsPanel()" style="width:100%; margin-top:14px; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:none; font-family:var(--font-display); font-weight:700; font-size:14px; cursor:pointer; color:var(--text-dim);">閉じる</button>
 </div>
@@ -569,6 +597,7 @@
 
 <div id="app-main" style="display:none;">
 <div id="a2hs-banner" style="display:none;"></div>
+<div id="offline-banner" style="display:none; background:#FFF3E0; color:#8a5a1f; text-align:center; font-size:12px; font-weight:700; padding:8px; border-bottom:1px solid #f0d9b5;">📴 オフライン表示中：通信が回復するまで、前回取得したデータを表示しています（編集はできません）</div>
 <div class="tabs-wrap">
   <div class="tabs">
     <button class="tab active" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
@@ -580,6 +609,7 @@
 
 <div class="panel active" id="panel-cards">
   <div id="hero"></div>
+  <div class="alerts" id="sale-alerts"></div>
   <div class="alerts" id="alerts"></div>
   <div class="summary" id="summary"></div>
   <div class="recent" id="recent"></div>
@@ -620,9 +650,9 @@
 <div class="overlay" id="schedule-import-overlay" onclick="if(event.target===this) closeScheduleImport();">
   <div class="modal">
     <div class="modal-title" id="modal-title-si">スケジュールをまとめて入力</div>
-    <div class="modal-sub">スケジュールのテキストを貼り付けると、AIが試合を自動検出します。</div>
+    <div class="modal-sub">Bリーグ公式サイトの日程ページからコピーした場合、自動で認識します（サーバー設定不要）。それ以外のテキストはAIが解析を試みます。</div>
     <div style="background:var(--butter-wash,#FFF7E6); border:1px solid var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:11.5px; color:#8a6d1f; line-height:1.7;">
-      ⚠️ サーバー側の追加設定が必要な機能です。未設定の場合は「失敗」と表示されます。
+      ⚠️ Bリーグ公式サイト以外のテキストはAIでの解析を試みますが、サーバー側の追加設定が必要です。未設定の場合は「失敗」と表示されます。
     </div>
     <div class="field" style="margin-top:14px;">
       <label>スケジュールテキスト（コピペでOK）</label>
@@ -743,6 +773,18 @@
 const SUPABASE_URL = 'https://btaryktxvqtggesfpgwc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_pvzoVo9cRmQrzILzaOjeBg_Ym269KXb';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// モーダル表示中は背景ページがスクロールできてしまい操作しづらいため、開いている間だけ固定する
+// （複数のモーダルが重なって開くケースもあるため、カウンタ方式で管理する）
+let scrollLockCount = 0;
+function lockBodyScroll(){
+  scrollLockCount++;
+  document.body.style.overflow = 'hidden';
+}
+function unlockBodyScroll(){
+  scrollLockCount = Math.max(0, scrollLockCount - 1);
+  if(scrollLockCount === 0) document.body.style.overflow = '';
+}
 
 // このブラウザタブでの一時的なセッションID（アフィリエイトクリックの計測用。localStorageは使わずページ読み込みごとに発行）
 const SESSION_ID = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
@@ -1055,6 +1097,12 @@ function clearFavoriteTeam(sport){
   Settings.set('favoriteTeams', all);
 }
 
+// 過去に手入力した会場名を、指定した競技に絞って<option>タグの形で返す（複数箇所の会場候補で使い回す）
+function pastVenueOptionsHtml(sport){
+  const pastVenues = [...new Set(trips.filter(t=>t.sport===sport && t.venue && t.venue.trim()).map(t=>t.venue.trim()))];
+  return pastVenues.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+}
+
 function renderTeamDatalist(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
@@ -1077,7 +1125,8 @@ function renderTeamDatalist(){
   // 競技を切り替えたら、前の競技のアリーナ名が残らないよう会場欄もクリアする
   // （編集時にfillModalFieldsから呼ばれる場合は、この後で正しい値が再セットされるので問題ない）
   document.getElementById('f-venue').value = '';
-  document.getElementById('f-venue-list').innerHTML = '';
+  // 過去に手入力した会場名も、同じ競技であれば入力候補に加える（毎回フルで打ち直す手間を減らす）
+  document.getElementById('f-venue-list').innerHTML = pastVenueOptionsHtml(sport);
 
   renderTeamOptionsForLeague();
 
@@ -1259,7 +1308,7 @@ function setHomeAway(mode){
   if(mode === 'HOME'){
     if(myTeam && myTeam.arena){
       venueInput.value = myTeam.arena;
-      venueList.innerHTML = `<option value="${myTeam.arena}">`;
+      venueList.innerHTML = `<option value="${myTeam.arena}">` + pastVenueOptionsHtml(sport);
       note.textContent = '（自チームのホームアリーナをセット）';
     }else{
       note.textContent = '（このチームのアリーナ情報が未登録です。会場欄に直接入力してください）';
@@ -1270,11 +1319,11 @@ function setHomeAway(mode){
     const arenas = getOpponentArenas(sport, matchText, teams);
     if(arenas.length){
       venueInput.value = arenas[0];
-      venueList.innerHTML = arenas.map(a=>`<option value="${a}">`).join('');
+      venueList.innerHTML = arenas.map(a=>`<option value="${a}">`).join('') + pastVenueOptionsHtml(sport);
       note.textContent = '（相手チームのホームアリーナをセット）';
     }else{
       venueInput.value = '';
-      venueList.innerHTML = '';
+      venueList.innerHTML = pastVenueOptionsHtml(sport);
       note.textContent = '（対戦相手のアリーナ情報が未登録、または対戦相手が未選択です。会場欄に直接入力してください）';
     }
   }
@@ -1294,7 +1343,7 @@ function handleTeamInput(){
   const venueInput = document.getElementById('f-venue');
   if(match && match.arena && homeAwayMode === null){
     venueInput.value = match.arena;
-    document.getElementById('f-venue-list').innerHTML = `<option value="${match.arena}">`;
+    document.getElementById('f-venue-list').innerHTML = `<option value="${match.arena}">` + pastVenueOptionsHtml(sport);
     note.textContent = '（ホームアリーナを仮セット。HOME/AWAYで切り替えられます）';
   }else if(!match){
     note.textContent = '';
@@ -1463,7 +1512,7 @@ function switchTab(name){
 
 /* ---------- hero: next upcoming trip ---------- */
 function renderHero(){
-  const upcoming = trips.filter(t=>new Date(tripEndDate(t)) >= new Date(TODAY)).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const upcoming = trips.filter(t=>new Date(tripEndDate(t)) >= new Date(TODAY) && !t.isCancelled).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const box = document.getElementById('hero');
   if(!upcoming.length){ box.innerHTML=''; return; }
   const t = upcoming[0];
@@ -1488,11 +1537,35 @@ function renderHero(){
 }
 
 /* ---------- forgotten-item alerts ---------- */
+// 7日以内にチケット発売日を迎える遠征を横断的に一覧表示する
+// （各遠征のチケットパネルを個別に開かないと気づけなかったため、見落とし防止に追加）
+function renderSaleAlerts(){
+  const box = document.getElementById('sale-alerts');
+  if(!box) return;
+  const items = trips
+    .filter(t => new Date(tripEndDate(t)) >= new Date(TODAY) && !t.isCancelled)
+    .map(t => ({ t, saleDate: t.detail?.ticket?.saleDate, saleTime: t.detail?.ticket?.saleTime }))
+    .filter(x => x.saleDate && x.saleDate >= TODAY && daysUntil(x.saleDate) <= 7 && !x.t.status.ticket)
+    .sort((a,b) => a.saleDate < b.saleDate ? -1 : 1);
+  if(!items.length){ box.innerHTML = ''; return; }
+  box.innerHTML = `
+    <h3>🔔 まもなくチケット発売（${items.length}件）</h3>
+    ${items.map(({t, saleDate, saleTime})=>{
+      const d = daysUntil(saleDate);
+      const {md, dow} = fmtDate(saleDate);
+      return `<div class="alert-row alert-row-sale" onclick="focusTrip('${t.id}','ticket')">
+        <div class="a-l"><span class="a-cat">🎫</span><span class="a-title">${t.match} のチケットが${md}(${dow})${saleTime?` ${saleTime}〜`:''}発売</span></div>
+        <span class="a-days">${d===0?'本日':`あと${d}日`}</span>
+      </div>`;
+    }).join('')}
+  `;
+}
+
 function renderAlerts(){
   const catInfo = k => CATS.find(c=>c.key===k);
   const items = [];
   let laterCount = 0; // 1ヶ月より先で、まだアラートには出していない未予約件数（参考表示用）
-  trips.filter(t=>new Date(tripEndDate(t)) >= new Date(TODAY)).forEach(t=>{
+  trips.filter(t=>new Date(tripEndDate(t)) >= new Date(TODAY) && !t.isCancelled).forEach(t=>{
     const withinMonth = daysUntil(t.date) <= 31;
     BOOKABLE_CATS.forEach(key=>{
       if(!t.status[key] && !t.detail[key]?.notNeeded){
@@ -1695,7 +1768,7 @@ function getLastUsedValue(sport, team, categoryKey, field){
 // （1項目ずつの「前回と同じ」チップとは違い、複数カテゴリを横断してまとめて一括適用するために使う）
 function getUsualTripPattern(sport, team, excludeTripId){
   const candidates = trips
-    .filter(t => t.sport===sport && t.team===team && t.id !== excludeTripId)
+    .filter(t => t.sport===sport && t.team===team && t.id !== excludeTripId && !t.isCancelled)
     .sort((a,b) => new Date(b.date) - new Date(a.date));
   if(!candidates.length) return null;
   const pattern = {};
@@ -1739,11 +1812,20 @@ function memoPlaceholder(key){
 
 // よく使う持ち物のプリセット（タップだけで追加できるようにし、入力の手間を減らす）
 const PACKING_PRESETS = ['🎫 チケット', '🔋 モバイルバッテリー', '👕 ユニフォーム', '🧣 防寒具', '☂️ 雨具', '💊 常備薬', '📷 カメラ', '🎌 応援グッズ'];
+// 試合日の月から、その季節ならではの持ち物を先頭に加える（天気APIを使わず、月だけで大まかに判定する簡易版）
+function seasonalPackingPresets(dateStr){
+  if(!dateStr) return [];
+  const month = new Date(dateStr).getMonth() + 1; // 1〜12
+  if(month === 12 || month <= 2) return ['🧤 手袋', '💧 カイロ'];
+  if(month >= 6 && month <= 8) return ['🧴 日焼け止め', '🧂 塩分タブレット', '❄️ 冷却タオル', '🌀 携帯扇風機'];
+  return [];
+}
 
 function renderPackingListSection(t){
   const list = t.packingList || [];
   const checkedCount = list.filter(i=>i.checked).length;
-  const presetsToShow = PACKING_PRESETS.filter(p => !list.some(i=>i.text===p));
+  const combinedPresets = [...seasonalPackingPresets(t.date), ...PACKING_PRESETS];
+  const presetsToShow = combinedPresets.filter(p => !list.some(i=>i.text===p));
   return `
     <details class="station-details packing-details" ${packingListOpen.has(t.id)?'open':''} ontoggle="if(this.open) packingListOpen.add('${t.id}'); else packingListOpen.delete('${t.id}');">
       <summary>🎒 持ち物リスト${list.length ? `<span class="packing-count">（${checkedCount}/${list.length}）</span>` : ''}</summary>
@@ -1751,7 +1833,7 @@ function renderPackingListSection(t){
         ${list.map((item, idx) => `
           <div class="packing-item">
             <input type="checkbox" ${item.checked?'checked':''} ${IS_EDITABLE?`onchange="togglePackingItem('${t.id}',${idx})"`:'disabled'}>
-            <span class="packing-item-text ${item.checked?'checked':''}">${item.text}</span>
+            <span class="packing-item-text ${item.checked?'checked':''}" ${IS_EDITABLE?`onclick="togglePackingItem('${t.id}',${idx})"`:''} style="${IS_EDITABLE?'cursor:pointer;':''}">${item.text}</span>
             ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:26px; height:26px; font-size:12px;" onclick="removePackingItem('${t.id}',${idx})">×</button>` : ''}
           </div>`).join('')}
         ${IS_EDITABLE ? `
@@ -1765,6 +1847,40 @@ function renderPackingListSection(t){
         </div>` : ''}
         ${list.length ? `<button type="button" class="packing-template-btn" onclick="saveAsPackingTemplate('${t.id}')">📋 テンプレートとして保存</button>` : ''}
         ` : (list.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">持ち物リストはまだありません</div>` : '')}
+      </div>
+    </details>`;
+}
+
+// 「誰が行く？」参加予定セクション。端末に記憶した名前を候補として出し、毎回フルネームを打たなくて済むようにする
+function renderAttendeesSection(t){
+  const attendees = t.attendees || [];
+  const knownNames = Settings.get('knownAttendeeNames', []);
+  const statusLabel = { going:'✓ 行く', maybe:'？ 未定', not_going:'✕ 行かない' };
+  const statusClass = { going:'att-going', maybe:'att-maybe', not_going:'att-notgoing' };
+  return `
+    <details class="station-details">
+      <summary>🙋 誰が行く？${attendees.length ? `<span class="packing-count">（${attendees.filter(a=>a.status==='going').length}人が参加予定）</span>` : ''}</summary>
+      <div style="margin-top:8px;">
+        ${attendees.map(a => `
+          <div class="att-row">
+            <span class="att-name">${a.name}</span>
+            <span class="att-status-badge ${statusClass[a.status]||''}">${statusLabel[a.status]||a.status}</span>
+            ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:24px; height:24px; font-size:11px;" onclick="removeTripAttendee('${t.id}','${a.name.replace(/'/g,"\\'")}')">×</button>` : ''}
+          </div>`).join('')}
+        ${(IS_EDITABLE) ? `
+        <div class="att-add-row">
+          ${knownNames.length ? `
+          <select id="att-known-${t.id}" onchange="if(this.value){ document.getElementById('att-input-${t.id}').value = this.value; }" style="font-size:16px;">
+            <option value="">よく使う名前から選ぶ</option>
+            ${knownNames.map(n=>`<option value="${n}">${n}</option>`).join('')}
+          </select>` : ''}
+          <input type="text" id="att-input-${t.id}" placeholder="名前を入力（例：パパ）" style="font-size:16px;">
+          <div style="display:flex; gap:6px; margin-top:6px;">
+            <button type="button" class="att-add-btn att-going" onclick="const n=document.getElementById('att-input-${t.id}').value; setTripAttendee('${t.id}',n,'going'); document.getElementById('att-input-${t.id}').value='';">✓ 行く</button>
+            <button type="button" class="att-add-btn att-maybe" onclick="const n=document.getElementById('att-input-${t.id}').value; setTripAttendee('${t.id}',n,'maybe'); document.getElementById('att-input-${t.id}').value='';">？ 未定</button>
+            <button type="button" class="att-add-btn att-notgoing" onclick="const n=document.getElementById('att-input-${t.id}').value; setTripAttendee('${t.id}',n,'not_going'); document.getElementById('att-input-${t.id}').value='';">✕ 行かない</button>
+          </div>
+        </div>` : (attendees.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">まだ参加予定の記録がありません</div>` : '')}
       </div>
     </details>`;
 }
@@ -1809,6 +1925,7 @@ function catPanelContent(t, c){
         <div class="field"><label>発駅</label><input value="${(d.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','departureStation',this.value)"`:'disabled'} placeholder="例）東京"></div>
         <div class="field"><label>着駅</label><input value="${(d.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
       </div>
+      ${(d.departureStation && d.arrivalStation) ? `<a class="link-open-btn" style="margin-bottom:10px;" href="https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(d.departureStation)}&to=${encodeURIComponent(d.arrivalStation)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🚃 乗換案内で経路を調べる</a>` : ''}
       <div class="legs-box">
         <div class="legs-label">乗り継ぎの内訳（新幹線＋特急など、別々に予約可能）</div>
         ${(d.legs||[]).map((leg,i)=>{
@@ -1864,7 +1981,7 @@ function catPanelContent(t, c){
         <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="例）楽天トラベル"></div>
         <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
-      ${(()=>{ if(d.method || !IS_EDITABLE) return ''; const lastMethod = getLastUsedValue(t.sport, t.team, c.key, 'method'); return lastMethod ? `<button type="button" class="quick-fill-chip" onclick="updateDetail('${t.id}','${c.key}','method','${lastMethod.replace(/'/g,"\\'")}')">↺ 前回と同じ「${lastMethod}」を使う</button>` : ''; })()}
+      ${(()=>{ if(d.method || !IS_EDITABLE) return ''; if(['transport_outbound','transport_return','hotel'].includes(c.key)) return ''; /* この3カテゴリは「⚡いつもの一括入力」がカード上にあるため、二重になるチップは出さない */ const lastMethod = getLastUsedValue(t.sport, t.team, c.key, 'method'); return lastMethod ? `<button type="button" class="quick-fill-chip" onclick="updateDetail('${t.id}','${c.key}','method','${lastMethod.replace(/'/g,"\\'")}')">↺ 前回と同じ「${lastMethod}」を使う</button>` : ''; })()}
       ${stationBlock}
       <div class="field-row">
         <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" min="0" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
@@ -1936,6 +2053,7 @@ function renderTicketCard(t, isPast){
             ${t.venue ? `<button type="button" class="venue-copy-badge" onclick="event.stopPropagation(); copyVenueName('${t.venue.replace(/'/g,"\\'")}')" title="会場名をコピー">📋</button>` : ''}
           </div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
+          ${t.isCancelled ? `<span class="cancelled-badge" ${IS_EDITABLE?`onclick="event.stopPropagation(); setTripCancelled('${t.id}', false)" style="cursor:pointer;" title="タップで解除"`:''}>中止・延期${IS_EDITABLE?' ✕':''}</span>` : ''}
           ${nextAction ? `<div class="next-action" onclick="focusTrip('${t.id}','${nextAction.key}')">👉 次は${nextAction.icon}${nextAction.label}の予約${pendingCount>1?`<span style="opacity:0.75;">（他${pendingCount-1}件）</span>`:''}</div>` : ''}
         </div>
         <div class="date-block">
@@ -1998,6 +2116,7 @@ function renderTicketCard(t, isPast){
           </div>`;
         })() : ''}
         ${renderPackingListSection(t)}
+        ${(!isPast && !t.isCancelled) ? renderAttendeesSection(t) : ''}
         ${isPast ? `
         <div class="journal-box">
           <div class="journal-label">🏆 観戦記録</div>
@@ -2013,7 +2132,7 @@ function renderTicketCard(t, isPast){
       </div>` : '';
 
   return `
-    <div class="ticket ${urgencyClass} ${showSlim?'ticket-slim':''}" id="trip-${t.id}">${slimRow}${fullCard}</div>`;
+    <div class="ticket ${urgencyClass} ${showSlim?'ticket-slim':''} ${t.isCancelled?'is-cancelled':''}" id="trip-${t.id}">${slimRow}${fullCard}</div>`;
 }
 
 function renderGrid(){
@@ -2107,7 +2226,7 @@ async function setBudgetCap(val){
     if(error) throw error;
   }catch(e){
     console.error(e);
-    showToast('予算の保存に失敗しました。通信環境をご確認ください');
+    showToast('予算の保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 
@@ -2124,8 +2243,57 @@ async function setTripResult(tripId, result){
     if(error) throw error;
   }catch(e){
     console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
+}
+
+// 試合が中止・延期になった場合、削除せずに記録を残したまま区別する
+async function setTripCancelled(tripId, cancelled){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  if(cancelled && !confirm('この遠征を「中止・延期」として記録します。削除ではないため、既に入力した交通・宿泊などの記録はそのまま残ります。よろしいですか？')) return;
+  t.isCancelled = cancelled;
+  render();
+  try{
+    const { error } = await sb.rpc('set_trip_cancelled', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_cancelled: cancelled });
+    if(error) throw error;
+    showToast(cancelled ? '✓ 中止・延期として記録しました' : '✓ 通常の遠征に戻しました', 1800);
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+
+// 「誰が行く？」参加予定を記録する。名前は端末に記憶し、次回から選ぶだけで済むようにする
+async function setTripAttendee(tripId, name, status){
+  if(!IS_EDITABLE || !name || !name.trim()) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const trimmed = name.trim();
+  const others = t.attendees.filter(a=>a.name!==trimmed);
+  t.attendees = [...others, {name: trimmed, status}];
+  // よく使う名前として端末に記憶しておく（次回はプルダウンから選ぶだけにする）
+  const knownNames = Settings.get('knownAttendeeNames', []);
+  if(!knownNames.includes(trimmed)) Settings.set('knownAttendeeNames', [...knownNames, trimmed]);
+  render();
+  try{
+    const { error } = await sb.rpc('set_trip_attendee', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_name: trimmed, p_status: status });
+    if(error) throw error;
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+function removeTripAttendee(tripId, name){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t.attendees = t.attendees.filter(a=>a.name!==name);
+  render();
+  sb.rpc('delete_trip_attendee', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_name: name }).then(({error})=>{
+    if(error){ console.error(error); showToast('削除に失敗しました。通信環境をご確認のうえ、もう一度お試しください。'); }
+  });
 }
 
 async function setTripJournal(tripId, memo){
@@ -2139,7 +2307,7 @@ async function setTripJournal(tripId, memo){
     showToast('✓ 思い出メモを保存しました', 1200);
   }catch(e){
     console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 
@@ -2201,7 +2369,7 @@ async function saveBookingDetail(tripId, key, patch, suppressToast){
     if(!suppressToast) showToast('✓ 保存しました', 1200);
   }catch(e){
     console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 
@@ -2362,23 +2530,80 @@ function updateSimple(tripId, key, val){
   saveBookingDetail(tripId, key, { memo: val });
 }
 
+let lastDeletedTrip = null; // 直前に削除した遠征の内容（「元に戻す」用。1件のみ保持）
 async function deleteTrip(tripId){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
-  if(!confirm(`「${t.match}」を削除します。よろしいですか？`)) return;
+  // 既に何かしら予約済みの遠征を削除しようとしている場合、中止・延期として記録を残す選択肢も案内する
+  // （交通・宿泊などを既に支払っている可能性があり、削除すると記録ごと失われてしまうため）
+  const hasBookedSomething = BOOKABLE_CATS.some(k => t.status[k]);
+  if(hasBookedSomething){
+    const wantFullDelete = confirm(`「${t.match}」には既に予約済みの項目があります。\n\n試合が中止・延期になった場合は、削除の代わりに記録を残せます。\n\n「OK」を押す：このまま完全に削除する\n「キャンセル」を押す：削除せず「中止・延期」として記録する`);
+    if(!wantFullDelete){
+      setTripCancelled(tripId, true);
+      return;
+    }
+  }else{
+    if(!confirm(`「${t.match}」を削除します。よろしいですか？`)) return;
+  }
   try{
     const { error } = await sb.rpc('delete_trip', { p_edit_token: EDIT_TOKEN, p_trip_id: tripId });
     if(error) throw error;
+    // 元に戻せるよう、削除直前の内容をまるごと保持しておく（別の遠征を削除したら上書きされる＝直前の1件のみ対応）
+    lastDeletedTrip = JSON.parse(JSON.stringify(t));
     trips = trips.filter(x=>x.id!==tripId);
     delete activeCat[tripId];
     expandedTrips.delete(tripId);
     packingListOpen.delete(tripId);
     for(const key of [...stationDetailsOpen]){ if(key.startsWith(`${tripId}:`)) stationDetailsOpen.delete(key); }
     render();
+    showToast('削除しました', 6000, { label:'元に戻す', onclick:'undoDeleteTrip()' });
   }catch(e){
     console.error(e);
-    showToast('削除に失敗しました。通信環境をご確認ください');
+    showToast('削除に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+
+// 直前に削除した遠征を復元する（新規作成と同じ手順で作り直し、各カテゴリの内容も1つずつ復元する）
+async function undoDeleteTrip(){
+  if(!IS_EDITABLE || !lastDeletedTrip) return;
+  const t = lastDeletedTrip;
+  lastDeletedTrip = null;
+  showToast('復元しています…', 2000);
+  try{
+    const { data: newId, error } = await sb.rpc('upsert_trip', {
+      p_edit_token: EDIT_TOKEN,
+      p_sport: t.sport, p_team: t.team, p_opponent: t.match,
+      p_match_date: t.date, p_start_time: t.time || null, p_venue: t.venue || null,
+      p_estimated_cost: t.cost || 0
+    });
+    if(error) throw error;
+    for(const key of CATS.map(c=>c.key)){
+      const d = t.detail[key];
+      if(!d) continue;
+      const hasContent = d.method || d.memo || d.notNeeded || d.cost || d.link;
+      if(!hasContent) continue;
+      await sb.rpc('upsert_booking_detail', {
+        p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_category: key,
+        p_is_booked: !!t.status[key], p_method: d.method||null, p_booked_at: d.bookedDate||null,
+        p_cost: d.cost||null, p_memo: d.memo||null, p_is_not_needed: !!d.notNeeded,
+        p_sale_date: d.saleDate||null, p_sale_time: d.saleTime||null, p_notify_on_sale: !!d.notifyOnSale,
+        p_departure_station: d.departureStation||null, p_arrival_station: d.arrivalStation||null,
+        p_legs: d.legs||[], p_link: d.link||null
+      });
+    }
+    if(t.result){ await sb.rpc('set_trip_result', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_result: t.result }); }
+    if(t.journalMemo){ await sb.rpc('set_trip_journal', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_memo: t.journalMemo }); }
+    if(t.isCancelled){ await sb.rpc('set_trip_cancelled', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_cancelled: true }); }
+    if(t.packingList && t.packingList.length){ await sb.rpc('set_packing_list', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_packing_list: t.packingList }); }
+    for(const a of (t.attendees||[])){ await sb.rpc('set_trip_attendee', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_name: a.name, p_status: a.status }); }
+    await fetchNotebook(TOKEN);
+    render();
+    showToast('✓ 復元しました', 2000);
+  }catch(e){
+    console.error(e);
+    showToast('復元に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 
@@ -2548,10 +2773,10 @@ function renderHistory(){
 /* ---------- 訪問スタジアム制覇スタンプ ---------- */
 function renderStamps(){
   const wrap = document.getElementById('stamps-wrap');
-  const pastTrips = trips.filter(t => tripEndDate(t) < TODAY && t.venue && t.venue.trim());
+  const pastTrips = trips.filter(t => tripEndDate(t) < TODAY && t.venue && t.venue.trim() && !t.isCancelled);
   // 観戦記録（勝敗）は、会場の記入有無に関わらず全ての過去の遠征を対象にする
   // （会場を入れ忘れていても、勝敗を記録した意味がきちんと反映されるように）
-  const allPastTrips = trips.filter(t => tripEndDate(t) < TODAY);
+  const allPastTrips = trips.filter(t => tripEndDate(t) < TODAY && !t.isCancelled);
 
   if(!pastTrips.length){
     wrap.innerHTML = `<div class="empty-state">
@@ -2641,7 +2866,7 @@ function renderStamps(){
 }
 
 function shareStamps(){
-  const pastTrips = trips.filter(t => tripEndDate(t) < TODAY && t.venue && t.venue.trim());
+  const pastTrips = trips.filter(t => tripEndDate(t) < TODAY && t.venue && t.venue.trim() && !t.isCancelled);
   if(!pastTrips.length){ showToast('まだ共有できる訪問記録がありません'); return; }
   const bySport = {};
   pastTrips.forEach(t=>{
@@ -2697,7 +2922,7 @@ async function saveThemeColor(hex){
     showToast('✓ テーマカラーを変更しました', 1500);
   }catch(e){
     console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 
@@ -2830,8 +3055,9 @@ function openModal(tripId){
   }
   document.getElementById('overlay').classList.add('open');
   document.getElementById('modal-save-msg').textContent='';
+  lockBodyScroll();
 }
-function closeModal(){ document.getElementById('overlay').classList.remove('open'); editingTripId = null; duplicateTemplateDetail = null; }
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); editingTripId = null; duplicateTemplateDetail = null; unlockBodyScroll(); }
 
 function readSportValue(){
   const v = document.getElementById('f-sport').value;
@@ -2962,7 +3188,7 @@ async function submitTrip(keepOpen){
   }catch(e){
     console.error(e);
     document.getElementById('modal-save-msg').style.color = '#c0392b';
-    document.getElementById('modal-save-msg').textContent = '保存に失敗しました。通信環境をご確認のうえもう一度お試しください。';
+    document.getElementById('modal-save-msg').textContent = '保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。';
   }finally{
     submitBtn.disabled = false;
   }
@@ -2987,8 +3213,9 @@ function openCopyModal(tripId, key){
       </label>`).join('');
   }
   document.getElementById('copy-overlay').classList.add('open');
+  lockBodyScroll();
 }
-function closeCopyModal(){ document.getElementById('copy-overlay').classList.remove('open'); }
+function closeCopyModal(){ document.getElementById('copy-overlay').classList.remove('open'); unlockBodyScroll(); }
 async function confirmCopy(){
   if(!IS_EDITABLE) return;
   const { tripId, key } = copySource;
@@ -3008,14 +3235,16 @@ async function confirmCopy(){
     showToast(`${checked.length}件の遠征に${CATS.find(c=>c.key===key).label}情報をコピーしました`);
   }catch(e){
     console.error(e);
-    showToast('コピーに失敗しました。通信環境をご確認ください');
+    showToast('コピーに失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 
 /* ---------- family sharing ---------- */
-function showToast(msg, duration){
+function showToast(msg, duration, action){
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = action
+    ? `<span>${msg}</span> <button type="button" class="toast-action-btn" onclick="${action.onclick}">${action.label}</button>`
+    : msg;
   t.classList.add('show');
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(()=>t.classList.remove('show'), duration || 2600);
@@ -3130,7 +3359,7 @@ async function savePackingList(tripId){
     if(error) throw error;
   }catch(e){
     console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 // この遠征の持ち物リストの中身（項目名のみ、チェック状態は含めない）を、
@@ -3146,7 +3375,7 @@ async function saveAsPackingTemplate(tripId){
     showToast('✓ 持ち物テンプレートを更新しました。次回以降の遠征に自動で反映されます', 2600);
   }catch(e){
     console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 // 設定パネルから、テンプレートの項目を個別に削除する
@@ -3159,7 +3388,7 @@ async function removeFromPackingTemplate(idx){
     openSettingsPanel(); // 表示を更新
   }catch(e){
     console.error(e);
-    showToast('保存に失敗しました。通信環境をご確認ください');
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 function addPackingItem(tripId, text){
@@ -3276,7 +3505,10 @@ function renderCalendar(){
   wrap.innerHTML = `
     <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0 10px;">
       <button onclick="calNav(-1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px; color:var(--text-dim);">‹</button>
-      <div style="font-family:var(--font-display); font-weight:900; font-size:17px;">${monthLabel}</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div style="font-family:var(--font-display); font-weight:900; font-size:17px;">${monthLabel}</div>
+        ${(y!==new Date().getFullYear() || m!==new Date().getMonth()) ? `<button onclick="calGoToday()" style="font-size:10.5px; padding:4px 10px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface-2); color:var(--text-dim); cursor:pointer;">今日</button>` : ''}
+      </div>
       <button onclick="calNav(1)" style="background:none; border:none; font-size:22px; cursor:pointer; padding:4px 10px; color:var(--text-dim);">›</button>
     </div>
     ${IS_EDITABLE ? `<div style="text-align:right; margin-bottom:10px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
@@ -3386,15 +3618,22 @@ function openCalPopup(y,m,d){
   popup.style.top = '50%';
   popup.style.left = '50%';
   popup.style.transform = 'translate(-50%,-50%)';
+  lockBodyScroll();
 }
 function closeCalPopup(){
   document.getElementById('cal-popup-overlay').style.display = 'none';
   document.getElementById('cal-popup').style.display = 'none';
+  unlockBodyScroll();
 }
 function calNav(dir){
   calMonth += dir;
   if(calMonth < 0){ calMonth = 11; calYear--; }
   if(calMonth > 11){ calMonth = 0; calYear++; }
+  renderCalendar();
+}
+function calGoToday(){
+  calYear = new Date().getFullYear();
+  calMonth = new Date().getMonth();
   renderCalendar();
 }
 
@@ -3403,10 +3642,56 @@ function openScheduleImport(){
   document.getElementById('schedule-import-overlay').classList.add('open');
   document.getElementById('schedule-import-text').value = '';
   document.getElementById('schedule-import-status').textContent = '';
-  document.getElementById('schedule-import-result').innerHTML = '';
+  const resultBox = document.getElementById('schedule-import-result');
+  resultBox.innerHTML = '';
+  resultBox.dataset.count = '0';
+  document.getElementById('schedule-import-confirm-btn').style.display = 'none';
+  lockBodyScroll();
 }
 function closeScheduleImport(){
   document.getElementById('schedule-import-overlay').classList.remove('open');
+  unlockBodyScroll();
+}
+
+// Bリーグ公式サイトの試合日程ページ特有のコピペパターンを、外部APIを使わず解析する
+// （HOME/AWAYマーカーを起点に、日付・時刻・会場・対戦相手を順番に読み取る）
+function parseBLeagueScheduleText(rawText){
+  const lines = rawText.split('\n').map(l=>l.trim()).filter(l=>l);
+  const games = [];
+  const currentYear = new Date().getFullYear();
+  let i = 0;
+  while(i < lines.length){
+    if(lines[i] === 'HOME' || lines[i] === 'AWAY'){
+      i++; // HOME/AWAY自体は今回使わない（会場が既に分かるため）
+      i++; // 大会名は読み飛ばす
+      const ownTeamLine1 = lines[i]; i++;
+      if(lines[i] === ownTeamLine1) i++; // 重複行をスキップ
+      const dateMatch = lines[i]?.match(/^(\d{1,2})\/(\d{1,2})$/);
+      if(!dateMatch){ continue; } // 想定外の形式ならこの行だけ進めてやり直す
+      const month = parseInt(dateMatch[1]), day = parseInt(dateMatch[2]);
+      i++;
+      if(lines[i]?.match(/^\(.\)$/)) i++; // 曜日
+      const timeMatch = lines[i]?.match(/^(\d{1,2}):(\d{2})$/);
+      const time = timeMatch ? lines[i] : null;
+      if(timeMatch) i++;
+      if(lines[i] === 'location_on') i++;
+      const venue = lines[i]; i++;
+      const oppTeamLine1 = lines[i]; i++;
+      if(lines[i] === oppTeamLine1) i++;
+      while(i < lines.length && lines[i] !== 'HOME' && lines[i] !== 'AWAY') i++; // 「中継」等の余分な行を読み飛ばす
+      // シーズンは秋〜春をまたぐため、7月より前の月なら年をまたいだとみなし翌年扱いにする
+      const year = month < 7 ? currentYear + 1 : currentYear;
+      games.push({
+        sport: 'バスケットボール',
+        team: ownTeamLine1, opponent: oppTeamLine1,
+        match_date: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`,
+        start_time: time, venue
+      });
+    }else{
+      i++;
+    }
+  }
+  return games;
 }
 
 async function runScheduleImport(){
@@ -3416,6 +3701,16 @@ async function runScheduleImport(){
   const status = document.getElementById('schedule-import-status');
   btn.disabled = true;
   status.innerHTML = '<span class="spinner"></span>解析中…';
+
+  // まずBリーグ公式サイトのコピペ形式に一致するか、外部APIを使わず軽量に試す
+  const bLeagueGames = parseBLeagueScheduleText(text);
+  if(bLeagueGames.length){
+    renderScheduleImportResult(bLeagueGames);
+    status.textContent = `${bLeagueGames.length}件の試合を検出しました（Bリーグ公式サイトの形式として認識）。内容を確認・修正して「登録する」を押してください。`;
+    btn.disabled = false;
+    return;
+  }
+
   try{
     const response = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
@@ -3431,11 +3726,33 @@ async function runScheduleImport(){
     const clean = rawText.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(clean);
     status.textContent = `${parsed.length}件の試合を検出しました。内容を確認・修正して「登録する」を押してください。`;
-    document.getElementById('schedule-import-result').innerHTML = parsed.map((g,i)=>`
+    renderScheduleImportResult(parsed);
+  }catch(e){
+    status.textContent = '解析に失敗しました。サーバー側の追加設定（Edge Function）が未完了の可能性があります。テキストの問題ではない場合があります。';
+    console.error(e);
+  }finally{
+    btn.disabled = false;
+  }
+}
+// スケジュール解析結果（AI経路・Bリーグ正規表現経路どちらから来ても）を確認画面として描画する
+function renderScheduleImportResult(parsed){
+  const resultBox = document.getElementById('schedule-import-result');
+  resultBox.dataset.count = parsed.length; // confirmScheduleImportがこの件数を見て登録対象を判断するため必須
+  resultBox.innerHTML = parsed.map((g,i)=>`
       <div style="background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
           <input type="checkbox" id="ig${i}" checked style="width:16px; height:16px; accent-color:var(--rose); flex-shrink:0;">
           <span style="font-size:11px; color:var(--text-faint); font-weight:700;">${i+1}件目</span>
+        </div>
+        <div class="field" style="margin-bottom:6px;">
+          <label style="font-size:10px;">競技</label>
+          <select id="ig${i}-sport" style="font-size:13px; padding:6px 8px;">
+            <option ${(!g.sport||g.sport==='バスケットボール')?'selected':''}>バスケットボール</option>
+            <option ${g.sport==='サッカー'?'selected':''}>サッカー</option>
+            <option ${g.sport==='野球'?'selected':''}>野球</option>
+            <option ${g.sport==='バレーボール'?'selected':''}>バレーボール</option>
+            <option ${g.sport==='その他'?'selected':''}>その他</option>
+          </select>
         </div>
         <div class="field-row" style="margin-bottom:6px;">
           <div class="field"><label style="font-size:10px;">チーム名</label><input id="ig${i}-team" value="${(g.team||'').replace(/"/g,'&quot;')}" style="font-size:13px; padding:6px 8px;"></div>
@@ -3447,13 +3764,7 @@ async function runScheduleImport(){
         </div>
         <div class="field" style="margin-top:6px;"><label style="font-size:10px;">会場</label><input id="ig${i}-venue" value="${(g.venue||'').replace(/"/g,'&quot;')}" style="font-size:13px; padding:6px 8px;"></div>
       </div>`).join('');
-    document.getElementById('schedule-import-confirm-btn').style.display = 'block';
-  }catch(e){
-    status.textContent = '解析に失敗しました。サーバー側の追加設定（Edge Function）が未完了の可能性があります。テキストの問題ではない場合があります。';
-    console.error(e);
-  }finally{
-    btn.disabled = false;
-  }
+  document.getElementById('schedule-import-confirm-btn').style.display = 'block';
 }
 
 async function confirmScheduleImport(){
@@ -3463,6 +3774,7 @@ async function confirmScheduleImport(){
     const cb = document.getElementById('ig'+i);
     if(!cb || !cb.checked) continue;
     checked.push({
+      sport: document.getElementById(`ig${i}-sport`)?.value || '未設定',
       team: document.getElementById(`ig${i}-team`).value.trim(),
       opponent: document.getElementById(`ig${i}-opponent`).value.trim(),
       match_date: document.getElementById(`ig${i}-date`).value,
@@ -3502,6 +3814,7 @@ async function confirmScheduleImport(){
 
 function render(){
   renderHero();
+  renderSaleAlerts();
   renderAlerts();
   renderSummary();
   renderRecent();
@@ -3534,24 +3847,50 @@ function normalizeTrip(raw){
     journalMemo: raw.journal_memo || '',
     packingList: Array.isArray(raw.packing_list) ? raw.packing_list : [],
     result: raw.result || null, // 'win' | 'loss' | 'draw' | null(未記録)
+    isCancelled: !!raw.is_cancelled,
+    attendees: Array.isArray(raw.attendees) ? raw.attendees : [], // [{name, status:'going'|'maybe'|'not_going'}]
     status, detail
   };
 }
 
+let isOfflineView = false; // キャッシュから表示している場合はtrue（バナー表示・保存操作の制限に使う）
 async function fetchNotebook(token){
-  const { data, error } = await sb.rpc('get_notebook', { p_token: token });
-  if(error) throw error;
-  TOKEN = token;
-  notebook = data.notebook;
-  IS_EDITABLE = !!notebook.is_editable;
-  EDIT_TOKEN = IS_EDITABLE ? token : null;
-  SHARE_TOKEN = IS_EDITABLE ? (notebook.share_token || null) : null;
-  budgetCap = notebook.budget_cap || 0;
-  packingTemplate = Array.isArray(notebook.packing_template) ? notebook.packing_template : [];
-  if(notebook.theme_color) applyThemeColor(notebook.theme_color);
-  trips = (data.trips || []).map(normalizeTrip);
-  // ホーム画面アイコンなど、URLのハッシュが失われるケースに備えてローカルに最終アクセストークンを保存
-  Settings.set('lastToken', token);
+  try{
+    const { data, error } = await sb.rpc('get_notebook', { p_token: token });
+    if(error) throw error;
+    TOKEN = token;
+    notebook = data.notebook;
+    IS_EDITABLE = !!notebook.is_editable;
+    EDIT_TOKEN = IS_EDITABLE ? token : null;
+    SHARE_TOKEN = IS_EDITABLE ? (notebook.share_token || null) : null;
+    budgetCap = notebook.budget_cap || 0;
+    packingTemplate = Array.isArray(notebook.packing_template) ? notebook.packing_template : [];
+    if(notebook.theme_color) applyThemeColor(notebook.theme_color);
+    trips = (data.trips || []).map(normalizeTrip);
+    // ホーム画面アイコンなど、URLのハッシュが失われるケースに備えてローカルに最終アクセストークンを保存
+    Settings.set('lastToken', token);
+    // オフライン閲覧用に、直近取得できたデータをまるごとキャッシュしておく
+    isOfflineView = false;
+    try{ Settings.set('offlineCache_'+token, data); }catch(cacheErr){ /* 保存容量オーバー等は無視してよい */ }
+  }catch(e){
+    // 通信エラーの場合、以前このリンクで取得できていたキャッシュがあれば、それを使って閲覧だけは続けられるようにする
+    const cached = Settings.get('offlineCache_'+token, null);
+    const isConfirmedInvalid = e && e.message && e.message.includes('invalid token');
+    if(cached && !isConfirmedInvalid){
+      TOKEN = token;
+      notebook = cached.notebook;
+      IS_EDITABLE = false; // オフライン中は編集内容の食い違いを避けるため、閲覧専用として扱う
+      EDIT_TOKEN = null;
+      SHARE_TOKEN = null;
+      budgetCap = notebook.budget_cap || 0;
+      packingTemplate = Array.isArray(notebook.packing_template) ? notebook.packing_template : [];
+      if(notebook.theme_color) applyThemeColor(notebook.theme_color);
+      trips = (cached.trips || []).map(normalizeTrip);
+      isOfflineView = true;
+      return;
+    }
+    throw e;
+  }
 }
 
 /* ---------- link-based persistence (no login) ---------- */
@@ -3643,14 +3982,21 @@ function openSettingsPanel(){
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📱 その他</div>
       <button onclick="resetA2HSBanner()" style="width:100%; text-align:left; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:12.5px; cursor:pointer; color:var(--text);">「ホーム画面に追加」の案内をもう一度表示する</button>
     </div>
+    ${IS_EDITABLE ? `
+    <div style="border-top:1px solid var(--line); padding-top:14px; margin-top:14px;">
+      <div style="font-size:12.5px; font-weight:700; color:#c0392b; margin-bottom:8px;">⚠️ 危険な操作</div>
+      <button onclick="deleteNotebookSelfService()" style="width:100%; text-align:left; background:#FBEEEE; border:1px solid #e0b8b8; border-radius:8px; padding:10px 12px; font-size:12.5px; cursor:pointer; color:#c0392b;">この手帳を完全に削除する（元に戻せません）</button>
+    </div>` : ''}
   `;
 
   document.getElementById('settings-popup-overlay').style.display = 'block';
   document.getElementById('settings-popup').style.display = 'block';
+  lockBodyScroll();
 }
 function closeSettingsPanel(){
   document.getElementById('settings-popup-overlay').style.display = 'none';
   document.getElementById('settings-popup').style.display = 'none';
+  unlockBodyScroll();
 }
 function clearFavoriteTeamUI(sport){
   clearFavoriteTeam(sport);
@@ -3740,11 +4086,13 @@ function openSharePopup(){
   document.getElementById('share-popup-overlay').style.display = 'block';
   document.getElementById('share-popup').style.display = 'block';
   requestAnimationFrame(positionSharePopup);
+  lockBodyScroll();
 }
 
 function closeSharePopup(){
   document.getElementById('share-popup-overlay').style.display = 'none';
   document.getElementById('share-popup').style.display = 'none';
+  unlockBodyScroll();
 }
 
 // QRコードを表示/非表示。ブラウザ内で完結して生成する（外部サービスにリンク＝トークンを送信しないため、
@@ -3767,7 +4115,7 @@ function toggleQrCode(kind, url){
   if(typeof QRCode !== 'undefined'){
     new QRCode(document.getElementById(`qr-canvas-${kind}`), { text: url, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
   }else{
-    document.getElementById(`qr-canvas-${kind}`).innerHTML = '<div style="font-size:12px; color:var(--text-dim); padding:20px;">QRコードの読み込みに失敗しました。通信環境をご確認のうえ再度お試しください。</div>';
+    document.getElementById(`qr-canvas-${kind}`).innerHTML = '<div style="font-size:12px; color:var(--text-dim); padding:20px;">QRコードの読み込みに失敗しました。通信環境をご確認のうえ、もう一度お試しください。</div>';
   }
 }
 
@@ -3850,6 +4198,27 @@ function dismissA2HS(){
   Settings.set('a2hsDismissed', true);
 }
 
+// 手帳をセルフサービスで完全に削除する（取り返しがつかないため、「削除」と入力してもらう二段階確認にする）
+async function deleteNotebookSelfService(){
+  if(!IS_EDITABLE) return;
+  if(!confirm('この手帳を完全に削除します。登録した全ての遠征データが失われ、元に戻すことはできません。よろしいですか？')) return;
+  const typed = prompt('本当に削除する場合は、確認のため「削除」と入力してください。');
+  if(typed !== '削除'){
+    if(typed !== null) showToast('入力内容が一致しなかったため、削除を中止しました');
+    return;
+  }
+  try{
+    const { error } = await sb.rpc('delete_notebook', { p_edit_token: EDIT_TOKEN });
+    if(error) throw error;
+    Settings.remove('lastToken');
+    location.hash = '';
+    showScreen('landing-screen');
+  }catch(e){
+    console.error(e);
+    showToast('削除に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+
 async function createNewNotebook(){
   const btns = document.querySelectorAll('#landing-create-btn, #error-screen .add-btn');
   btns.forEach(b=>{ b.disabled = true; });
@@ -3865,7 +4234,7 @@ async function createNewNotebook(){
   }catch(e){
     console.error(e);
     btns.forEach(b=>{ b.disabled = false; });
-    showToast('作成に失敗しました。通信環境をご確認ください');
+    showToast('作成に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
 }
 
@@ -3924,8 +4293,25 @@ function initCategoryBannerRotators(){
   });
 }
 
+// 明日試合がある場合、アプリを開いた時に一度だけ持ち物確認を促す（同じ日に何度も出さないようSettingsで記録する）
+function checkDayBeforeReminder(){
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().slice(0,10);
+  const tripsTomorrow = trips.filter(t => t.date === tomorrowStr && !t.isCancelled);
+  if(!tripsTomorrow.length) return;
+  if(Settings.get('dayBeforeReminderShown', null) === tomorrowStr) return; // 今日は既に見せた
+  Settings.set('dayBeforeReminderShown', tomorrowStr);
+  const t = tripsTomorrow[0];
+  const msg = tripsTomorrow.length > 1
+    ? `📦 明日は${t.match}など${tripsTomorrow.length}件の遠征があります。持ち物を確認しましょう`
+    : `📦 明日は${t.match}です。持ち物を確認しましょう`;
+  showToast(msg, 6000, { label:'見る', onclick:`focusTrip('${t.id}')` });
+}
+
 async function startApp(){
   showScreen('app-main');
+  document.getElementById('offline-banner').style.display = isOfflineView ? 'block' : 'none';
   renderShareBanner();
   applyEditableUI();
   await loadAds();
@@ -3935,6 +4321,7 @@ async function startApp(){
     cardViewMode = trips.length > 15 ? 'compact' : 'detailed';
   }
   render();
+  if(!isOfflineView) setTimeout(checkDayBeforeReminder, 800); // 他の初期表示と重ならないよう少し遅らせる
   scanAndScheduleAllNotifications();
   initBannerRotator();
 }
