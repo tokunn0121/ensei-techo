@@ -3908,6 +3908,7 @@ function openScheduleImport(){
   lockBodyScroll();
 }
 function closeScheduleImport(){
+  if(scheduleImportInProgress) return; // 登録処理中は、背景タップ等で誤って閉じられないようにする
   document.getElementById('schedule-import-overlay').classList.remove('open');
   unlockBodyScroll();
 }
@@ -4048,11 +4049,15 @@ function renderScheduleImportResult(parsed){
         <button type="button" onclick="toggleAllScheduleImport(false)" style="font-size:11px; padding:5px 10px; border-radius:999px; border:1.5px solid var(--line); background:#fff; cursor:pointer;">すべて解除</button>
       </div>
     </div>`;
-  resultBox.innerHTML = toggleBarHtml + parsed.map((g,i)=>`
-      <div style="background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px;">
+  resultBox.innerHTML = toggleBarHtml + parsed.map((g,i)=>{
+    const dateLabel = g.match_date ? `${parseInt(g.match_date.split('-')[1])}/${parseInt(g.match_date.split('-')[2])}` : '日付未定';
+    const isChecked = manyResults ? false : true;
+    return `
+      <div class="ig-card" id="ig-card-${i}" style="background:${isChecked?'#fff':'var(--surface-2)'}; border:1.5px solid ${isChecked?'var(--rose)':'var(--line)'}; border-radius:10px; padding:10px 12px; margin-bottom:8px;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <input type="checkbox" id="ig${i}" ${manyResults?'':'checked'} onchange="updateScheduleImportCount()" style="width:16px; height:16px; accent-color:var(--rose); flex-shrink:0;">
-          <span style="font-size:11px; color:var(--text-faint); font-weight:700;">${i+1}件目</span>
+          <input type="checkbox" id="ig${i}" ${isChecked?'checked':''} onchange="updateScheduleImportCount(); document.getElementById('ig-card-${i}').style.background=this.checked?'#fff':'var(--surface-2)'; document.getElementById('ig-card-${i}').style.borderColor=this.checked?'var(--rose)':'var(--line)';" style="width:18px; height:18px; accent-color:var(--rose); flex-shrink:0;">
+          <span style="font-size:14px; font-weight:900; color:var(--text);">${dateLabel}</span>
+          <span style="font-size:13px; color:var(--text-dim); font-weight:700;">vs ${g.opponent||'対戦相手未定'}</span>
         </div>
         <div class="field" style="margin-bottom:6px;">
           <label style="font-size:10px;">競技</label>
@@ -4073,7 +4078,8 @@ function renderScheduleImportResult(parsed){
           <div class="field"><label style="font-size:10px;">時刻</label><input type="time" id="ig${i}-time" value="${g.start_time||''}" style="font-size:13px; padding:6px 8px;"></div>
         </div>
         <div class="field" style="margin-top:6px;"><label style="font-size:10px;">会場</label><input id="ig${i}-venue" value="${(g.venue||'').replace(/"/g,'&quot;')}" style="font-size:13px; padding:6px 8px;"></div>
-      </div>`).join('');
+      </div>`;
+  }).join('');
   document.getElementById('schedule-import-confirm-btn').style.display = 'block';
   updateScheduleImportCount();
 }
@@ -4096,7 +4102,9 @@ function updateScheduleImportCount(){
   if(label) label.textContent = `${checkedCount}/${total}件を選択中`;
 }
 
+let scheduleImportInProgress = false; // 連打による重複登録を防ぐフラグ
 async function confirmScheduleImport(){
+  if(scheduleImportInProgress) return; // 既に処理中なら何もしない（連打対策）
   const total = parseInt(document.getElementById('schedule-import-result').dataset.count || '0');
   const checked = [];
   for(let i=0;i<total;i++){
@@ -4112,6 +4120,16 @@ async function confirmScheduleImport(){
     });
   }
   if(!checked.length){ closeScheduleImport(); return; }
+  scheduleImportInProgress = true;
+  // 処理中は画面全体を覆い、下の「登録」ボタンや各チェックボックスに一切触れられないようにする（連打・誤操作の防止）
+  const blocker = document.createElement('div');
+  blocker.id = 'schedule-import-blocker';
+  blocker.style.cssText = 'position:absolute; inset:0; background:rgba(255,255,255,0.85); z-index:10; display:flex; align-items:center; justify-content:center; border-radius:22px;';
+  blocker.innerHTML = '<div style="text-align:center;"><span class="spinner" style="width:22px; height:22px; border-width:3px;"></span><div style="margin-top:8px; font-size:13px; color:var(--text-dim); font-weight:700;">登録しています…</div></div>';
+  const modalEl = document.getElementById('schedule-import-overlay').querySelector('.modal');
+  modalEl.style.position = 'relative';
+  modalEl.appendChild(blocker);
+
   const status = document.getElementById('schedule-import-status');
   status.textContent = `${checked.length}件を登録しています…`;
   let done = 0;
@@ -4138,7 +4156,12 @@ async function confirmScheduleImport(){
   }
   status.textContent = `${done}件を登録しました。`;
   render();
-  setTimeout(()=>{ closeScheduleImport(); calMonth=new Date(checked[0].match_date).getMonth(); calYear=new Date(checked[0].match_date).getFullYear(); renderCalendar(); }, 1000);
+  setTimeout(()=>{
+    scheduleImportInProgress = false;
+    blocker.remove();
+    closeScheduleImport();
+    calMonth=new Date(checked[0].match_date).getMonth(); calYear=new Date(checked[0].match_date).getFullYear(); renderCalendar();
+  }, 1000);
 }
 
 function render(){
