@@ -49,6 +49,7 @@
     --radius: 18px;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
+  html{ overflow-x:hidden; }
   img{ max-width:100%; }
   body{
     background: var(--bg);
@@ -57,6 +58,7 @@
     min-height:100vh;
     padding-bottom: 60px;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
   ::selection{ background: var(--rose); color:#fff; }
 
@@ -112,6 +114,10 @@
   .hero .htitle{ font-size:11.5px; font-weight:700; color:var(--rose-deep); letter-spacing:.06em; }
   .hero .hmatch{ font-family:var(--font-display); font-weight:700; font-size:18.5px; margin-top:5px; }
   .hero .hmeta{ font-size:12.5px; color:var(--text-dim); margin-top:4px; }
+  .today-badge{ display:inline-block; font-size:10px; font-weight:900; color:#fff; background:var(--rose); padding:2px 8px; border-radius:999px; letter-spacing:0; vertical-align:middle; white-space:nowrap; }
+  .today-badge-sm{ font-size:9px; padding:1px 6px; }
+  .htoday-time{ font-size:12.5px; font-weight:700; color:var(--rose-deep); margin-top:6px; background:var(--rose-wash); display:inline-block; padding:4px 10px; border-radius:8px; }
+  .tcr-today-time{ font-size:10.5px; font-weight:700; color:var(--rose-deep); margin-top:3px; }
   .hero .hpending{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
   .hero .hpending span{ font-size:11px; background:#fff; border:1px solid var(--rose); color:var(--rose-deep); padding:4px 10px; border-radius:999px; font-weight:600; }
   .hero .hall-set{ font-size:11.5px; color:var(--sage); font-weight:700; margin-top:10px; }
@@ -186,6 +192,14 @@
   .next-action{ display:inline-block; margin-top:6px; font-size:11.5px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:5px 10px; border-radius:8px; cursor:pointer; }
   .ticket.pulse{ animation: pulseGlow 1.6s ease; }
   @keyframes pulseGlow{ 0%{ box-shadow:0 0 0 4px rgba(217,139,150,0.5);} 100%{ box-shadow:0 6px 20px rgba(74,63,58,0.06);} }
+  .spinner{ display:inline-block; width:14px; height:14px; border:2px solid var(--line); border-top-color:var(--rose); border-radius:50%; animation:spin 0.7s linear infinite; margin-right:6px; vertical-align:-2px; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  /* タップ時の共通フィードバック（個別に:activeが無いボタン類も、押した瞬間の反応が分かるようにする） */
+  button:active, .chip:active, .cat-chip:active, .icon-btn:active, .seg-btn:active, .add-btn:active,
+  .card-share-btn:active, .quick-fill-chip:active, .usual-pattern-btn:active, .bulk-done-btn:active,
+  .result-btn:active, .att-add-btn:active, .ha-btn:active{
+    opacity:0.65;
+  }
   /* コンパクト表示（1行リスト） */
   .ticket.ticket-slim{ min-height:0; }
   .ticket-compact-row{ display:flex; align-items:center; gap:12px; padding:14px; cursor:pointer; min-height:44px; }
@@ -230,6 +244,15 @@
   .soft-hint{ font-size:11px; color:#8a6d1f; background:var(--butter-wash,#FFF7E6); border:1px dashed var(--butter,#E0B84A); border-radius:8px; padding:8px 10px; margin-bottom:8px; line-height:1.6; }
   /* 持ち物リスト */
   .packing-details{ margin-top:10px; }
+  .timeline-details{ margin-top:10px; }
+  .timeline-list{ margin-top:8px; position:relative; padding-left:6px; }
+  .timeline-list::before{ content:''; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:var(--rose-wash); }
+  .timeline-row{ display:flex; align-items:center; gap:10px; padding:5px 0 5px 20px; position:relative; }
+  .timeline-dot{ position:absolute; left:-4px; width:10px; height:10px; border-radius:50%; background:var(--rose); border:2px solid #fff; box-shadow:0 0 0 1.5px var(--rose); flex-shrink:0; }
+  .timeline-time{ font-family:var(--font-num); font-weight:700; font-size:13px; color:var(--rose-deep); width:44px; flex-shrink:0; }
+  .timeline-icon{ font-size:14px; }
+  .timeline-label{ font-size:12.5px; color:var(--text); font-weight:600; }
+  .timeline-duration{ padding-left:26px; font-size:10.5px; color:var(--text-faint); }
   .packing-count{ font-weight:400; color:var(--text-faint); }
   .packing-item{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
   .att-row{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
@@ -358,10 +381,14 @@
   .status-text{ font-size:11px; color:var(--text-dim); white-space:nowrap; }
   .status-text.not-needed{ color:var(--text-faint); }
   .cat-panel{ display:flex; flex-direction:column; gap:9px; padding:13px; }
+  /* field-rowの基本形（2列並び）。cat-panel/spending-box配下は個別に上書きされるが、
+     それ以外（スケジュール一括入力の確認画面など）でも同じ見た目・安全策が効くようにする */
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .field-row .field{ min-width:0; }
   .cat-panel .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .cat-panel .field{ display:flex; flex-direction:column; gap:3px; }
+  .cat-panel .field{ display:flex; flex-direction:column; gap:3px; min-width:0; }
   .cat-panel .field label{ font-size:10px; color:var(--text-faint); }
-  .cat-panel .field input{ width:100%; background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:16px; font-family:var(--font-body); }
+  .cat-panel .field input{ width:100%; min-width:0; background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-size:16px; font-family:var(--font-body); }
   .cat-panel .field input:focus{ outline:2px solid var(--rose); }
   .done-toggle{ display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--sage); background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:8px 12px; cursor:pointer; min-height:38px; }
   .done-toggle input[type="checkbox"]{ width:16px; height:16px; flex-shrink:0; accent-color: var(--sage); }
@@ -414,8 +441,8 @@
   .theme-color-swatch{ width:40px; height:40px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; flex-shrink:0; }
   .theme-color-custom{ display:flex; align-items:center; justify-content:center; background:var(--surface-2); font-size:16px; position:relative; }
   .spending-box .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .spending-box .field{ display:flex; flex-direction:column; gap:4px; }
-  .spending-box .field input{ width:100%; font-size:16px; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2); }
+  .spending-box .field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .spending-box .field input{ width:100%; min-width:0; font-size:16px; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2); }
   .spending-box .field label{ font-size:11.5px; color:var(--text-dim); font-weight:600; }
   .spending-total b{ font-family:var(--font-num); font-size:16px; color:var(--rose-deep); }
   .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 22px; border-radius:999px; font-size:13px; z-index:200; box-shadow:0 8px 20px rgba(0,0,0,0.25); opacity:0; pointer-events:none; transition:opacity .25s; }
@@ -442,13 +469,13 @@
   /* ---------- modal ---------- */
   .overlay{ position:fixed; inset:0; background:rgba(74,63,58,0.35); backdrop-filter: blur(2px); display:none; align-items:flex-start; justify-content:center; z-index:100; padding:40px 16px; overflow-y:auto; }
   .overlay.open{ display:flex; }
-  .modal{ background: var(--surface); border-radius: 22px; width:100%; max-width:520px; padding:28px 28px 26px; box-shadow: 0 20px 50px rgba(74,63,58,0.25); }
+  .modal{ background: var(--surface); border-radius: 22px; width:100%; max-width:520px; padding:28px 28px 26px; box-shadow: 0 20px 50px rgba(74,63,58,0.25); overflow-x:hidden; }
   .modal h2{ font-family:var(--font-display); font-size:21px; margin-bottom:6px; font-weight:700; color:var(--text); }
   .modal .modal-sub{ font-size:12px; color:var(--text-dim); margin-bottom:16px; }
   .modal .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
-  .modal .field{ display:flex; flex-direction:column; gap:5px; margin-bottom:11px; }
+  .modal .field{ display:flex; flex-direction:column; gap:5px; margin-bottom:11px; min-width:0; }
   .modal .field label{ font-size:11.5px; color:var(--text-dim); font-weight:600; display:block; margin-bottom:5px; }
-  .modal input, .modal select{ background: var(--surface-2); border:1.5px solid var(--line); color:var(--text); padding:13px 14px; border-radius:10px; font-size:16px; font-family:var(--font-body); width:100%; }
+  .modal input, .modal select{ background: var(--surface-2); border:1.5px solid var(--line); color:var(--text); padding:13px 14px; border-radius:10px; font-size:16px; font-family:var(--font-body); width:100%; min-width:0; }
   .modal input:focus, .modal select:focus{ outline:2px solid var(--rose); }
   .modal-actions{ display:flex; gap:10px; margin-top:16px; justify-content:flex-end; flex-wrap:wrap; }
   .btn-secondary{ background:none; border:1.5px solid var(--line); color:var(--text-dim); padding:13px 20px; border-radius:999px; cursor:pointer; font-size:14px; font-family:var(--font-display); font-weight:700; }
@@ -529,7 +556,22 @@
     .hero .hcountdown{ align-self:flex-end; }
     .modal{ padding:22px 18px 20px; }
     .modal .row{ grid-template-columns:1fr; }
+    .field-row{ grid-template-columns:1fr; }
     .cat-panel .field-row{ grid-template-columns:1fr; }
+  }
+  /* 印刷用（スマホ操作が苦手な家族に紙で見せる、コンビニ印刷等を想定） */
+  @media print{
+    header .btn-group, .tabs, .filters, #team-filter-row, .control-row, .search-box,
+    .fab, #fab-add-btn, .card-actions, .cat-strip, .bulk-done-btn, .usual-pattern-btn,
+    .card-share-btn, .att-add-row, footer, .cat-banner-box, .pr-row, #banner-rotator, .next-action,
+    .cat-active-panel{
+      display:none !important;
+    }
+    body{ background:#fff; padding-bottom:0; }
+    .ticket{ box-shadow:none; border:1px solid #ccc; break-inside:avoid; }
+    .timeline-list{ display:block !important; }
+    .timeline-details summary{ display:none; }
+    .grid{ grid-template-columns:1fr; padding:0; }
   }
 </style>
 </head>
@@ -575,7 +617,7 @@
   <button onclick="closeSharePopup()" style="width:100%; margin-top:14px; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:none; font-family:var(--font-display); font-weight:700; font-size:14px; cursor:pointer; color:var(--text-dim);">閉じる</button>
 </div>
 
-<div id="loading-screen" style="padding:60px 5vw; color:var(--text-dim); font-size:13.5px;">読み込んでいます…</div>
+<div id="loading-screen" style="padding:60px 5vw; color:var(--text-dim); font-size:13.5px; text-align:center;"><span class="spinner"></span>読み込んでいます…</div>
 
 <div id="landing-screen" style="display:none; padding:60px 5vw; max-width:520px; margin:0 auto; text-align:center;">
   <h2 style="font-family:var(--font-display); font-size:22px; margin-bottom:10px;">遠征手帳へようこそ</h2>
@@ -600,9 +642,9 @@
 <div id="offline-banner" style="display:none; background:#FFF3E0; color:#8a5a1f; text-align:center; font-size:12px; font-weight:700; padding:8px; border-bottom:1px solid #f0d9b5;">📴 オフライン表示中：通信が回復するまで、前回取得したデータを表示しています（編集はできません）</div>
 <div class="tabs-wrap">
   <div class="tabs">
-    <button class="tab active" id="tab-cards" onclick="switchTab('cards')">遠征カード</button>
+    <button class="tab active" id="tab-cards" onclick="switchTab('cards')">🎫 遠征カード</button>
     <button class="tab" id="tab-calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
-    <button class="tab" id="tab-history" onclick="switchTab('history')">予約履歴</button>
+    <button class="tab" id="tab-history" onclick="switchTab('history')">🧾 予約履歴</button>
     <button class="tab" id="tab-stamps" onclick="switchTab('stamps')">🏟 スタンプ</button>
   </div>
 </div>
@@ -650,10 +692,7 @@
 <div class="overlay" id="schedule-import-overlay" onclick="if(event.target===this) closeScheduleImport();">
   <div class="modal">
     <div class="modal-title" id="modal-title-si">スケジュールをまとめて入力</div>
-    <div class="modal-sub">Bリーグ公式サイトの日程ページからコピーした場合、自動で認識します（サーバー設定不要）。それ以外のテキストはAIが解析を試みます。</div>
-    <div style="background:var(--butter-wash,#FFF7E6); border:1px solid var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:11.5px; color:#8a6d1f; line-height:1.7;">
-      ⚠️ Bリーグ公式サイト以外のテキストはAIでの解析を試みますが、サーバー側の追加設定が必要です。未設定の場合は「失敗」と表示されます。
-    </div>
+    <div class="modal-sub">Bリーグ公式サイトの日程ページからコピーすると自動で認識します。</div>
     <div class="field" style="margin-top:14px;">
       <label>スケジュールテキスト（コピペでOK）</label>
       <textarea id="schedule-import-text" style="width:100%; min-height:140px; border:1.5px solid var(--line); border-radius:10px; padding:12px; font-size:16px; font-family:var(--font-body); background:var(--surface-2); resize:vertical;" placeholder="例）&#10;10/3(金) 18:00 アルバルク東京 vs 宇都宮ブレックス @ TOYOTA ARENA TOKYO&#10;10/5(日) 14:00 千葉ジェッツ vs 琉球ゴールデンキングス @ LaLa arena TOKYO-BAY"></textarea>
@@ -681,7 +720,6 @@
 <div class="overlay" id="overlay" onclick="if(event.target===this) closeModal();">
   <div class="modal">
     <h2 id="modal-title">新しい遠征を登録</h2>
-    <p class="modal-sub" id="modal-sub">同じチームの試合は「登録して続けて追加」が便利です。</p>
     <div class="row">
       <div class="field"><label>日付</label><input id="f-date" type="date" style="font-size:16px;"></div>
       <div class="field" id="f-time-wrap"><label>試合開始時刻</label><input id="f-time" type="time" style="font-size:16px;"></div>
@@ -718,7 +756,6 @@
         <a href="javascript:void(0)" id="opponent-league-toggle-link" onclick="toggleOpponentLeaguePicker()" style="font-size:11.5px; color:var(--rose-deep); text-decoration:underline;">別リーグの相手と対戦する場合はこちら</a>
         <div id="opponent-league-picker" style="display:none; margin-top:6px;">
           <select id="f-opponent-league-select" onchange="handleOpponentLeagueChange()" style="font-size:16px;"></select>
-          <div id="opponent-league-note" style="font-weight:400; color:var(--text-faint); font-size:11px; margin-top:4px;"></div>
         </div>
       </div>
       <select id="f-match-select" onchange="handleOpponentSelectChange()" style="font-size:16px; display:block;">
@@ -853,6 +890,7 @@ let focusExpandTripId = null; // ジャンプ時だけその場で開く一時�
 let historyCatFilter = 'ALL';
 let activeCat = {}; // { tripId: 現在開いているカテゴリキー } 1遠征につき1カテゴリのみ開く（タブ切り替え式）
 let packingListOpen = new Set(); // 持ち物リストを手動で開いた遠征のID（render()で毎回<details>が作り直されても、開閉状態を維持するため）
+let timelineOpen = new Set(); // 当日タイムラインを手動で開いた遠征のID（同上）
 let stationDetailsOpen = new Set(); // 発着駅欄を手動で開いた「${tripId}:${categoryKey}」の組み合わせ
 let budgetCap = 0;
 let packingTemplate = []; // 手帳全体で共通の持ち物テンプレート（文字列の配列）。新規遠征作成時に自動でコピーされる
@@ -1227,18 +1265,15 @@ function handleTeamSelectChange(){
   const oppLeagueWrap = document.getElementById('f-opponent-league-wrap');
   const oppLeagueSel = document.getElementById('f-opponent-league-select');
   const picker = document.getElementById('opponent-league-picker');
-  const note = document.getElementById('opponent-league-note');
 
   if(leagues.length > 1 && myTeamObj && myTeamObj.league){
     oppLeagueWrap.style.display = 'block';
     oppLeagueSel.innerHTML = leagues.map(l=>`<option value="${l}">${l}</option>`).join('');
     oppLeagueSel.value = myTeamObj.league; // デフォルトは自チームと同じリーグ
-    note.textContent = '（プレシーズン等で別リーグの相手と対戦する場合は、ここでリーグを切り替えられます）';
     picker.style.display = 'none';
     document.getElementById('opponent-league-toggle-link').textContent = '別リーグの相手と対戦する場合はこちら';
   }else{
     oppLeagueWrap.style.display = 'none';
-    note.textContent = '';
   }
   renderOpponentOptionsForLeague();
   handleTeamInput();
@@ -1465,9 +1500,10 @@ function getBannerGroups(){
 }
 
 
-// 会場名からGoogleマップの検索URLを組み立てる（APIキー不要）
-function mapUrl(venueName){
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueName)}`;
+// 現在地を出発地として、指定した場所までのGoogleマップ経路検索URLを組み立てる
+// （originを指定しないと、Googleマップ側が自動的に現在地を起点にしてくれる仕様を利用）
+function routeFromCurrentLocationUrl(destinationName){
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destinationName)}`;
 }
 
 function fmtDate(iso){
@@ -1519,12 +1555,16 @@ function renderHero(){
   const d = daysUntil(t.date);
   const pending = BOOKABLE_CATS.filter(k=>!t.status[k] && !t.detail[k]?.notNeeded);
   const catInfo = k => CATS.find(c=>c.key===k);
+  // 本日の場合、一番早い時刻の予定を一言添える（急いで確認したい場面なので、展開しなくても分かるように）
+  const isToday = t.date === TODAY;
+  const earliestItem = isToday ? getTimelineItems(t)[0] : null;
   box.innerHTML = `
     <div class="hero" onclick="focusTrip('${t.id}')">
       <div>
-        <div class="htitle">次の遠征</div>
+        <div class="htitle">次の遠征${isToday?' <span class="today-badge">本日</span>':''}</div>
         <div class="hmatch">${t.team} ${t.match}</div>
         <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
+        ${earliestItem ? `<div class="htoday-time">${earliestItem.icon} ${earliestItem.time} ${earliestItem.label}</div>` : ''}
         ${pending.length
           ? `<div class="hpending">${pending.map(k=>`<span>${catInfo(k).icon} ${catInfo(k).label}が未予約</span>`).join('')}</div>`
           : `<div class="hall-set">✓ 交通・チケット・宿泊はすべて予約済みです</div>`}
@@ -1800,6 +1840,13 @@ async function applyUsualPattern(tripId){
   showToast('✓ いつもの設定を一括反映しました', 2000);
 }
 
+// 「予約先・方法」欄のプレースホルダー。宿泊だけは、ルート検索がこの値をそのまま行き先にするため、
+// 予約サイト名ではなく実際の場所の名前を入れてもらう必要がある
+function methodPlaceholder(key){
+  if(key==='hotel') return '例）東横イン仙台東口';
+  return '例）楽天トラベル';
+}
+
 function memoPlaceholder(key){
   const map = {
     ticket: '座席番号など',
@@ -1819,6 +1866,75 @@ function seasonalPackingPresets(dateStr){
   if(month === 12 || month <= 2) return ['🧤 手袋', '💧 カイロ'];
   if(month >= 6 && month <= 8) return ['🧴 日焼け止め', '🧂 塩分タブレット', '❄️ 冷却タオル', '🌀 携帯扇風機'];
   return [];
+}
+
+// 当日の動きを時系列でまとめる（入力されている時刻だけを拾い、無ければセクション自体を出さない）
+// 当日の時刻情報を、入力されている分だけ時系列の配列で返す（タイムライン表示・ヒーロー・コンパクト表示で共有する）
+function getTimelineItems(t){
+  const ob = t.detail.transport_outbound || {};
+  const rt = t.detail.transport_return || {};
+  const food = t.detail.food || {};
+  const other = t.detail.other || {};
+  const hotel = t.detail.hotel || {};
+  const items = [];
+  if(ob.departureTime) items.push({ time: ob.departureTime, icon:'🚃', label:'出発' });
+  if(ob.arrivalTime) items.push({ time: ob.arrivalTime, icon:'📍', label:'会場到着' });
+  if(t.gateOpenTime) items.push({ time: t.gateOpenTime, icon:'🚪', label:'開場' });
+  if(t.showStartTime) items.push({ time: t.showStartTime, icon:'🎉', label:'演出開始' });
+  if(t.time) items.push({ time: t.time, icon:'🏀', label:'試合開始' });
+  if(food.reservationTime) items.push({ time: food.reservationTime, icon:'🍜', label: food.placeName ? `${food.placeName}` : '食事' });
+  if(other.reservationTime) items.push({ time: other.reservationTime, icon:'📌', label: other.placeName ? `${other.placeName}` : '予定' });
+  if(rt.departureTime) items.push({ time: rt.departureTime, icon:'🚅', label:'会場を出る' });
+  if(rt.arrivalTime) items.push({ time: rt.arrivalTime, icon:'🏠', label:'帰宅予定' });
+  if(hotel.reservationTime) items.push({ time: hotel.reservationTime, icon:'🏨', label: hotel.method ? `${hotel.method}へ` : 'ホテルへ' });
+  return resolveTimelineOrder(items);
+}
+// 深夜0時をまたぐ日程（試合後、日付が変わってから帰宅する等）でも正しい順序になるよう並び替える。
+// 単純な時刻の文字列比較だと「00:45」が「19:00」より前に来てしまうため、
+// 時刻の並びを環状（24時間で一周する輪）とみなし、最も間隔が空いている場所を「一日の境目」として
+// そこで輪を切り開く方式にする（空港の乗り継ぎ計算などで使われる考え方と同じ）
+function resolveTimelineOrder(items){
+  if(items.length < 2) return items;
+  const withMinutes = items.map(item => {
+    const [h,m] = item.time.split(':').map(Number);
+    return { ...item, minutes: h*60+m };
+  });
+  withMinutes.sort((a,b) => a.minutes - b.minutes);
+  let maxGap = -1, maxGapIndex = 0;
+  for(let i=0; i<withMinutes.length; i++){
+    const cur = withMinutes[i].minutes;
+    const next = withMinutes[(i+1)%withMinutes.length].minutes;
+    const gap = (next - cur + 1440) % 1440;
+    if(gap > maxGap){ maxGap = gap; maxGapIndex = i; }
+  }
+  return [...withMinutes.slice(maxGapIndex+1), ...withMinutes.slice(0, maxGapIndex+1)];
+}
+
+function renderDayTimeline(t){
+  const items = getTimelineItems(t);
+  if(items.length < 2) return ''; // 1件だけ（多くの場合は試合開始時刻のみ）だと、カード上部の情報と重複するだけなので出さない
+  // 区間ごとの所要時間を計算する（乗換案内でおなじみの「◯分」表示）
+  const rows = items.map((item, i)=>{
+    let durationHtml = '';
+    if(i > 0){
+      const prevMin = parseInt(items[i-1].time.split(':')[0])*60 + parseInt(items[i-1].time.split(':')[1]);
+      const curMin = parseInt(item.time.split(':')[0])*60 + parseInt(item.time.split(':')[1]);
+      const diff0 = curMin - prevMin;
+      const diff = diff0 < 0 ? diff0 + 1440 : diff0; // 日をまたいだ場合（例：21:30→00:45）も正しく計算する
+      if(diff > 0){
+        const h = Math.floor(diff/60), m = diff%60;
+        durationHtml = `<div class="timeline-duration">${h>0?`${h}時間`:''}${m>0?`${m}分`:''}</div>`;
+      }
+    }
+    return `${durationHtml}<div class="timeline-row"><span class="timeline-dot"></span><span class="timeline-time">${item.time}</span><span class="timeline-icon">${item.icon}</span><span class="timeline-label">${item.label}</span></div>`;
+  }).join('');
+  return `
+    <details class="station-details timeline-details" ${timelineOpen.has(t.id)?'open':''} ontoggle="if(this.open) timelineOpen.add('${t.id}'); else timelineOpen.delete('${t.id}');">
+      <summary>⏱ 当日タイムライン</summary>
+      <div class="timeline-list">
+        ${rows}
+      </div>
+    </details>`;
 }
 
 function renderPackingListSection(t){
@@ -1852,14 +1968,16 @@ function renderPackingListSection(t){
 }
 
 // 「誰が行く？」参加予定セクション。端末に記憶した名前を候補として出し、毎回フルネームを打たなくて済むようにする
-function renderAttendeesSection(t){
+function renderAttendeesSection(t, isPast){
   const attendees = t.attendees || [];
   const knownNames = Settings.get('knownAttendeeNames', []);
-  const statusLabel = { going:'✓ 行く', maybe:'？ 未定', not_going:'✕ 行かない' };
+  const statusLabel = isPast
+    ? { going:'✓ 行った', maybe:'？ 未定のまま', not_going:'✕ 行かなかった' }
+    : { going:'✓ 行く', maybe:'？ 未定', not_going:'✕ 行かない' };
   const statusClass = { going:'att-going', maybe:'att-maybe', not_going:'att-notgoing' };
   return `
     <details class="station-details">
-      <summary>🙋 誰が行く？${attendees.length ? `<span class="packing-count">（${attendees.filter(a=>a.status==='going').length}人が参加予定）</span>` : ''}</summary>
+      <summary>🙋 ${isPast?'誰が行った？':'誰が行く？'}${attendees.length ? `<span class="packing-count">（${attendees.filter(a=>a.status==='going').length}人${isPast?'参加':'参加予定'}）</span>` : ''}</summary>
       <div style="margin-top:8px;">
         ${attendees.map(a => `
           <div class="att-row">
@@ -1876,7 +1994,7 @@ function renderAttendeesSection(t){
           </select>` : ''}
           <input type="text" id="att-input-${t.id}" placeholder="名前を入力（例：パパ）" style="font-size:16px;">
           <div style="display:flex; gap:6px; margin-top:6px;">
-            <button type="button" class="att-add-btn att-going" onclick="const n=document.getElementById('att-input-${t.id}').value; setTripAttendee('${t.id}',n,'going'); document.getElementById('att-input-${t.id}').value='';">✓ 行く</button>
+            <button type="button" class="att-add-btn att-going" onclick="const n=document.getElementById('att-input-${t.id}').value; setTripAttendee('${t.id}',n,'going'); document.getElementById('att-input-${t.id}').value='';">${isPast?'✓ 行った':'✓ 行く'}</button>
             <button type="button" class="att-add-btn att-maybe" onclick="const n=document.getElementById('att-input-${t.id}').value; setTripAttendee('${t.id}',n,'maybe'); document.getElementById('att-input-${t.id}').value='';">？ 未定</button>
             <button type="button" class="att-add-btn att-notgoing" onclick="const n=document.getElementById('att-input-${t.id}').value; setTripAttendee('${t.id}',n,'not_going'); document.getElementById('att-input-${t.id}').value='';">✕ 行かない</button>
           </div>
@@ -1897,6 +2015,39 @@ function catPanelContent(t, c){
       </div>
       ${IS_EDITABLE ? `<label class="done-toggle" style="margin-top:6px;"><input type="checkbox" ${d.notifyOnSale?'checked':''} onchange="handleNotifyToggle('${t.id}',this)" ${(!d.saleDate||!d.saleTime)?'disabled':''}> この時間に通知する（このブラウザを開いている間）</label>` : ''}
       ${d.saleDate && d.saleTime ? `<div style="font-size:10.5px; color:#8a6d1f; margin-top:4px;">${d.notifyOnSale ? '✅ 通知予約済み' : '通知はオフです'}</div>` : ''}
+    </div>` : '';
+
+  // チケットパネルに、開場時間・演出開始時刻（当日タイムライン用、任意項目）を出す
+  const venueTimesBlock = c.key==='ticket' ? `
+    <div class="field-row" style="margin-top:2px;">
+      <div class="field"><label>開場時間</label><input type="time" value="${t.gateOpenTime||''}" ${IS_EDITABLE?`onchange="setTripVenueTimes('${t.id}','gateOpenTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>演出開始</label><input type="time" value="${t.showStartTime||''}" ${IS_EDITABLE?`onchange="setTripVenueTimes('${t.id}','showStartTime',this.value)"`:'disabled'}></div>
+    </div>` : '';
+
+  // 交通(往路・復路)パネルに、出発・到着予定時刻（当日タイムライン用、任意項目）を出す
+  const transportTimesBlock = (c.key==='transport_outbound' || c.key==='transport_return') ? `
+    <div class="field-row" style="margin-top:2px;">
+      <div class="field"><label>${c.key==='transport_outbound'?'出発時刻':'会場を出る時刻'}</label><input type="time" value="${d.departureTime||''}" ${IS_EDITABLE?`onchange="setTransportTimes('${t.id}','${c.key}','departureTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>${c.key==='transport_outbound'?'会場到着予定':'帰宅予定'}</label><input type="time" value="${d.arrivalTime||''}" ${IS_EDITABLE?`onchange="setTransportTimes('${t.id}','${c.key}','arrivalTime',this.value)"`:'disabled'}></div>
+    </div>` : '';
+
+  // 飲食・その他パネルに、お店の名前・来店予定時刻（当日タイムライン＆ルート検索用、任意項目）を出す
+  const placeTimeBlock = (c.key==='food' || c.key==='other') ? `
+    <div class="field-row" style="margin-top:2px;">
+      <div class="field"><label>${c.key==='food'?'お店の名前':'場所の名前'}</label><input value="${(d.placeName||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','${c.key}','placeName',this.value)"`:'disabled'} placeholder="${c.key==='food'?'例）餃子の王将 仙台店':'例）仙台市博物館'}"></div>
+      <div class="field"><label>予定時刻</label><input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','${c.key}','reservationTime',this.value)"`:'disabled'}></div>
+    </div>` : '';
+
+  // 場所の名前が分かっているカテゴリ（飲食・その他・宿泊）には、現在地からのルート検索リンクを出す
+  const routeDestination = c.key==='hotel' ? d.method : (c.key==='food' || c.key==='other') ? d.placeName : '';
+  const routeBlock = routeDestination ? `<a class="link-open-btn" style="margin-bottom:10px;" href="${routeFromCurrentLocationUrl(routeDestination)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ 現在地から${routeDestination}へのルートを調べる</a>` : '';
+
+  // 宿泊パネルに、到着予定時刻（当日タイムライン用、任意項目）を出す
+  // 連戦などで「その日の終わりはホテルへ」というケースに対応するため
+  const hotelTimeBlock = c.key==='hotel' ? `
+    <div class="field" style="margin-top:2px;">
+      <label>到着予定時刻</label>
+      <input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','hotel','reservationTime',this.value)"`:'disabled'}>
     </div>` : '';
 
   const catBannerBlock = getCatBannerAds(c.key).length ? (()=>{
@@ -1955,15 +2106,13 @@ function catPanelContent(t, c){
     </details>
   ` : '';
 
-  const stayInfoBlock = (c.key==='hotel') ? (()=>{
-    const checkInMd = fmtDate(t.date).md, checkInDow = fmtDate(t.date).dow;
-    return `<div class="stay-info-hint">🏨 試合日：${checkInMd}(${checkInDow})（日帰りの場合は不要かも）</div>`;
-  })() : '';
 
   if(!c.bookable){
     return `
       <div class="cat-panel">
-        <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="お店の名前など"></div>
+        ${placeTimeBlock}
+        ${routeBlock}
+        <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="${c.key==='food'?'メニューのメモなど':'メモ'}"></div>
         ${(c.key==='food' || c.key==='other') ? `
         <div class="field"><label>${c.key==='food' ? 'お店のリンク（食べログ・地図など）' : 'リンク'}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは電話番号など"></div>
         ${renderLinkAction(d.link, c.key==='food'?'お店のページ':'リンク先')}
@@ -1976,12 +2125,15 @@ function catPanelContent(t, c){
   return `
     <div class="cat-panel">
       ${saleBlock}
-      ${stayInfoBlock}
       <div class="field-row">
-        <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="例）楽天トラベル"></div>
+        <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="${methodPlaceholder(c.key)}"></div>
         <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
       ${(()=>{ if(d.method || !IS_EDITABLE) return ''; if(['transport_outbound','transport_return','hotel'].includes(c.key)) return ''; /* この3カテゴリは「⚡いつもの一括入力」がカード上にあるため、二重になるチップは出さない */ const lastMethod = getLastUsedValue(t.sport, t.team, c.key, 'method'); return lastMethod ? `<button type="button" class="quick-fill-chip" onclick="updateDetail('${t.id}','${c.key}','method','${lastMethod.replace(/'/g,"\\'")}')">↺ 前回と同じ「${lastMethod}」を使う</button>` : ''; })()}
+      ${venueTimesBlock}
+      ${transportTimesBlock}
+      ${hotelTimeBlock}
+      ${routeBlock}
       ${stationBlock}
       <div class="field-row">
         <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" min="0" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
@@ -2018,13 +2170,14 @@ function renderTicketCard(t, isPast){
   const isExpanded = expandedTrips.has(t.id) || focusExpandTripId === t.id;
   const showSlim = isCompact && !isExpanded;
   const showFull = !isCompact || isExpanded;
+  const todayEarliestItem = (t.date===TODAY) ? getTimelineItems(t)[0] : null;
 
   // コンパクト表示（折りたたみ状態）：編集操作は持たせず、タップで展開してから行う設計にする
   const slimRow = showSlim ? `
     <div class="ticket-compact-row" onclick="toggleExpand('${t.id}')">
       <div class="tcr-date">
         <div class="tcr-d">${md}</div>
-        <div class="tcr-dow">${dow}</div>
+        <div class="tcr-dow">${t.date===TODAY?'<span class="today-badge today-badge-sm">本日</span>':dow}</div>
       </div>
       <div class="tcr-main">
         <div class="tcr-line1">
@@ -2035,6 +2188,7 @@ function renderTicketCard(t, isPast){
           <span class="tcr-match">vs ${t.match || '対戦未定'}</span>
           ${t.venue ? `<span class="tcr-venue">📍${t.venue}</span>` : ''}
         </div>
+        ${todayEarliestItem ? `<div class="tcr-today-time">${todayEarliestItem.icon} ${todayEarliestItem.time} ${todayEarliestItem.label}</div>` : ''}
         ${pendingCount>0 ? `<div class="tcr-pending">⚠️ 未予約${pendingCount}件</div>` : `<div class="tcr-ok">✓ 準備OK</div>`}
       </div>
       <span class="tcr-chevron">▾</span>
@@ -2049,7 +2203,7 @@ function renderTicketCard(t, isPast){
           <div class="matchup">${t.match}</div>
           <div class="venue-row">
             <span class="venue">${t.venue}</span>
-            ${t.venue ? `<a class="map-badge" href="${mapUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ 地図を見る</a>` : ''}
+            ${t.venue ? `<a class="map-badge" href="${routeFromCurrentLocationUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ ルート検索</a>` : ''}
             ${t.venue ? `<button type="button" class="venue-copy-badge" onclick="event.stopPropagation(); copyVenueName('${t.venue.replace(/'/g,"\\'")}')" title="会場名をコピー">📋</button>` : ''}
           </div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
@@ -2115,8 +2269,9 @@ function renderTicketCard(t, isPast){
             ${catPanelContent(t,c)}
           </div>`;
         })() : ''}
+        ${renderDayTimeline(t)}
         ${renderPackingListSection(t)}
-        ${(!isPast && !t.isCancelled) ? renderAttendeesSection(t) : ''}
+        ${!t.isCancelled ? renderAttendeesSection(t, isPast) : ''}
         ${isPast ? `
         <div class="journal-box">
           <div class="journal-label">🏆 観戦記録</div>
@@ -2231,6 +2386,67 @@ async function setBudgetCap(val){
 }
 
 // 観戦記録（勝敗）を記録する。同じボタンをもう一度押すと記録を取り消す
+// 開場時間・演出開始時刻を保存する（当日タイムライン用、任意項目）
+async function setTripVenueTimes(tripId, field, val){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t[field] = val;
+  const other = field==='gateOpenTime' ? (t.showStartTime||null) : (t.gateOpenTime||null);
+  try{
+    const { error } = await sb.rpc('set_trip_venue_times', {
+      p_edit_token: EDIT_TOKEN, p_trip_id: tripId,
+      p_gate_open_time: field==='gateOpenTime' ? (val||null) : other,
+      p_show_start_time: field==='showStartTime' ? (val||null) : other
+    });
+    if(error) throw error;
+    render();
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+// 出発時刻・到着予定時刻を保存する（交通(往路・復路)に紐づく、当日タイムライン用の任意項目）
+async function setTransportTimes(tripId, catKey, field, val){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t.detail[catKey][field] = val;
+  const other = field==='departureTime' ? (t.detail[catKey].arrivalTime||null) : (t.detail[catKey].departureTime||null);
+  try{
+    const { error } = await sb.rpc('set_transport_times', {
+      p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_category: catKey,
+      p_departure_time: field==='departureTime' ? (val||null) : other,
+      p_arrival_time: field==='arrivalTime' ? (val||null) : other
+    });
+    if(error) throw error;
+    render();
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+// お店の名前・来店予定時刻を保存する（飲食・その他カテゴリ向け、当日タイムライン＆ルート検索用）
+async function setPlaceAndTime(tripId, catKey, field, val){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t.detail[catKey][field] = val;
+  const other = field==='placeName' ? (t.detail[catKey].reservationTime||null) : (t.detail[catKey].placeName||null);
+  try{
+    const { error } = await sb.rpc('set_place_and_time', {
+      p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_category: catKey,
+      p_place_name: field==='placeName' ? (val||null) : other,
+      p_reservation_time: field==='reservationTime' ? (val||null) : other
+    });
+    if(error) throw error;
+    render();
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+
 async function setTripResult(tripId, result){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
@@ -2556,6 +2772,7 @@ async function deleteTrip(tripId){
     delete activeCat[tripId];
     expandedTrips.delete(tripId);
     packingListOpen.delete(tripId);
+    timelineOpen.delete(tripId);
     for(const key of [...stationDetailsOpen]){ if(key.startsWith(`${tripId}:`)) stationDetailsOpen.delete(key); }
     render();
     showToast('削除しました', 6000, { label:'元に戻す', onclick:'undoDeleteTrip()' });
@@ -2566,6 +2783,11 @@ async function deleteTrip(tripId){
 }
 
 // 直前に削除した遠征を復元する（新規作成と同じ手順で作り直し、各カテゴリの内容も1つずつ復元する）
+// ⚠️ 注意: これまで3回、新しいフィールド（result/journal→cancelled/attendees/packingList→
+// venue times/transport times/place+time）を追加した際に、この関数への反映を忘れて
+// 「削除→元に戻す」でデータが欠ける不具合を繰り返している。
+// 今後 trips や booking_details に新しい列・専用RPCを追加する場合は、必ずこの関数も
+// あわせて更新すること（normalizeTrip()が返す全フィールドと照らし合わせて確認する）。
 async function undoDeleteTrip(){
   if(!IS_EDITABLE || !lastDeletedTrip) return;
   const t = lastDeletedTrip;
@@ -2596,6 +2818,19 @@ async function undoDeleteTrip(){
     if(t.result){ await sb.rpc('set_trip_result', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_result: t.result }); }
     if(t.journalMemo){ await sb.rpc('set_trip_journal', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_memo: t.journalMemo }); }
     if(t.isCancelled){ await sb.rpc('set_trip_cancelled', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_cancelled: true }); }
+    if(t.gateOpenTime || t.showStartTime){ await sb.rpc('set_trip_venue_times', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_gate_open_time: t.gateOpenTime||null, p_show_start_time: t.showStartTime||null }); }
+    for(const tKey of ['transport_outbound','transport_return']){
+      const tdRestore = t.detail[tKey];
+      if(tdRestore && (tdRestore.departureTime || tdRestore.arrivalTime)){
+        await sb.rpc('set_transport_times', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_category: tKey, p_departure_time: tdRestore.departureTime||null, p_arrival_time: tdRestore.arrivalTime||null });
+      }
+    }
+    for(const key of ['food','other','hotel']){
+      const pd = t.detail[key];
+      if(pd && (pd.placeName || pd.reservationTime)){
+        await sb.rpc('set_place_and_time', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_category: key, p_place_name: pd.placeName||null, p_reservation_time: pd.reservationTime||null });
+      }
+    }
     if(t.packingList && t.packingList.length){ await sb.rpc('set_packing_list', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_packing_list: t.packingList }); }
     for(const a of (t.attendees||[])){ await sb.rpc('set_trip_attendee', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_name: a.name, p_status: a.status }); }
     await fetchNotebook(TOKEN);
@@ -2693,8 +2928,30 @@ function renderSpendingSummary(){
       });
     });
     const grandTotal = Object.values(byCategory).reduce((a,b)=>a+b, 0);
+    // ドーナツグラフ用のconic-gradientを組み立てる（外部ライブラリ不要、CSSだけで円グラフを描く）
+    const donutColors = ['#D98B96','#93B5C6','#E0B84A','#8FBC94','#B08FC7','#D9A05B'];
+    let cumPct = 0;
+    const gradientStops = grandTotal ? CATS.filter(c=>byCategory[c.key] > 0).sort((a,b)=>byCategory[b.key]-byCategory[a.key]).map((c,i)=>{
+      const pct = byCategory[c.key] / grandTotal * 100;
+      const start = cumPct;
+      cumPct += pct;
+      return `${donutColors[i%donutColors.length]} ${start}% ${cumPct}%`;
+    }).join(', ') : '';
+    const donutHtml = grandTotal ? `
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:14px;">
+        <div style="width:88px; height:88px; border-radius:50%; flex-shrink:0; background:conic-gradient(${gradientStops}); position:relative;">
+          <div style="position:absolute; inset:14px; border-radius:50%; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--text-faint); text-align:center; line-height:1.3;">全期間<br>合計</div>
+        </div>
+        <div style="flex:1; display:flex; flex-wrap:wrap; gap:6px 10px;">
+          ${CATS.filter(c=>byCategory[c.key] > 0).sort((a,b)=>byCategory[b.key]-byCategory[a.key]).map((c,i)=>`
+            <div style="display:flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-dim);">
+              <span style="width:9px; height:9px; border-radius:50%; background:${donutColors[i%donutColors.length]}; display:inline-block;"></span>${c.label}
+            </div>`).join('')}
+        </div>
+      </div>` : '';
     wrap.innerHTML = tabsHtml + `
       <div class="spending-box">
+        ${donutHtml}
         ${grandTotal ? CATS.filter(c=>byCategory[c.key] > 0).sort((a,b)=>byCategory[b.key]-byCategory[a.key]).map(c=>{
           const pct = Math.round(byCategory[c.key] / grandTotal * 100);
           return `
@@ -2782,7 +3039,7 @@ function renderStamps(){
     wrap.innerHTML = `<div class="empty-state">
       <div class="empty-icon">🏟️</div>
       <div class="empty-title">まだ訪問記録がありません</div>
-      <div class="empty-desc">試合日が過ぎた遠征から、自動的にスタンプが貯まっていきます。<br>過去の遠征を登録すると、この場でも反映されます。</div>
+      <div class="empty-desc">試合日が過ぎた遠征から、自動的にスタンプが貯まっていきます。</div>
     </div>`;
     return;
   }
@@ -2856,10 +3113,14 @@ function renderStamps(){
       </div>`;
   }).join('');
 
-  const noMemoCount = pastTrips.filter(t => !t.journalMemo || !t.journalMemo.trim()).length;
-  const memoNudge = noMemoCount ? `
+  // 思い出メモ・観戦記録（勝敗）のどちらか未記入なら振り返りを促す（中止・延期した遠征は対象外）
+  // 会場を入力し忘れた遠征も対象に含めるため、venue絞り込み済みのpastTripsではなくallPastTripsを使う
+  const notedTrips = allPastTrips;
+  const noMemoCount = notedTrips.filter(t => !t.journalMemo || !t.journalMemo.trim()).length;
+  const noResultCount = notedTrips.filter(t => !t.result).length;
+  const memoNudge = (noMemoCount || noResultCount) ? `
     <div class="memo-nudge" onclick="switchTab('cards'); setSortMode('date');">
-      📝 思い出メモが未記入の遠征が${noMemoCount}件あります。書き残しておきませんか？
+      📝 ${[noMemoCount?`思い出メモが未記入の遠征が${noMemoCount}件`:'', noResultCount?`観戦記録(勝敗)が未記入の遠征が${noResultCount}件`:''].filter(Boolean).join('、')}あります。書き残しておきませんか？
     </div>` : '';
 
   wrap.innerHTML = memoNudge + sections + `<button class="add-btn" style="width:100%; margin-top:6px;" onclick="shareStamps()">📤 スタンプをシェアする</button>`;
@@ -3034,13 +3295,11 @@ function openModal(tripId){
   const t = editingTripId ? trips.find(x=>x.id===editingTripId) : null;
   if(t){
     document.getElementById('modal-title').textContent = '遠征を編集';
-    document.getElementById('modal-sub').textContent = '日程や会場に間違いがあれば、ここで直接修正できます。';
     document.getElementById('modal-keepopen-btn').style.display = 'none';
     document.getElementById('modal-submit-btn').textContent = '更新する';
     fillModalFields(t);
   }else{
     document.getElementById('modal-title').textContent = '新しい遠征を登録';
-    document.getElementById('modal-sub').textContent = '同じチームの試合は「登録して続けて追加」が便利です。';
     document.getElementById('modal-keepopen-btn').style.display = 'inline-block';
     document.getElementById('modal-submit-btn').textContent = '登録する';
     ['f-venue','f-date','f-time'].forEach(id=>document.getElementById(id).value='');
@@ -3168,7 +3427,7 @@ async function submitTrip(keepOpen){
         document.getElementById('venue-suggest-note').textContent = '';
         handleTeamSelectChange(); // 対戦相手のリーグ選択をチームの既定リーグに戻し、選択肢も作り直す
         document.getElementById('modal-save-msg').textContent = `「${match}」を登録しました。続けて次の試合を入力できます。`;
-        document.getElementById('f-match').focus();
+        document.getElementById('f-date').focus();
       }else{
         closeModal();
       }
@@ -3200,7 +3459,7 @@ function openCopyModal(tripId, key){
   copySource = { tripId, key };
   const c = CATS.find(x=>x.key===key);
   document.getElementById('copy-title').textContent = `${c.icon} ${c.label}情報をコピー`;
-  document.getElementById('copy-sub').textContent = `この試合の${c.label}情報を、選んだ遠征にもそのままコピーします（連泊で同じホテル・同じ交通手段を使う場合などに便利です）。`;
+  document.getElementById('copy-sub').textContent = `この試合の${c.label}情報を、選んだ遠征にそのままコピーします。`;
   const others = trips.filter(t=>t.id!==tripId && tripEndDate(t)>=TODAY).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const list = document.getElementById('copy-list');
   if(!others.length){
@@ -3252,7 +3511,7 @@ function showToast(msg, duration, action){
 function buildTripShareText(t){
   const catInfo = k => CATS.find(c=>c.key===k);
   const lines = [`【${t.team}】${t.match}`, `${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time||''}　@${t.venue||'会場未定'}`];
-  if(t.venue) lines.push(`🗺️ ${mapUrl(t.venue)}`);
+  if(t.venue) lines.push(`🗺️ ${routeFromCurrentLocationUrl(t.venue)}`);
   lines.push('');
   CATS.forEach(c=>{
     const d = t.detail[c.key];
@@ -3655,6 +3914,45 @@ function closeScheduleImport(){
 
 // Bリーグ公式サイトの試合日程ページ特有のコピペパターンを、外部APIを使わず解析する
 // （HOME/AWAYマーカーを起点に、日付・時刻・会場・対戦相手を順番に読み取る）
+// Bリーグ公式サイト（bleague.jp）の試合日程ページ特有のコピペパターンを解析する。
+// 89ers.jp（チーム個別サイト）とは構造が異なる別形式のため、専用に解析する:
+// 「YYYY.MM.DD(曜)」の日付行を起点に、チームA×2行→チームB×2行→県|会場略称→（あれば）時刻、と続く。
+// HOME/AWAYの明示が無いため、全試合を通して最も多く登場するチーム名を「自チーム」とみなし、
+// 各試合ごとにもう一方を「対戦相手」とする（自チームの略称を決め打ちしないため、どのチームの
+// 日程ページを貼っても機械的に判定できる）
+function parseBLeagueJpScheduleText(rawText){
+  const lines = rawText.split('\n').map(l=>l.trim()).filter(l=>l);
+  const blocks = [];
+  let i = 0;
+  while(i < lines.length){
+    const dateMatch = lines[i]?.match(/^(\d{4})\.(\d{1,2})\.(\d{1,2})\(.\)$/);
+    if(!dateMatch){ i++; continue; }
+    const year = dateMatch[1], month = dateMatch[2], day = dateMatch[3];
+    i++;
+    const teamA = lines[i]; i++;
+    if(lines[i] === teamA) i++; // 重複行をスキップ
+    const teamB = lines[i]; i++;
+    if(lines[i] === teamB) i++;
+    const venueRaw = lines[i]; i++; // 例：「宮城県 | ゼビオ」
+    let time = null;
+    const timeMatch = lines[i]?.match(/^(\d{1,2}):(\d{2})$/);
+    if(timeMatch){ time = lines[i]; i++; } // 時刻はまだ未定の試合もあるため、無ければスキップする
+    while(i < lines.length && !lines[i].match(/^\d{4}\.\d{1,2}\.\d{1,2}\(.\)$/)) i++; // 「見どころ」等の固定文言を読み飛ばす
+    blocks.push({ year, month, day, teamA, teamB, venue: (venueRaw||'').replace(' | ',' '), time });
+  }
+  if(!blocks.length) return [];
+  // 全試合を通して最も多く登場するチーム名を「自チーム」と判定する
+  const freq = {};
+  blocks.forEach(b => { freq[b.teamA] = (freq[b.teamA]||0)+1; freq[b.teamB] = (freq[b.teamB]||0)+1; });
+  const myTeamName = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0][0];
+  return blocks.map(b => ({
+    sport: 'バスケットボール',
+    team: myTeamName, opponent: (b.teamA === myTeamName) ? b.teamB : b.teamA,
+    match_date: `${b.year}-${String(b.month).padStart(2,'0')}-${String(b.day).padStart(2,'0')}`,
+    start_time: b.time, venue: b.venue
+  }));
+}
+
 function parseBLeagueScheduleText(rawText){
   const lines = rawText.split('\n').map(l=>l.trim()).filter(l=>l);
   const games = [];
@@ -3666,7 +3964,7 @@ function parseBLeagueScheduleText(rawText){
       i++; // 大会名は読み飛ばす
       const ownTeamLine1 = lines[i]; i++;
       if(lines[i] === ownTeamLine1) i++; // 重複行をスキップ
-      const dateMatch = lines[i]?.match(/^(\d{1,2})\/(\d{1,2})$/);
+      const dateMatch = lines[i]?.match(/^(\d{1,2})[\/.](\d{1,2})$/); // 「09/06」「8.29」どちらの表記にも対応する
       if(!dateMatch){ continue; } // 想定外の形式ならこの行だけ進めてやり直す
       const month = parseInt(dateMatch[1]), day = parseInt(dateMatch[2]);
       i++;
@@ -3702,8 +4000,9 @@ async function runScheduleImport(){
   btn.disabled = true;
   status.innerHTML = '<span class="spinner"></span>解析中…';
 
-  // まずBリーグ公式サイトのコピペ形式に一致するか、外部APIを使わず軽量に試す
-  const bLeagueGames = parseBLeagueScheduleText(text);
+  // まずBリーグ公式サイトのコピペ形式に一致するか、外部APIを使わず軽量に試す（bleague.jp形式→89ers.jp形式の順）
+  const bLeagueJpGames = parseBLeagueJpScheduleText(text);
+  const bLeagueGames = bLeagueJpGames.length ? bLeagueJpGames : parseBLeagueScheduleText(text);
   if(bLeagueGames.length){
     renderScheduleImportResult(bLeagueGames);
     status.textContent = `${bLeagueGames.length}件の試合を検出しました（Bリーグ公式サイトの形式として認識）。内容を確認・修正して「登録する」を押してください。`;
@@ -3738,10 +4037,21 @@ async function runScheduleImport(){
 function renderScheduleImportResult(parsed){
   const resultBox = document.getElementById('schedule-import-result');
   resultBox.dataset.count = parsed.length; // confirmScheduleImportがこの件数を見て登録対象を判断するため必須
-  resultBox.innerHTML = parsed.map((g,i)=>`
+  // 件数が多い場合（シーズン全体貼り付け等）、行きたい試合だけを選ぶ使い方が主になるため、
+  // 一括で全解除できるようにする。10件以下なら、そのまま全部登録したいケースの方が多いと見て全選択のままにする
+  const manyResults = parsed.length > 10;
+  const toggleBarHtml = `
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding:0 2px;">
+      <span id="ig-select-count" style="font-size:11.5px; color:var(--text-dim); font-weight:700;"></span>
+      <div style="display:flex; gap:6px;">
+        <button type="button" onclick="toggleAllScheduleImport(true)" style="font-size:11px; padding:5px 10px; border-radius:999px; border:1.5px solid var(--line); background:#fff; cursor:pointer;">すべて選択</button>
+        <button type="button" onclick="toggleAllScheduleImport(false)" style="font-size:11px; padding:5px 10px; border-radius:999px; border:1.5px solid var(--line); background:#fff; cursor:pointer;">すべて解除</button>
+      </div>
+    </div>`;
+  resultBox.innerHTML = toggleBarHtml + parsed.map((g,i)=>`
       <div style="background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <input type="checkbox" id="ig${i}" checked style="width:16px; height:16px; accent-color:var(--rose); flex-shrink:0;">
+          <input type="checkbox" id="ig${i}" ${manyResults?'':'checked'} onchange="updateScheduleImportCount()" style="width:16px; height:16px; accent-color:var(--rose); flex-shrink:0;">
           <span style="font-size:11px; color:var(--text-faint); font-weight:700;">${i+1}件目</span>
         </div>
         <div class="field" style="margin-bottom:6px;">
@@ -3765,6 +4075,25 @@ function renderScheduleImportResult(parsed){
         <div class="field" style="margin-top:6px;"><label style="font-size:10px;">会場</label><input id="ig${i}-venue" value="${(g.venue||'').replace(/"/g,'&quot;')}" style="font-size:13px; padding:6px 8px;"></div>
       </div>`).join('');
   document.getElementById('schedule-import-confirm-btn').style.display = 'block';
+  updateScheduleImportCount();
+}
+// 「すべて選択/解除」ボタン。シーズン全体から行きたい試合だけを選ぶ使い方を想定し、一括切り替えできるようにする
+function toggleAllScheduleImport(checked){
+  const total = parseInt(document.getElementById('schedule-import-result').dataset.count || '0');
+  for(let i=0;i<total;i++){
+    const cb = document.getElementById('ig'+i);
+    if(cb) cb.checked = checked;
+  }
+  updateScheduleImportCount();
+}
+function updateScheduleImportCount(){
+  const total = parseInt(document.getElementById('schedule-import-result').dataset.count || '0');
+  let checkedCount = 0;
+  for(let i=0;i<total;i++){
+    if(document.getElementById('ig'+i)?.checked) checkedCount++;
+  }
+  const label = document.getElementById('ig-select-count');
+  if(label) label.textContent = `${checkedCount}/${total}件を選択中`;
 }
 
 async function confirmScheduleImport(){
@@ -3828,11 +4157,13 @@ function normalizeTrip(raw){
   CATS.forEach(c=>{
     const bd = (raw.booking_details||[]).find(x=>x.category===c.key) || {};
     status[c.key] = !!bd.is_booked;
-    const base = { memo: bd.memo || '', notNeeded: !!bd.is_not_needed, link: bd.link || '' };
+    const base = { memo: bd.memo || '', notNeeded: !!bd.is_not_needed, link: bd.link || '',
+      placeName: bd.place_name || '', reservationTime: bd.reservation_time ? String(bd.reservation_time).slice(0,5) : '' };
     detail[c.key] = c.bookable
       ? { ...base, method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0,
           saleDate: bd.sale_date || '', saleTime: bd.sale_time ? String(bd.sale_time).slice(0,5) : '', notifyOnSale: !!bd.notify_on_sale,
-          departureStation: bd.departure_station || '', arrivalStation: bd.arrival_station || '', legs: Array.isArray(bd.legs) ? bd.legs : [] }
+          departureStation: bd.departure_station || '', arrivalStation: bd.arrival_station || '', legs: Array.isArray(bd.legs) ? bd.legs : [],
+          departureTime: bd.departure_time ? String(bd.departure_time).slice(0,5) : '', arrivalTime: bd.arrival_time ? String(bd.arrival_time).slice(0,5) : '' }
       : base;
   });
   return {
@@ -3842,6 +4173,8 @@ function normalizeTrip(raw){
     match: raw.opponent || '',
     date: raw.match_date,
     time: raw.start_time ? String(raw.start_time).slice(0,5) : '',
+    gateOpenTime: raw.gate_open_time ? String(raw.gate_open_time).slice(0,5) : '',
+    showStartTime: raw.show_start_time ? String(raw.show_start_time).slice(0,5) : '',
     venue: raw.venue || '',
     cost: raw.estimated_cost || 0,
     journalMemo: raw.journal_memo || '',
@@ -3930,7 +4263,6 @@ function openSettingsPanel(){
     </div>` : ''}
     <div style="margin-bottom:18px;">
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">📤 データのバックアップ</div>
-      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">登録した遠征の内容をテキストファイルとして保存できます。手元の記録用にどうぞ。</div>
       <div style="display:flex; gap:8px;">
         <button type="button" class="add-btn" style="flex:1; padding:11px; font-size:12px;" onclick="exportAllData()">📤 テキストで保存</button>
         <button type="button" class="add-btn" style="flex:1; padding:11px; font-size:12px;" onclick="exportAllDataCSV()">📊 CSVで保存</button>
@@ -3938,8 +4270,7 @@ function openSettingsPanel(){
     </div>
     ${IS_EDITABLE ? `
     <div style="margin-bottom:18px;">
-      <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎨 テーマカラー</div>
-      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">手帳全体の色を変更できます（家族みんなに反映されます）。</div>
+      <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎨 テーマカラー<span style="font-weight:400; color:var(--text-faint); font-size:10.5px;">（家族みんなに反映されます）</span></div>
       <div class="theme-color-presets">
         ${THEME_COLOR_PRESETS.map(c=>`<button type="button" class="theme-color-swatch" style="background:${c};" onclick="saveThemeColor('${c}')" title="${c}"></button>`).join('')}
         <label class="theme-color-swatch theme-color-custom" title="自由に選ぶ">
@@ -3948,8 +4279,7 @@ function openSettingsPanel(){
       </div>
     </div>` : ''}
     <div style="margin-bottom:18px;">
-      <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎒 持ち物テンプレート</div>
-      <div style="font-size:11.5px; color:var(--text-faint); line-height:1.7; margin-bottom:10px;">新しい遠征に自動でコピーされます。持ち物リストの「テンプレートとして保存」で更新できます。</div>
+      <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">🎒 持ち物テンプレート<span style="font-weight:400; color:var(--text-faint); font-size:10.5px;">（新しい遠征に自動コピー）</span></div>
       ${packingTemplate.length ? `
       <div class="theme-color-presets" style="gap:6px;">
         ${packingTemplate.map((item,idx)=>`<span class="packing-preset-chip" style="cursor:default;">${item}${IS_EDITABLE?` <button type="button" onclick="removeFromPackingTemplate(${idx})" style="border:none; background:none; color:var(--text-faint); cursor:pointer; padding:0 0 0 4px; font-size:11px;">×</button>`:''}</span>`).join('')}
@@ -4017,7 +4347,7 @@ function openSharePopup(){
   const lineSection = document.getElementById('share-popup-line-section');
 
   if(IS_EDITABLE){
-    modeLabel.textContent = '編集リンクまたは閲覧専用リンクをコピーできます';
+    modeLabel.textContent = '';
     editSection.innerHTML = `
       <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\\'")}','edit')">
         <span class="sab-icon">✏️</span>
