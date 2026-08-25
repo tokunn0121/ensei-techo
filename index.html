@@ -1506,6 +1506,83 @@ function routeFromCurrentLocationUrl(destinationName){
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destinationName)}`;
 }
 
+// 会場名から、楽天トラベルの検索URLで使う「都道府県-市区町村」のローマ字表記を引く。
+// 55クラブ全ての正確なローマ字市区町村を確証を持って把握しているわけではないため、
+// 確実に分かっている主要都市だけに限定し、無ければリンク自体を出さない（誤った都市への
+// リンクを量産するより、出さない方が安全という判断）。今後、確認が取れ次第追加していく。
+const VENUE_AREA_MAP = {
+  'ゼビオアリーナ仙台': 'Japan-Miyagi-Sendai',
+  '北海きたえーる': 'Japan-Hokkaido-Sapporo',
+  '東急ドレッセとどろきアリーナ': 'Japan-Kanagawa-Kawasaki',
+  '横浜BUNTAI': 'Japan-Kanagawa-Yokohama',
+  '千葉ポートアリーナ': 'Japan-Chiba-Chiba',
+  'LaLa arena TOKYO-BAY': 'Japan-Chiba-Funabashi',
+  'TOYOTA ARENA TOKYO': 'Japan-Tokyo-Chofu',
+  'ブレックスアリーナ宇都宮': 'Japan-Tochigi-Utsunomiya',
+  '沖縄サントリーアリーナ': 'Japan-Okinawa-Okinawa', // 那覇市ではなく沖縄市（公式サイトで確認済み）
+  // --- 野球（NPB 12球団本拠地、検索で裏付けを取って追加） ---
+  '東京ドーム': 'Japan-Tokyo-Bunkyo', // 東京23区の「区」がこの形式で機能するかは未検証（要確認）
+  '明治神宮野球場': 'Japan-Tokyo-Shinjuku', // 同上
+  '横浜スタジアム': 'Japan-Kanagawa-Yokohama',
+  'バンテリンドーム ナゴヤ': 'Japan-Aichi-Nagoya',
+  '阪神甲子園球場': 'Japan-Hyogo-Nishinomiya',
+  'MAZDA Zoom-Zoom スタジアム広島': 'Japan-Hiroshima-Hiroshima',
+  'みずほPayPayドーム福岡': 'Japan-Fukuoka-Fukuoka',
+  'ZOZOマリンスタジアム': 'Japan-Chiba-Chiba',
+  'ベルーナドーム': 'Japan-Saitama-Tokorozawa',
+  '楽天モバイルパーク宮城': 'Japan-Miyagi-Sendai',
+  '京セラドーム大阪': 'Japan-Osaka-Osaka',
+  'エスコンフィールドHOKKAIDO': 'Japan-Hokkaido-Kitahiroshima', // 札幌市ではなく北広島市（2023年移転、検索で確認済み）
+  // --- サッカー（J1、検索で裏付けが取れた分のみ。全クラブ網羅はできていない） ---
+  'メルカリスタジアム': 'Japan-Ibaraki-Kashima', // 鹿嶋市（検索で確認済み。「鹿島」ではなく「鹿嶋」表記）
+  '埼玉スタジアム2002': 'Japan-Saitama-Saitama',
+  'フクダ電子アリーナ': 'Japan-Chiba-Chiba',
+  '三協フロンテア柏スタジアム': 'Japan-Chiba-Kashiwa',
+  '味の素スタジアム': 'Japan-Tokyo-Chofu',
+  '町田GIONスタジアム': 'Japan-Tokyo-Machida',
+  '等々力陸上競技場': 'Japan-Kanagawa-Kawasaki',
+  '日産スタジアム': 'Japan-Kanagawa-Yokohama',
+  'IAIスタジアム日本平': 'Japan-Shizuoka-Shizuoka',
+  '豊田スタジアム': 'Japan-Aichi-Toyota', // 名古屋市ではなく豊田市
+  'サンガスタジアム by KYOCERA': 'Japan-Kyoto-Kameoka', // 京都市ではなく亀岡市（検索で確認済み）
+  'パナソニック スタジアム 吹田': 'Japan-Osaka-Suita', // 大阪市ではなく吹田市（検索で確認済み）
+  'ヨドコウ桜スタジアム': 'Japan-Osaka-Osaka',
+  'ノエビアスタジアム神戸': 'Japan-Hyogo-Kobe',
+  'エディオンピースウイング広島': 'Japan-Hiroshima-Hiroshima',
+  // --- バスケットボール（B.LEAGUE PREMIER 残りクラブ。彼女(仙台89ERSサポーター)の実際の対戦相手を優先して検索・確認） ---
+  '新秋田県立体育館': 'Japan-Akita-Akita',
+  'アダストリアみとアリーナ': 'Japan-Ibaraki-Mito', // 検索で確認済み
+  'オープンハウスアリーナ太田': 'Japan-Gunma-Ota',
+  'YKK AP ARENA': 'Japan-Toyama-Toyama',
+  'ホワイトリング': 'Japan-Nagano-Nagano',
+  '豊橋市総合体育館': 'Japan-Aichi-Toyohashi',
+  'ウィングアリーナ刈谷': 'Japan-Aichi-Kariya',
+  'IGアリーナ': 'Japan-Aichi-Nagoya', // 名古屋市北区（検索で確認、区レベルは未検証のため市に丸める）
+  '滋賀ダイハツアリーナ': 'Japan-Shiga-Otsu', // 大津市（検索で確認済み、守山市ではない）
+  'にっしんでんきアリーナ京都': 'Japan-Kyoto-Kyoto', // 京都市右京区（区レベルは未検証のため市に丸める）
+  'おおきにアリーナ舞洲': 'Japan-Osaka-Osaka', // 大阪市此花区（同上）
+  'GLION ARENA KOBE': 'Japan-Hyogo-Kobe',
+  '広島グリーンアリーナ': 'Japan-Hiroshima-Hiroshima', // サッカー用のエディオンピースウイング広島とは別施設
+  '松江市総合体育館': 'Japan-Shimane-Matsue',
+  'SAGAアリーナ': 'Japan-Saga-Saga',
+  'ハピネスアリーナ': 'Japan-Nagasaki-Nagasaki', // 長崎ヴェルカのホームタウンとして確認済み
+};
+// 日付付きの楽天トラベル ホテル検索URLを組み立てる（試合当日チェックイン・翌日チェックアウトの1泊を想定）
+function rakutenHotelSearchUrl(venueName, checkinDateIso){
+  const area = VENUE_AREA_MAP[venueName];
+  if(!area || !checkinDateIso) return null;
+  const ci = new Date(checkinDateIso);
+  const co = new Date(ci); co.setDate(co.getDate()+1);
+  const p = d => ({y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate()});
+  const a = p(ci), b = p(co);
+  const rakutenUrl = `https://search.travel.rakuten.co.jp/ds/hotellist/${area}?f_nen1=${a.y}&f_tuki1=${a.m}&f_hi1=${a.d}&f_nen2=${b.y}&f_tuki2=${b.m}&f_hi2=${b.d}&f_otona_su=1&f_heya_su=1`;
+  return moshimoWrapUrl(rakutenUrl);
+}
+// もしもアフィリエイト「どこでもリンク」（楽天トラベル案件）で任意のURLをラップする
+function moshimoWrapUrl(destinationUrl){
+  return `https://af.moshimo.com/af/c/click?a_id=5713301&p_id=55&pc_id=55&pl_id=624&url=${encodeURIComponent(destinationUrl)}`;
+}
+
 function fmtDate(iso){
   if(!iso) return {md:'--', dow:''};
   const d = new Date(iso);
@@ -2031,6 +2108,14 @@ function catPanelContent(t, c){
       <div class="field"><label>${c.key==='transport_outbound'?'会場到着予定':'帰宅予定'}</label><input type="time" value="${d.arrivalTime||''}" ${IS_EDITABLE?`onchange="setTransportTimes('${t.id}','${c.key}','arrivalTime',this.value)"`:'disabled'}></div>
     </div>` : '';
 
+  // 交通(往路)で、まだ予約先が決まっていない場合、レンタカー・航空券への導線を出す
+  // （日付・行き先を指定した検索URLの形式が未確認のため、現時点ではトップページへの汎用リンク）
+  const transportSearchBlock = (c.key==='transport_outbound' && !(d.method||'').trim()) ? `
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🚗 レンタカーを探す</a>
+      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">✈️ 航空券を探す</a>
+    </div>` : '';
+
   // 飲食・その他パネルに、お店の名前・来店予定時刻（当日タイムライン＆ルート検索用、任意項目）を出す
   const placeTimeBlock = (c.key==='food' || c.key==='other') ? `
     <div class="field-row" style="margin-top:2px;">
@@ -2038,9 +2123,23 @@ function catPanelContent(t, c){
       <div class="field"><label>予定時刻</label><input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','${c.key}','reservationTime',this.value)"`:'disabled'}></div>
     </div>` : '';
 
+  // 飲食パネルで、まだお店が決まっていない場合、食べログ・ホットペッパーグルメへの導線を出す
+  // （バリューコマースの参照リンク。行き先を指定できない固定リンクのため、各サイトのトップページへ遷移する）
+  const gourmetSearchBlock = (c.key==='food' && !(d.placeName||'').trim()) ? `
+    <div style="display:flex; gap:6px; margin-bottom:10px;">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685606" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685606" height="1" width="1" style="border:none; position:absolute;" alt="">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; position:absolute;" alt="">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">✨ OZmall</a>
+    </div>` : '';
+
   // 場所の名前が分かっているカテゴリ（飲食・その他・宿泊）には、現在地からのルート検索リンクを出す
   const routeDestination = c.key==='hotel' ? d.method : (c.key==='food' || c.key==='other') ? d.placeName : '';
   const routeBlock = routeDestination ? `<a class="link-open-btn" style="margin-bottom:10px;" href="${routeFromCurrentLocationUrl(routeDestination)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ 現在地から${routeDestination}へのルートを調べる</a>` : '';
+
+  // 宿泊先がまだ決まっていない場合、試合日を自動で反映した楽天トラベルの検索リンクを出す
+  // （決まっている場合は、上のルート検索の方が実用的なのでこちらは出さない）
+  const hotelSearchUrl = (c.key==='hotel' && !(d.method||'').trim() && t.venue) ? rakutenHotelSearchUrl(t.venue, t.date) : null;
+  const hotelSearchBlock = hotelSearchUrl ? `<a class="link-open-btn" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${hotelSearchUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();">🏨 試合日の空室を楽天トラベルで探す</a><img src="https://i.moshimo.com/af/i/impression?a_id=5713301&p_id=55&pc_id=55&pl_id=624" width="1" height="1" style="border:none; position:absolute;" alt="" loading="lazy">` : '';
 
   // 宿泊パネルに、到着予定時刻（当日タイムライン用、任意項目）を出す
   // 連戦などで「その日の終わりはホテルへ」というケースに対応するため
@@ -2111,6 +2210,7 @@ function catPanelContent(t, c){
     return `
       <div class="cat-panel">
         ${placeTimeBlock}
+        ${gourmetSearchBlock}
         ${routeBlock}
         <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="${c.key==='food'?'メニューのメモなど':'メモ'}"></div>
         ${(c.key==='food' || c.key==='other') ? `
@@ -2129,6 +2229,8 @@ function catPanelContent(t, c){
         <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="${methodPlaceholder(c.key)}"></div>
         <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
+      ${hotelSearchBlock}
+      ${transportSearchBlock}
       ${(()=>{ if(d.method || !IS_EDITABLE) return ''; if(['transport_outbound','transport_return','hotel'].includes(c.key)) return ''; /* この3カテゴリは「⚡いつもの一括入力」がカード上にあるため、二重になるチップは出さない */ const lastMethod = getLastUsedValue(t.sport, t.team, c.key, 'method'); return lastMethod ? `<button type="button" class="quick-fill-chip" onclick="updateDetail('${t.id}','${c.key}','method','${lastMethod.replace(/'/g,"\\'")}')">↺ 前回と同じ「${lastMethod}」を使う</button>` : ''; })()}
       ${venueTimesBlock}
       ${transportTimesBlock}
@@ -3035,8 +3137,20 @@ function renderStamps(){
   // （会場を入れ忘れていても、勝敗を記録した意味がきちんと反映されるように）
   const allPastTrips = trips.filter(t => tripEndDate(t) < TODAY && !t.isCancelled);
 
+  // 思い出メモ・観戦記録（勝敗）のどちらか未記入なら振り返りを促す（中止・延期した遠征は対象外）
+  // 会場を入力し忘れた遠征も対象に含めるため、venue絞り込み済みのpastTripsではなくallPastTripsを使う
+  const notedTrips = allPastTrips;
+  const noMemoCount = notedTrips.filter(t => !t.journalMemo || !t.journalMemo.trim()).length;
+  const noResultCount = notedTrips.filter(t => !t.result).length;
+  const memoNudge = (noMemoCount || noResultCount) ? `
+    <div class="memo-nudge" onclick="switchTab('cards'); setSortMode('date');">
+      📝 ${[noMemoCount?`思い出メモが未記入の遠征が${noMemoCount}件`:'', noResultCount?`観戦記録(勝敗)が未記入の遠征が${noResultCount}件`:''].filter(Boolean).join('、')}あります。書き残しておきませんか？
+    </div>` : '';
+
   if(!pastTrips.length){
-    wrap.innerHTML = `<div class="empty-state">
+    // 会場が入力された過去の遠征は無くても、思い出メモ・観戦記録の促しだけは表示する
+    // （会場未記入の遠征がある場合、それに気づく唯一の入口になるため）
+    wrap.innerHTML = memoNudge + `<div class="empty-state">
       <div class="empty-icon">🏟️</div>
       <div class="empty-title">まだ訪問記録がありません</div>
       <div class="empty-desc">試合日が過ぎた遠征から、自動的にスタンプが貯まっていきます。</div>
@@ -3113,16 +3227,8 @@ function renderStamps(){
       </div>`;
   }).join('');
 
-  // 思い出メモ・観戦記録（勝敗）のどちらか未記入なら振り返りを促す（中止・延期した遠征は対象外）
-  // 会場を入力し忘れた遠征も対象に含めるため、venue絞り込み済みのpastTripsではなくallPastTripsを使う
-  const notedTrips = allPastTrips;
-  const noMemoCount = notedTrips.filter(t => !t.journalMemo || !t.journalMemo.trim()).length;
-  const noResultCount = notedTrips.filter(t => !t.result).length;
-  const memoNudge = (noMemoCount || noResultCount) ? `
-    <div class="memo-nudge" onclick="switchTab('cards'); setSortMode('date');">
-      📝 ${[noMemoCount?`思い出メモが未記入の遠征が${noMemoCount}件`:'', noResultCount?`観戦記録(勝敗)が未記入の遠征が${noResultCount}件`:''].filter(Boolean).join('、')}あります。書き残しておきませんか？
-    </div>` : '';
-
+  // 思い出メモ・観戦記録（勝敗）の促し（memoNudge）は、この関数の冒頭（早期リターンより前）で
+  // 既に計算済みの変数をそのまま使う（会場未記入だけの過去遠征でも表示されるようにするため）
   wrap.innerHTML = memoNudge + sections + `<button class="add-btn" style="width:100%; margin-top:6px;" onclick="shareStamps()">📤 スタンプをシェアする</button>`;
 }
 
@@ -3905,6 +4011,10 @@ function openScheduleImport(){
   resultBox.innerHTML = '';
   resultBox.dataset.count = '0';
   document.getElementById('schedule-import-confirm-btn').style.display = 'none';
+  // 前回、何らかの理由で処理中フラグやオーバーレイが残ってしまっていた場合に備えて、開く度に確実にリセットする
+  scheduleImportInProgress = false;
+  window.__adRotators?.['schedule-import-ad-rotator']?.stop();
+  document.getElementById('schedule-import-blocker')?.remove();
   lockBodyScroll();
 }
 function closeScheduleImport(){
@@ -4122,46 +4232,65 @@ async function confirmScheduleImport(){
   if(!checked.length){ closeScheduleImport(); return; }
   scheduleImportInProgress = true;
   // 処理中は画面全体を覆い、下の「登録」ボタンや各チェックボックスに一切触れられないようにする（連打・誤操作の防止）
+  // 待ち時間が発生するため、あわせて広告枠も表示する（既存のローテーション広告の仕組みをそのまま流用）
   const blocker = document.createElement('div');
   blocker.id = 'schedule-import-blocker';
-  blocker.style.cssText = 'position:absolute; inset:0; background:rgba(255,255,255,0.85); z-index:10; display:flex; align-items:center; justify-content:center; border-radius:22px;';
-  blocker.innerHTML = '<div style="text-align:center;"><span class="spinner" style="width:22px; height:22px; border-width:3px;"></span><div style="margin-top:8px; font-size:13px; color:var(--text-dim); font-weight:700;">登録しています…</div></div>';
+  blocker.style.cssText = 'position:absolute; inset:0; background:rgba(255,255,255,0.92); z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:22px; padding:20px;';
+  const scheduleImportAds = getBannerGroups().flatMap(g=>g.ads);
+  blocker.innerHTML = `
+    <div style="text-align:center; margin-bottom:18px;">
+      <span class="spinner" style="width:22px; height:22px; border-width:3px;"></span>
+      <div style="margin-top:8px; font-size:13px; color:var(--text-dim); font-weight:700;">登録しています…</div>
+    </div>
+    ${scheduleImportAds.length ? `
+    <div style="width:100%; max-width:320px;">
+      <div style="font-size:10px; color:var(--text-faint); text-align:center; margin-bottom:6px;">広告【PR】</div>
+      <div id="schedule-import-ad-rotator" style="min-height:60px;"></div>
+    </div>` : ''}`;
   const modalEl = document.getElementById('schedule-import-overlay').querySelector('.modal');
   modalEl.style.position = 'relative';
   modalEl.appendChild(blocker);
+  // 待ち時間が短いケースもあるため、通常より短い間隔（5秒）でローテーションさせる
+  if(scheduleImportAds.length) createAdRotator('schedule-import-ad-rotator', null, scheduleImportAds, 5000);
 
   const status = document.getElementById('schedule-import-status');
   status.textContent = `${checked.length}件を登録しています…`;
   let done = 0;
-  for(const g of checked){
-    if(!g.match_date) continue;
-    try{
-      const { data, error } = await sb.rpc('upsert_trip',{
-        p_edit_token: EDIT_TOKEN,
-        p_sport: g.sport || '未設定',
-        p_team: g.team || '未設定',
-        p_opponent: g.opponent || null,
-        p_match_date: g.match_date,
-        p_start_time: g.start_time || null,
-        p_venue: g.venue || null,
-        p_estimated_cost: 0
-      });
-      if(!error){
-        const s={}, d2={};
-        CATS.forEach(c=>{ s[c.key]=false; d2[c.key]=c.bookable?{method:'',bookedDate:'',cost:0,memo:''}:{memo:''}; });
-        trips.push({ id:data, sport:g.sport||'未設定', team:g.team||'未設定', match:g.opponent||'', date:g.match_date, time:g.start_time||'', venue:g.venue||'', cost:0, status:s, detail:d2 });
-        done++;
-      }
-    }catch(e){ console.error(e); }
+  try{
+    for(const g of checked){
+      if(!g.match_date) continue;
+      try{
+        const { data, error } = await sb.rpc('upsert_trip',{
+          p_edit_token: EDIT_TOKEN,
+          p_sport: g.sport || '未設定',
+          p_team: g.team || '未設定',
+          p_opponent: g.opponent || null,
+          p_match_date: g.match_date,
+          p_start_time: g.start_time || null,
+          p_venue: g.venue || null,
+          p_estimated_cost: 0
+        });
+        if(!error){
+          const s={}, d2={};
+          CATS.forEach(c=>{ s[c.key]=false; d2[c.key]=c.bookable?{method:'',bookedDate:'',cost:0,memo:''}:{memo:''}; });
+          trips.push({ id:data, sport:g.sport||'未設定', team:g.team||'未設定', match:g.opponent||'', date:g.match_date, time:g.start_time||'', venue:g.venue||'', cost:0, status:s, detail:d2 });
+          done++;
+        }
+      }catch(e){ console.error(e); }
+    }
+    status.textContent = `${done}件を登録しました。`;
+    render();
+  }finally{
+    // ここで予期しないエラーが起きても、処理中フラグ・オーバーレイ・広告タイマーは必ず解除する
+    // （でないと、次にモーダルを開いた時にボタンが永久に反応しなくなってしまうため）
+    setTimeout(()=>{
+      scheduleImportInProgress = false;
+      window.__adRotators?.['schedule-import-ad-rotator']?.stop();
+      blocker.remove();
+      closeScheduleImport();
+      if(checked[0]?.match_date){ calMonth=new Date(checked[0].match_date).getMonth(); calYear=new Date(checked[0].match_date).getFullYear(); renderCalendar(); }
+    }, 1000);
   }
-  status.textContent = `${done}件を登録しました。`;
-  render();
-  setTimeout(()=>{
-    scheduleImportInProgress = false;
-    blocker.remove();
-    closeScheduleImport();
-    calMonth=new Date(checked[0].match_date).getMonth(); calYear=new Date(checked[0].match_date).getFullYear(); renderCalendar();
-  }, 1000);
 }
 
 function render(){
@@ -4623,7 +4752,7 @@ function createAdRotator(containerId, dotsId, ads, intervalMs){
     timer = setInterval(()=> show(idx+1), intervalMs || 10000);
   }
   window.__adRotators = window.__adRotators || {};
-  window.__adRotators[containerId] = { goto: (i)=>{ show(i); resetTimer(); } };
+  window.__adRotators[containerId] = { goto: (i)=>{ show(i); resetTimer(); }, stop: ()=>{ clearInterval(timer); } };
   show(0);
   resetTimer();
 }
