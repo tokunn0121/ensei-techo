@@ -1970,6 +1970,7 @@ async function applyUsualPattern(tripId){
 // 予約サイト名ではなく実際の場所の名前を入れてもらう必要がある
 function methodPlaceholder(key){
   if(key==='hotel') return '例）東横イン仙台東口';
+  if(key==='transport_outbound' || key==='transport_return') return '例）えきねっと';
   return '例）楽天トラベル';
 }
 
@@ -2170,7 +2171,7 @@ function catPanelContent(t, c){
   const transportSearchBlock = (c.key==='transport_outbound' && !(d.method||'').trim()) ? `
     <div style="display:flex; gap:8px; margin-bottom:10px;">
       <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🚗 レンタカーを探す</a>
-      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">✈️ 航空券を探す</a>
+      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686889" target="_blank" rel="nofollow noopener" onclick="event.stopPropagation();">✈️ 航空券を探す</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686889" height="1" width="1" style="border:none; display:none;" alt="">
     </div>` : '';
 
   // 飲食・その他パネルに、お店の名前・来店予定時刻（当日タイムライン＆ルート検索用、任意項目）を出す
@@ -4829,14 +4830,15 @@ function initBannerRotator(){
 
 function initCategoryBannerRotators(){
   // 各遠征カード×各カテゴリのバナー枠を初期化（開いているパネルのみ実DOMが存在するため、開閉のたびに呼ぶ）
-  Object.keys(CAT_BANNER_ADS).forEach(catKey=>{
-    document.querySelectorAll(`[data-cat-banner="${catKey}"]`).forEach(el=>{
-      if(el.dataset.rotatorInit) return;
-      el.dataset.rotatorInit = '1';
-      const rotId = el.id;
-      const dotsId = rotId + '-dots';
-      createAdRotator(rotId, dotsId, getCatBannerAds(catKey), 10000);
-    });
+  // フォールバックデータのキー一覧に頼ると、AD_DATA側だけに存在するカテゴリの広告枠が
+  // 見落とされるため、実際に画面上に存在する枠（[data-cat-banner]）を直接探す方式にする
+  document.querySelectorAll('[data-cat-banner]').forEach(el=>{
+    if(el.dataset.rotatorInit) return;
+    el.dataset.rotatorInit = '1';
+    const catKey = el.dataset.catBanner;
+    const rotId = el.id;
+    const dotsId = rotId + '-dots';
+    createAdRotator(rotId, dotsId, getCatBannerAds(catKey), 10000);
   });
 }
 
