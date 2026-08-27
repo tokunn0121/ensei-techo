@@ -255,6 +255,8 @@
   .timeline-duration{ padding-left:26px; font-size:10.5px; color:var(--text-faint); }
   .packing-count{ font-weight:400; color:var(--text-faint); }
   .packing-item{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
+  .packing-item-shop{ font-size:15px; text-decoration:none; flex-shrink:0; opacity:0.75; }
+  .packing-item-shop:active{ opacity:1; }
   .att-row{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
   .att-row:last-of-type{ border-bottom:none; }
   .att-name{ flex:1; font-size:13px; font-weight:700; }
@@ -600,6 +602,9 @@
     <!-- MAF Rakuten Widget FROM HERE -->
     <script type="text/javascript">MafRakutenWidgetParam=function() { return{ size:'468x160',design:'slide',recommend:'on',auto_mode:'on',a_id:'5713296', border:'off'};};</script><script type="text/javascript" src="https://dn.msmstatic.com/site/rakuten/widget.js"></script>
     <!-- MAF Rakuten Widget TO HERE -->
+    <div style="margin-top:10px; text-align:center;">
+      <a href="https://af.moshimo.com/af/c/click?a_id=5775525&p_id=1225&pc_id=1925&pl_id=19144" rel="nofollow noopener" target="_blank" referrerpolicy="no-referrer-when-downgrade" attributionsrc><img src="https://image.moshimo.com/af-img/0349/000000019144.jpg" style="max-width:100%; height:auto; border:none;" alt="Yahoo!ショッピング"></a><img src="https://i.moshimo.com/af/i/impression?a_id=5775525&p_id=1225&pc_id=1925&pl_id=19144" width="1" height="1" style="border:none; display:none;" loading="lazy">
+    </div>
     </div>
   </div>
   <button onclick="closeSettingsPanel()" style="width:100%; margin-top:14px; padding:12px; border-radius:10px; border:1.5px solid var(--line); background:none; font-family:var(--font-display); font-weight:700; font-size:14px; cursor:pointer; color:var(--text-dim);">閉じる</button>
@@ -1187,6 +1192,7 @@ function renderTeamDatalist(){
     document.getElementById('match-manual-toggle').textContent = '✏️ 手入力に切り替え';
   }
   document.getElementById('venue-suggest-note').textContent = '';
+  document.getElementById('venue-suggest-note').style.cssText = 'font-weight:400; color:var(--text-faint); font-size:11.5px;';
   homeAwayMode = null;
   updateHomeAwayUI();
   applyPlaceholders(sport);
@@ -1340,13 +1346,17 @@ function setHomeAway(mode){
   const note = document.getElementById('venue-suggest-note');
   const venueInput = document.getElementById('f-venue');
   const venueList = document.getElementById('f-venue-list');
+  const noteStyleSuccess = 'font-weight:400; color:var(--text-faint); font-size:11.5px;';
+  const noteStyleAction = 'font-weight:700; color:var(--rose-deep); font-size:11.5px;'; // 手入力が必要な場合は、見落とされないよう目立たせる
   if(mode === 'HOME'){
     if(myTeam && myTeam.arena){
       venueInput.value = myTeam.arena;
       venueList.innerHTML = `<option value="${myTeam.arena}">` + pastVenueOptionsHtml(sport);
       note.textContent = '（自チームのホームアリーナをセット）';
+      note.style.cssText = noteStyleSuccess;
     }else{
       note.textContent = '（このチームのアリーナ情報が未登録です。会場欄に直接入力してください）';
+      note.style.cssText = noteStyleAction;
       venueInput.focus();
     }
   } else if(mode === 'AWAY'){
@@ -1356,10 +1366,12 @@ function setHomeAway(mode){
       venueInput.value = arenas[0];
       venueList.innerHTML = arenas.map(a=>`<option value="${a}">`).join('') + pastVenueOptionsHtml(sport);
       note.textContent = '（相手チームのホームアリーナをセット）';
+      note.style.cssText = noteStyleSuccess;
     }else{
       venueInput.value = '';
       venueList.innerHTML = pastVenueOptionsHtml(sport);
       note.textContent = '（対戦相手のアリーナ情報が未登録、または対戦相手が未選択です。会場欄に直接入力してください）';
+      note.style.cssText = noteStyleAction;
     }
   }
 }
@@ -1380,8 +1392,10 @@ function handleTeamInput(){
     venueInput.value = match.arena;
     document.getElementById('f-venue-list').innerHTML = `<option value="${match.arena}">` + pastVenueOptionsHtml(sport);
     note.textContent = '（ホームアリーナを仮セット。HOME/AWAYで切り替えられます）';
+    note.style.cssText = 'font-weight:400; color:var(--text-faint); font-size:11.5px;'; // 前回の「未登録」表示（赤字）が残らないようリセット
   }else if(!match){
     note.textContent = '';
+    note.style.cssText = 'font-weight:400; color:var(--text-faint); font-size:11.5px;';
   }
   updateHomeAwayUI();
 }
@@ -1399,10 +1413,7 @@ const PR_LINKS_FALLBACK = {
   transport_outbound: [],
   transport_return: [],
   ticket: [],
-  food: [
-    {label:'お店を予約(ホットペッパー)', url:'https://www.hotpepper.jp/'},
-    {label:'食べログで探す', url:'https://tabelog.com/'},
-  ],
+  food: [], // 食べログ・ホットペッパー・OZmallは、飲食パネル内のgourmetSearchBlockでアフィリエイト付きリンクとして直接表示するため、ここには置かない
   other: [
     {label:'楽天市場で遠征グッズ【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713296&p_id=54&pc_id=54&pl_id=616'},
   ],
@@ -1582,6 +1593,44 @@ function rakutenHotelSearchUrl(venueName, checkinDateIso){
 function moshimoWrapUrl(destinationUrl){
   return `https://af.moshimo.com/af/c/click?a_id=5713301&p_id=55&pc_id=55&pl_id=624&url=${encodeURIComponent(destinationUrl)}`;
 }
+// もしもアフィリエイト「どこでもリンク」（楽天市場案件。楽天トラベルとは別プログラムなのでa_idは同じでもp_id/pl_idが異なる）
+function moshimoRakutenIchibaUrl(destinationUrl){
+  return `https://af.moshimo.com/af/c/click?a_id=5713296&p_id=54&pc_id=54&pl_id=616&url=${encodeURIComponent(destinationUrl)}`;
+}
+// 持ち物リストの項目名（絵文字つき）から、楽天市場でのキーワード検索リンクを組み立てる
+// 持ち物リストの項目名（絵文字つき）から、検索に使える語句だけを取り出す（先頭の絵文字・記号とその後の空白を除去）
+function extractKeywordFromItemText(itemText){
+  return itemText.replace(/^[\p{Extended_Pictographic}\u200d\ufe0f\s]+/gu, '').trim();
+}
+function rakutenIchibaSearchUrl(itemText){
+  const keyword = extractKeywordFromItemText(itemText);
+  if(!keyword) return null;
+  const searchUrl = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`;
+  return moshimoRakutenIchibaUrl(searchUrl);
+}
+// もしもアフィリエイト「どこでもリンク」（Yahoo!ショッピング案件）
+function moshimoYahooShoppingUrl(destinationUrl){
+  return `https://af.moshimo.com/af/c/click?a_id=5775525&p_id=1225&pc_id=1925&pl_id=18502&url=${encodeURIComponent(destinationUrl)}`;
+}
+function yahooShoppingSearchUrl(itemText){
+  const keyword = extractKeywordFromItemText(itemText);
+  if(!keyword) return null;
+  const searchUrl = `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(keyword)}`;
+  return moshimoYahooShoppingUrl(searchUrl);
+}
+
+// ユーザーが自由入力した文字列をHTMLのテキストとして安全に表示するためのエスケープ関数。
+// これが無いと、対戦相手名やメモ欄などに <script> や <img onerror=...> のような文字列を
+// 入力された場合、閲覧した全員のブラウザでそのまま実行されてしまう（格納型XSS）。
+function escapeHtml(str){
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 function fmtDate(iso){
   if(!iso) return {md:'--', dow:''};
@@ -1639,9 +1688,9 @@ function renderHero(){
     <div class="hero" onclick="focusTrip('${t.id}')">
       <div>
         <div class="htitle">次の遠征${isToday?' <span class="today-badge">本日</span>':''}</div>
-        <div class="hmatch">${t.team} ${t.match}</div>
+        <div class="hmatch">${escapeHtml(t.team)} ${escapeHtml(t.match)}</div>
         <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
-        ${earliestItem ? `<div class="htoday-time">${earliestItem.icon} ${earliestItem.time} ${earliestItem.label}</div>` : ''}
+        ${earliestItem ? `<div class="htoday-time">${earliestItem.icon} ${earliestItem.time} ${escapeHtml(earliestItem.label)}</div>` : ''}
         ${pending.length
           ? `<div class="hpending">${pending.map(k=>`<span>${catInfo(k).icon} ${catInfo(k).label}が未予約</span>`).join('')}</div>`
           : `<div class="hall-set">✓ 交通・チケット・宿泊はすべて予約済みです</div>`}
@@ -1671,7 +1720,7 @@ function renderSaleAlerts(){
       const d = daysUntil(saleDate);
       const {md, dow} = fmtDate(saleDate);
       return `<div class="alert-row alert-row-sale" onclick="focusTrip('${t.id}','ticket')">
-        <div class="a-l"><span class="a-cat">🎫</span><span class="a-title">${t.match} のチケットが${md}(${dow})${saleTime?` ${saleTime}〜`:''}発売</span></div>
+        <div class="a-l"><span class="a-cat">🎫</span><span class="a-title">${escapeHtml(t.match)} のチケットが${md}(${dow})${saleTime?` ${saleTime}〜`:''}発売</span></div>
         <span class="a-days">${d===0?'本日':`あと${d}日`}</span>
       </div>`;
     }).join('')}
@@ -2003,7 +2052,7 @@ function renderDayTimeline(t){
         durationHtml = `<div class="timeline-duration">${h>0?`${h}時間`:''}${m>0?`${m}分`:''}</div>`;
       }
     }
-    return `${durationHtml}<div class="timeline-row"><span class="timeline-dot"></span><span class="timeline-time">${item.time}</span><span class="timeline-icon">${item.icon}</span><span class="timeline-label">${item.label}</span></div>`;
+    return `${durationHtml}<div class="timeline-row"><span class="timeline-dot"></span><span class="timeline-time">${item.time}</span><span class="timeline-icon">${item.icon}</span><span class="timeline-label">${escapeHtml(item.label)}</span></div>`;
   }).join('');
   return `
     <details class="station-details timeline-details" ${timelineOpen.has(t.id)?'open':''} ontoggle="if(this.open) timelineOpen.add('${t.id}'); else timelineOpen.delete('${t.id}');">
@@ -2023,12 +2072,18 @@ function renderPackingListSection(t){
     <details class="station-details packing-details" ${packingListOpen.has(t.id)?'open':''} ontoggle="if(this.open) packingListOpen.add('${t.id}'); else packingListOpen.delete('${t.id}');">
       <summary>🎒 持ち物リスト${list.length ? `<span class="packing-count">（${checkedCount}/${list.length}）</span>` : ''}</summary>
       <div style="margin-top:8px;">
-        ${list.map((item, idx) => `
+        ${list.map((item, idx) => {
+          const rakutenUrl = rakutenIchibaSearchUrl(item.text);
+          const yahooUrl = yahooShoppingSearchUrl(item.text);
+          return `
           <div class="packing-item">
             <input type="checkbox" ${item.checked?'checked':''} ${IS_EDITABLE?`onchange="togglePackingItem('${t.id}',${idx})"`:'disabled'}>
-            <span class="packing-item-text ${item.checked?'checked':''}" ${IS_EDITABLE?`onclick="togglePackingItem('${t.id}',${idx})"`:''} style="${IS_EDITABLE?'cursor:pointer;':''}">${item.text}</span>
+            <span class="packing-item-text ${item.checked?'checked':''}" ${IS_EDITABLE?`onclick="togglePackingItem('${t.id}',${idx})"`:''} style="${IS_EDITABLE?'cursor:pointer;':''}">${escapeHtml(item.text)}</span>
+            ${rakutenUrl ? `<a href="${rakutenUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();" class="packing-item-shop" title="楽天市場で探す">🛒</a>` : ''}
+            ${yahooUrl ? `<a href="${yahooUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();" class="packing-item-shop" title="Yahoo!ショッピングで探す">🛍️</a>` : ''}
             ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:26px; height:26px; font-size:12px;" onclick="removePackingItem('${t.id}',${idx})">×</button>` : ''}
-          </div>`).join('')}
+          </div>`;
+        }).join('')}
         ${IS_EDITABLE ? `
         <div class="packing-add-row">
           <input type="text" id="packing-input-${t.id}" placeholder="持ち物を追加してEnter" onkeydown="if(event.key==='Enter'){ event.preventDefault(); addPackingItemFromInput('${t.id}'); }">
@@ -2039,6 +2094,8 @@ function renderPackingListSection(t){
           ${presetsToShow.map(p=>`<button type="button" class="packing-preset-chip" onclick="addPackingItem('${t.id}','${p.replace(/'/g,"\\'")}')">＋ ${p}</button>`).join('')}
         </div>` : ''}
         ${list.length ? `<button type="button" class="packing-template-btn" onclick="saveAsPackingTemplate('${t.id}')">📋 テンプレートとして保存</button>` : ''}
+        ${list.some(item=>rakutenIchibaSearchUrl(item.text)) ? `<img src="https://i.moshimo.com/af/i/impression?a_id=5713296&p_id=54&pc_id=54&pl_id=616" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">` : ''}
+        ${list.some(item=>yahooShoppingSearchUrl(item.text)) ? `<img src="https://i.moshimo.com/af/i/impression?a_id=5775525&p_id=1225&pc_id=1925&pl_id=18502" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">` : ''}
         ` : (list.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">持ち物リストはまだありません</div>` : '')}
       </div>
     </details>`;
@@ -2058,7 +2115,7 @@ function renderAttendeesSection(t, isPast){
       <div style="margin-top:8px;">
         ${attendees.map(a => `
           <div class="att-row">
-            <span class="att-name">${a.name}</span>
+            <span class="att-name">${escapeHtml(a.name)}</span>
             <span class="att-status-badge ${statusClass[a.status]||''}">${statusLabel[a.status]||a.status}</span>
             ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:24px; height:24px; font-size:11px;" onclick="removeTripAttendee('${t.id}','${a.name.replace(/'/g,"\\'")}')">×</button>` : ''}
           </div>`).join('')}
@@ -2127,8 +2184,8 @@ function catPanelContent(t, c){
   // （バリューコマースの参照リンク。行き先を指定できない固定リンクのため、各サイトのトップページへ遷移する）
   const gourmetSearchBlock = (c.key==='food' && !(d.placeName||'').trim()) ? `
     <div style="display:flex; gap:6px; margin-bottom:10px;">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685606" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685606" height="1" width="1" style="border:none; position:absolute;" alt="">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; position:absolute;" alt="">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686842" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686842" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
       <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">✨ OZmall</a>
     </div>` : '';
 
@@ -2139,7 +2196,12 @@ function catPanelContent(t, c){
   // 宿泊先がまだ決まっていない場合、試合日を自動で反映した楽天トラベルの検索リンクを出す
   // （決まっている場合は、上のルート検索の方が実用的なのでこちらは出さない）
   const hotelSearchUrl = (c.key==='hotel' && !(d.method||'').trim() && t.venue) ? rakutenHotelSearchUrl(t.venue, t.date) : null;
-  const hotelSearchBlock = hotelSearchUrl ? `<a class="link-open-btn" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${hotelSearchUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();">🏨 試合日の空室を楽天トラベルで探す</a><img src="https://i.moshimo.com/af/i/impression?a_id=5713301&p_id=55&pc_id=55&pl_id=624" width="1" height="1" style="border:none; position:absolute;" alt="" loading="lazy">` : '';
+  const hotelSearchBlock = (c.key==='hotel' && !(d.method||'').trim()) ? (hotelSearchUrl
+    ? `<a class="link-open-btn" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${hotelSearchUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();">🏨 試合日の空室を楽天トラベルで探す</a><img src="https://i.moshimo.com/af/i/impression?a_id=5713301&p_id=55&pc_id=55&pl_id=624" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">`
+    // 会場がVENUE_AREA_MAPに未登録の場合（バレーボール・サッカーJ2/J3・その他競技など）でも、
+    // 日付・会場を反映できないだけで、最低限トップページへの導線は出す（収益機会を逃さないため）
+    : `<a class="link-open-btn" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🏨 楽天トラベルでホテルを探す</a>`
+  ) : '';
 
   // 宿泊パネルに、到着予定時刻（当日タイムライン用、任意項目）を出す
   // 連戦などで「その日の終わりはホテルへ」というケースに対応するため
@@ -2283,14 +2345,14 @@ function renderTicketCard(t, isPast){
       </div>
       <div class="tcr-main">
         <div class="tcr-line1">
-          <span class="tcr-team">${sportIcon(t.sport)} ${t.team}</span>
+          <span class="tcr-team">${sportIcon(t.sport)} ${escapeHtml(t.team)}</span>
           <span class="tcr-pct" style="color:${pct===100?'var(--sage)':'var(--rose-deep)'};">${pct}%</span>
         </div>
         <div class="tcr-line2">
           <span class="tcr-match">vs ${t.match || '対戦未定'}</span>
-          ${t.venue ? `<span class="tcr-venue">📍${t.venue}</span>` : ''}
+          ${t.venue ? `<span class="tcr-venue">📍${escapeHtml(t.venue)}</span>` : ''}
         </div>
-        ${todayEarliestItem ? `<div class="tcr-today-time">${todayEarliestItem.icon} ${todayEarliestItem.time} ${todayEarliestItem.label}</div>` : ''}
+        ${todayEarliestItem ? `<div class="tcr-today-time">${todayEarliestItem.icon} ${todayEarliestItem.time} ${escapeHtml(todayEarliestItem.label)}</div>` : ''}
         ${pendingCount>0 ? `<div class="tcr-pending">⚠️ 未予約${pendingCount}件</div>` : `<div class="tcr-ok">✓ 準備OK</div>`}
       </div>
       <span class="tcr-chevron">▾</span>
@@ -2301,10 +2363,10 @@ function renderTicketCard(t, isPast){
       ${isCompact ? `<div class="compact-collapse-bar" onclick="toggleExpand('${t.id}')">︿ コンパクト表示に戻す</div>` : ''}
       <div class="head">
         <div>
-          <span class="sport-tag">${sportIcon(t.sport)} ${t.team}</span>
-          <div class="matchup">${t.match}</div>
+          <span class="sport-tag">${sportIcon(t.sport)} ${escapeHtml(t.team)}</span>
+          <div class="matchup">${escapeHtml(t.match)}</div>
           <div class="venue-row">
-            <span class="venue">${t.venue}</span>
+            <span class="venue">${escapeHtml(t.venue)}</span>
             ${t.venue ? `<a class="map-badge" href="${routeFromCurrentLocationUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ ルート検索</a>` : ''}
             ${t.venue ? `<button type="button" class="venue-copy-badge" onclick="event.stopPropagation(); copyVenueName('${t.venue.replace(/'/g,"\\'")}')" title="会場名をコピー">📋</button>` : ''}
           </div>
@@ -2383,7 +2445,7 @@ function renderTicketCard(t, isPast){
             <button type="button" class="result-btn result-draw ${t.result==='draw'?'active':''}" ${IS_EDITABLE?`onclick="setTripResult('${t.id}','draw')"`:'disabled'}>➖ 引き分け</button>
           </div>
           <div class="journal-label" style="margin-top:12px;">📝 この遠征の思い出</div>
-          <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)"`:'disabled'}>${(t.journalMemo||'').replace(/</g,'&lt;')}</textarea>
+          <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)"`:'disabled'}>${escapeHtml(t.journalMemo)}</textarea>
         </div>` : ''}
         <button class="card-share-btn" onclick="shareTrip('${t.id}')">📤 家族に共有する</button>
       </div>` : '';
@@ -3220,7 +3282,7 @@ function renderStamps(){
                 <span class="stamp-venue-name">🏟️ ${venue}</span>
                 <span class="stamp-venue-count">${count}回</span>
               </div>
-              ${trip ? `<div class="stamp-venue-memo">📝 ${trip.journalMemo}</div>` : ''}
+              ${trip ? `<div class="stamp-venue-memo">📝 ${escapeHtml(trip.journalMemo)}</div>` : ''}
             </div>`;
           }).join('')}
         </div>
@@ -3531,6 +3593,7 @@ async function submitTrip(keepOpen){
         homeAwayMode = null;
         updateHomeAwayUI();
         document.getElementById('venue-suggest-note').textContent = '';
+        document.getElementById('venue-suggest-note').style.cssText = 'font-weight:400; color:var(--text-faint); font-size:11.5px;';
         handleTeamSelectChange(); // 対戦相手のリーグ選択をチームの既定リーグに戻し、選択肢も作り直す
         document.getElementById('modal-save-msg').textContent = `「${match}」を登録しました。続けて次の試合を入力できます。`;
         document.getElementById('f-date').focus();
@@ -3574,7 +3637,7 @@ function openCopyModal(tripId, key){
     list.innerHTML = others.map(t=>`
       <label style="display:flex; align-items:center; gap:10px; background:var(--surface-2); border-radius:10px; padding:10px 12px; font-size:13px; cursor:pointer;">
         <input type="checkbox" value="${t.id}" style="width:16px; height:16px; accent-color:var(--rose);">
-        <span>${fmtDate(t.date).md}（${fmtDate(t.date).dow}）　${t.team} ${t.match}</span>
+        <span>${fmtDate(t.date).md}（${fmtDate(t.date).dow}）　${escapeHtml(t.team)} ${escapeHtml(t.match)}</span>
       </label>`).join('');
   }
   document.getElementById('copy-overlay').classList.add('open');
@@ -3607,9 +3670,11 @@ async function confirmCopy(){
 /* ---------- family sharing ---------- */
 function showToast(msg, duration, action){
   const t = document.getElementById('toast');
+  // msgはユーザー入力（チーム名・メモ等）を含む場合があるため、常にエスケープしてから挿入する。
+  // action.label/onclickは開発者が書いた固定文字列のみを渡す前提のため、そのまま使う。
   t.innerHTML = action
-    ? `<span>${msg}</span> <button type="button" class="toast-action-btn" onclick="${action.onclick}">${action.label}</button>`
-    : msg;
+    ? `<span>${escapeHtml(msg)}</span> <button type="button" class="toast-action-btn" onclick="${action.onclick}">${action.label}</button>`
+    : escapeHtml(msg);
   t.classList.add('show');
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(()=>t.classList.remove('show'), duration || 2600);
@@ -3895,10 +3960,10 @@ function renderCalendar(){
           <div class="cal-date" style="color:${color}; display:flex; align-items:center; gap:3px;">${c.d}${saleEvents.length?'<span title="チケット発売日" style="font-size:9px;">🔔</span>':''}</div>
           ${events.slice(0,3).map(t=>{
             const pct = completion(t);
-            return `<span class="cal-evt ${pct===100?'done':'pending'}">${t.team}</span>`;
+            return `<span class="cal-evt ${pct===100?'done':'pending'}">${escapeHtml(t.team)}</span>`;
           }).join('')}
           ${events.length>3 ? `<span style="font-size:8.5px; color:var(--text-faint);">+${events.length-3}件</span>` : ''}
-          ${(!events.length && saleEvents.length) ? saleEvents.slice(0,2).map(t=>`<span class="cal-evt" style="background:var(--butter,#E0B84A); color:#5a4213;">🎫 ${t.team}</span>`).join('') : ''}
+          ${(!events.length && saleEvents.length) ? saleEvents.slice(0,2).map(t=>`<span class="cal-evt" style="background:var(--butter,#E0B84A); color:#5a4213;">🎫 ${escapeHtml(t.team)}</span>`).join('') : ''}
         </div>`;
       }).join('')}
     </div>
@@ -3952,7 +4017,7 @@ function openCalPopup(y,m,d){
   const saleBlock = saleEvents.length ? `
     <div style="background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-bottom:10px;">
       <div style="font-size:12px; font-weight:700; color:#8a6d1f; margin-bottom:4px;">🔔 この日はチケット発売日です</div>
-      ${saleEvents.map(t=>`<div style="font-size:12px; color:#8a6d1f;">${t.team} ${t.match||''}　${t.detail.ticket.saleTime||''}〜</div>`).join('')}
+      ${saleEvents.map(t=>`<div style="font-size:12px; color:#8a6d1f;">${escapeHtml(t.team)} ${escapeHtml(t.match||'')}　${t.detail.ticket.saleTime||''}〜</div>`).join('')}
     </div>` : '';
 
   popup.innerHTML = `
@@ -3965,7 +4030,7 @@ function openCalPopup(y,m,d){
       const pct = completion(t);
       return `
       <div class="cpop-trip">
-        <div class="cpop-team">${sportIcon(t.sport)} ${t.team}</div>
+        <div class="cpop-team">${sportIcon(t.sport)} ${escapeHtml(t.team)}</div>
         <div class="cpop-meta">${t.match||''}　${t.time||''}　${t.venue?'@ '+t.venue:''}</div>
         <div class="cpop-prog"><div class="cpop-prog-fill" style="width:${pct}%; background:${pct===100?'var(--sage)':'var(--rose)'};"></div></div>
         <div class="cpop-btns">
