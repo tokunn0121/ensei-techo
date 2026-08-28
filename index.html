@@ -418,7 +418,9 @@
   .leg-add{ background:none; border:1.5px dashed var(--line); border-radius:8px; padding:7px 12px; font-size:11.5px; color:var(--text-dim); cursor:pointer; width:100%; }
   .legs-total{ font-size:12px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:8px 12px; border-radius:8px; margin-bottom:8px; }
   .legs-total b{ font-family:var(--font-num); }
-  .link-open-btn{ display:block; text-align:center; font-size:12.5px; font-weight:700; color:#fff; background:var(--sage); padding:10px; border-radius:10px; text-decoration:none; margin-top:4px; }
+  .link-open-btn{ display:block; text-align:center; font-size:12.5px; font-weight:700; color:#fff; background:var(--sage); padding:10px; border-radius:10px; text-decoration:none; margin-top:4px; position:relative; }
+  .link-open-btn.is-pr{ padding-right:34px; } /* PRバッジ分の余白 */
+  .link-open-btn .pr-badge-inline{ position:absolute; top:50%; right:8px; transform:translateY(-50%); background:rgba(255,255,255,0.9); color:#5a4213; font-family:var(--font-num); font-size:9px; font-weight:700; padding:1px 5px; border-radius:6px; }
   .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
   .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
   .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
@@ -896,6 +898,9 @@ let historyCatFilter = 'ALL';
 let activeCat = {}; // { tripId: 現在開いているカテゴリキー } 1遠征につき1カテゴリのみ開く（タブ切り替え式）
 let packingListOpen = new Set(); // 持ち物リストを手動で開いた遠征のID（render()で毎回<details>が作り直されても、開閉状態を維持するため）
 let timelineOpen = new Set(); // 当日タイムラインを手動で開いた遠征のID（同上）
+let attendeesOpen = new Set(); // 「誰が行く？」を手動で開いた遠征のID（同上。参加者を追加するたびにrender()が呼ばれて閉じてしまうのを防ぐ）
+let icsHelpOpen = false; // 設定パネル内「登録方法を見る」の開閉状態（設定パネルは1つしか無いのでSetではなくbooleanで十分。
+                          // テーマカラー変更等の操作のたびにopenSettingsPanel()が呼ばれてパネル全体が作り直されるため、同様に必要）
 let stationDetailsOpen = new Set(); // 発着駅欄を手動で開いた「${tripId}:${categoryKey}」の組み合わせ
 let budgetCap = 0;
 let packingTemplate = []; // 手帳全体で共通の持ち物テンプレート（文字列の配列）。新規遠征作成時に自動でコピーされる
@@ -1980,8 +1985,15 @@ function memoPlaceholder(key){
     hotel: 'ホテル名など',
     transport_outbound: '座席・便名など',
     transport_return: '座席・便名など',
+    food: 'メニューのメモなど',
   };
   return map[key] || '詳細メモ';
+}
+// 「リンク」欄のラベル。予約系カテゴリは「予約リンク・確認番号」で統一、飲食だけ性質が異なる（お店の情報ページ）ため別表現にする
+function linkFieldLabel(key){
+  if(key==='food') return 'お店のリンク（食べログ・地図など）';
+  if(key==='other') return 'リンク';
+  return '予約リンク・確認番号';
 }
 
 // よく使う持ち物のプリセット（タップだけで追加できるようにし、入力の手間を減らす）
@@ -2097,6 +2109,7 @@ function renderPackingListSection(t){
         ${list.length ? `<button type="button" class="packing-template-btn" onclick="saveAsPackingTemplate('${t.id}')">📋 テンプレートとして保存</button>` : ''}
         ${list.some(item=>rakutenIchibaSearchUrl(item.text)) ? `<img src="https://i.moshimo.com/af/i/impression?a_id=5713296&p_id=54&pc_id=54&pl_id=616" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">` : ''}
         ${list.some(item=>yahooShoppingSearchUrl(item.text)) ? `<img src="https://i.moshimo.com/af/i/impression?a_id=5775525&p_id=1225&pc_id=1925&pl_id=18502" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">` : ''}
+        ${list.some(item=>rakutenIchibaSearchUrl(item.text) || yahooShoppingSearchUrl(item.text)) ? `<div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-top:4px;">🛒🛍️は提携サイトでの検索リンクです【PR】</div>` : ''}
         ` : (list.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">持ち物リストはまだありません</div>` : '')}
       </div>
     </details>`;
@@ -2111,7 +2124,7 @@ function renderAttendeesSection(t, isPast){
     : { going:'✓ 行く', maybe:'？ 未定', not_going:'✕ 行かない' };
   const statusClass = { going:'att-going', maybe:'att-maybe', not_going:'att-notgoing' };
   return `
-    <details class="station-details">
+    <details class="station-details" ${attendeesOpen.has(t.id)?'open':''} ontoggle="if(this.open) attendeesOpen.add('${t.id}'); else attendeesOpen.delete('${t.id}');">
       <summary>🙋 ${isPast?'誰が行った？':'誰が行く？'}${attendees.length ? `<span class="packing-count">（${attendees.filter(a=>a.status==='going').length}人${isPast?'参加':'参加予定'}）</span>` : ''}</summary>
       <div style="margin-top:8px;">
         ${attendees.map(a => `
@@ -2170,8 +2183,8 @@ function catPanelContent(t, c){
   // （日付・行き先を指定した検索URLの形式が未確認のため、現時点ではトップページへの汎用リンク）
   const transportSearchBlock = (c.key==='transport_outbound' && !(d.method||'').trim()) ? `
     <div style="display:flex; gap:8px; margin-bottom:10px;">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🚗 レンタカーを探す</a>
-      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686889" target="_blank" rel="nofollow noopener" onclick="event.stopPropagation();">✈️ 航空券を探す</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686889" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🚗 レンタカーを探す<span class="pr-badge-inline">PR</span></a>
+      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686889" target="_blank" rel="nofollow noopener" onclick="event.stopPropagation();">✈️ 航空券を探す<span class="pr-badge-inline">PR</span></a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686889" height="1" width="1" style="border:none; display:none;" alt="">
     </div>` : '';
 
   // 飲食・その他パネルに、お店の名前・来店予定時刻（当日タイムライン＆ルート検索用、任意項目）を出す
@@ -2185,9 +2198,9 @@ function catPanelContent(t, c){
   // （バリューコマースの参照リンク。行き先を指定できない固定リンクのため、各サイトのトップページへ遷移する）
   const gourmetSearchBlock = (c.key==='food' && !(d.placeName||'').trim()) ? `
     <div style="display:flex; gap:6px; margin-bottom:10px;">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686842" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686842" height="1" width="1" style="border:none; display:none;" alt="">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">✨ OZmall</a>
+      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 26px 10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686842" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ<span class="pr-badge-inline">PR</span></a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686842" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 26px 10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー<span class="pr-badge-inline">PR</span></a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 26px 10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">✨ OZmall<span class="pr-badge-inline">PR</span></a>
     </div>` : '';
 
   // 場所の名前が分かっているカテゴリ（飲食・その他・宿泊）には、現在地からのルート検索リンクを出す
@@ -2198,10 +2211,10 @@ function catPanelContent(t, c){
   // （決まっている場合は、上のルート検索の方が実用的なのでこちらは出さない）
   const hotelSearchUrl = (c.key==='hotel' && !(d.method||'').trim() && t.venue) ? rakutenHotelSearchUrl(t.venue, t.date) : null;
   const hotelSearchBlock = (c.key==='hotel' && !(d.method||'').trim()) ? (hotelSearchUrl
-    ? `<a class="link-open-btn" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${hotelSearchUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();">🏨 試合日の空室を楽天トラベルで探す</a><img src="https://i.moshimo.com/af/i/impression?a_id=5713301&p_id=55&pc_id=55&pl_id=624" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">`
+    ? `<a class="link-open-btn is-pr" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${hotelSearchUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();">🏨 試合日の空室を楽天トラベルで探す<span class="pr-badge-inline">PR</span></a><img src="https://i.moshimo.com/af/i/impression?a_id=5713301&p_id=55&pc_id=55&pl_id=624" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">`
     // 会場がVENUE_AREA_MAPに未登録の場合（バレーボール・サッカーJ2/J3・その他競技など）でも、
     // 日付・会場を反映できないだけで、最低限トップページへの導線は出す（収益機会を逃さないため）
-    : `<a class="link-open-btn" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🏨 楽天トラベルでホテルを探す</a>`
+    : `<a class="link-open-btn is-pr" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🏨 楽天トラベルでホテルを探す<span class="pr-badge-inline">PR</span></a>`
   ) : '';
 
   // 宿泊パネルに、到着予定時刻（当日タイムライン用、任意項目）を出す
@@ -2258,7 +2271,7 @@ function catPanelContent(t, c){
               <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
               <div class="field"><label>この区間の金額</label><input type="number" min="0" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
             </div>
-            <div class="field"><label>予約リンク・確認番号</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLegLink('${t.id}','${c.key}',${i},this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+            <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLegLink('${t.id}','${c.key}',${i},this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
             ${renderLinkAction(leg.link, '予約ページ')}
           </div>`;
         }).join('')}
@@ -2275,9 +2288,9 @@ function catPanelContent(t, c){
         ${placeTimeBlock}
         ${gourmetSearchBlock}
         ${routeBlock}
-        <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="${c.key==='food'?'メニューのメモなど':'メモ'}"></div>
+        <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
         ${(c.key==='food' || c.key==='other') ? `
-        <div class="field"><label>${c.key==='food' ? 'お店のリンク（食べログ・地図など）' : 'リンク'}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは電話番号など"></div>
+        <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは電話番号など"></div>
         ${renderLinkAction(d.link, c.key==='food'?'お店のページ':'リンク先')}
         ` : ''}
         ${segment}
@@ -2304,7 +2317,7 @@ function catPanelContent(t, c){
         <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" min="0" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
         <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
       </div>
-      <div class="field"><label>予約リンク・確認番号</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+      <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
       ${renderLinkAction(d.link, '予約ページ')}
       ${segment}
       ${copyOutboundBlock}
@@ -2565,7 +2578,7 @@ async function setTripVenueTimes(tripId, field, val){
       p_show_start_time: field==='showStartTime' ? (val||null) : other
     });
     if(error) throw error;
-    render();
+    setTimeout(render, 0); // ネイティブの時刻ピッカーが完全に閉じきる前にDOMが再構築されるのを防ぐ
   }catch(e){
     console.error(e);
     showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
@@ -2585,7 +2598,7 @@ async function setTransportTimes(tripId, catKey, field, val){
       p_arrival_time: field==='arrivalTime' ? (val||null) : other
     });
     if(error) throw error;
-    render();
+    setTimeout(render, 0);
   }catch(e){
     console.error(e);
     showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
@@ -2605,7 +2618,7 @@ async function setPlaceAndTime(tripId, catKey, field, val){
       p_reservation_time: field==='reservationTime' ? (val||null) : other
     });
     if(error) throw error;
-    render();
+    setTimeout(render, 0);
   }catch(e){
     console.error(e);
     showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
@@ -2726,7 +2739,12 @@ async function saveBookingDetail(tripId, key, patch, suppressToast){
   if(patch.is_booked !== undefined) t.status[key] = patch.is_booked;
   t.detail[key] = merged;
   activeCat[tripId] = key;
-  render();
+  // render()を即座に呼ぶと、日付・時刻欄（<input type="date/time">）のネイティブピッカーが
+  // 完全に閉じきる前にDOM要素ごと再構築されてしまい、ピッカーが強制的に閉じられて
+  // その時点の暫定値（今日の日付・現在時刻に近い値）が誤って確定してしまう場合がある。
+  // ブラウザがchangeイベントの後処理（ピッカーを閉じる等）を終える猶予を与えるため、
+  // ごくわずかに遅延させてから再描画する。
+  setTimeout(render, 0);
   try{
     const { error } = await sb.rpc('upsert_booking_detail', {
       p_edit_token: EDIT_TOKEN,
@@ -2938,6 +2956,7 @@ async function deleteTrip(tripId){
     expandedTrips.delete(tripId);
     packingListOpen.delete(tripId);
     timelineOpen.delete(tripId);
+    attendeesOpen.delete(tripId);
     for(const key of [...stationDetailsOpen]){ if(key.startsWith(`${tripId}:`)) stationDetailsOpen.delete(key); }
     render();
     showToast('削除しました', 6000, { label:'元に戻す', onclick:'undoDeleteTrip()' });
@@ -3008,12 +3027,14 @@ async function undoDeleteTrip(){
 }
 
 let duplicateTemplateDetail = null;
+let duplicateTemplateAttendees = null; // 複製元の参加者(誰が行く？)。連戦等で毎回同じメンバーの場合、入力し直す手間を省く
 function duplicateTrip(tripId){
   if(!IS_EDITABLE) return;
   const t = trips.find(x=>x.id===tripId);
   if(!t) return;
   duplicateTemplateDetail = JSON.parse(JSON.stringify(t.detail));
   BOOKABLE_CATS.forEach(k=>{ duplicateTemplateDetail[k].bookedDate = ''; });
+  duplicateTemplateAttendees = t.attendees && t.attendees.length ? JSON.parse(JSON.stringify(t.attendees)) : null;
   openModal();
   const isKnown = KNOWN_SPORTS.includes(t.sport);
   document.getElementById('f-sport').value = isKnown ? t.sport : 'その他';
@@ -3485,7 +3506,7 @@ function openModal(tripId){
   document.getElementById('modal-save-msg').textContent='';
   lockBodyScroll();
 }
-function closeModal(){ document.getElementById('overlay').classList.remove('open'); editingTripId = null; duplicateTemplateDetail = null; unlockBodyScroll(); }
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); editingTripId = null; duplicateTemplateDetail = null; duplicateTemplateAttendees = null; unlockBodyScroll(); }
 
 function readSportValue(){
   const v = document.getElementById('f-sport').value;
@@ -3579,6 +3600,14 @@ async function submitTrip(keepOpen){
               : { memo:d.memo||'' });
           }
         }
+      }
+      // 複製元の参加者（誰が行く？）も、連戦等で毎回同じメンバーの場合の入力の手間を省くため引き継ぐ
+      if(duplicateTemplateAttendees){
+        newTrip.attendees = duplicateTemplateAttendees;
+        for(const a of duplicateTemplateAttendees){
+          await sb.rpc('set_trip_attendee', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_name: a.name, p_status: a.status });
+        }
+        duplicateTemplateAttendees = null;
       }
 
       if(keepOpen){
@@ -4510,7 +4539,7 @@ function openSettingsPanel(){
         <input id="ics-url-input" value="${icsUrl}" readonly onclick="this.select()" style="flex:1; border:none; background:transparent; font-family:var(--font-num); font-size:16px; color:var(--text-dim); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
         <button class="sb-copy" onclick="copyShareLink(document.getElementById('ics-url-input').value)" style="background:var(--rose); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font-display); white-space:nowrap;">コピー</button>
       </div>
-      <details style="margin-top:8px;">
+      <details style="margin-top:8px;" ${icsHelpOpen?'open':''} ontoggle="icsHelpOpen = this.open;">
         <summary style="font-size:11.5px; color:var(--rose-deep); cursor:pointer;">登録方法を見る</summary>
         <div style="font-size:11px; color:var(--text-dim); line-height:1.8; margin-top:6px; padding-left:4px;">
           <b>Googleカレンダー：</b>PCのGoogleカレンダーを開く→左メニュー「他のカレンダー」の＋→「URLで追加」→上のリンクを貼り付け<br>
