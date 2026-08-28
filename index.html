@@ -2158,8 +2158,8 @@ function catPanelContent(t, c){
     <div style="background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:2px;">
       <div style="font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px;">🔔 チケット発売日リマインダー</div>
       <div class="field-row">
-        <div class="field"><label>発売日</label><input type="date" value="${d.saleDate||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',this.value,null,null)"`:'disabled'}></div>
-        <div class="field"><label>発売時刻</label><input type="time" value="${d.saleTime||''}" ${IS_EDITABLE?`onchange="updateSaleInfo('${t.id}',null,this.value,null)"`:'disabled'}></div>
+        <div class="field"><label>発売日</label><input type="date" value="${d.saleDate||''}" ${IS_EDITABLE?`onblur="updateSaleInfo('${t.id}',this.value,null,null)"`:'disabled'}></div>
+        <div class="field"><label>発売時刻</label><input type="time" value="${d.saleTime||''}" ${IS_EDITABLE?`onblur="updateSaleInfo('${t.id}',null,this.value,null)"`:'disabled'}></div>
       </div>
       ${IS_EDITABLE ? `<label class="done-toggle" style="margin-top:6px;"><input type="checkbox" ${d.notifyOnSale?'checked':''} onchange="handleNotifyToggle('${t.id}',this)" ${(!d.saleDate||!d.saleTime)?'disabled':''}> この時間に通知する（このブラウザを開いている間）</label>` : ''}
       ${d.saleDate && d.saleTime ? `<div style="font-size:10.5px; color:#8a6d1f; margin-top:4px;">${d.notifyOnSale ? '✅ 通知予約済み' : '通知はオフです'}</div>` : ''}
@@ -2168,15 +2168,15 @@ function catPanelContent(t, c){
   // チケットパネルに、開場時間・演出開始時刻（当日タイムライン用、任意項目）を出す
   const venueTimesBlock = c.key==='ticket' ? `
     <div class="field-row" style="margin-top:2px;">
-      <div class="field"><label>開場時間</label><input type="time" value="${t.gateOpenTime||''}" ${IS_EDITABLE?`onchange="setTripVenueTimes('${t.id}','gateOpenTime',this.value)"`:'disabled'}></div>
-      <div class="field"><label>演出開始</label><input type="time" value="${t.showStartTime||''}" ${IS_EDITABLE?`onchange="setTripVenueTimes('${t.id}','showStartTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>開場時間</label><input type="time" value="${t.gateOpenTime||''}" ${IS_EDITABLE?`onblur="setTripVenueTimes('${t.id}','gateOpenTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>演出開始</label><input type="time" value="${t.showStartTime||''}" ${IS_EDITABLE?`onblur="setTripVenueTimes('${t.id}','showStartTime',this.value)"`:'disabled'}></div>
     </div>` : '';
 
   // 交通(往路・復路)パネルに、出発・到着予定時刻（当日タイムライン用、任意項目）を出す
   const transportTimesBlock = (c.key==='transport_outbound' || c.key==='transport_return') ? `
     <div class="field-row" style="margin-top:2px;">
-      <div class="field"><label>${c.key==='transport_outbound'?'出発時刻':'会場を出る時刻'}</label><input type="time" value="${d.departureTime||''}" ${IS_EDITABLE?`onchange="setTransportTimes('${t.id}','${c.key}','departureTime',this.value)"`:'disabled'}></div>
-      <div class="field"><label>${c.key==='transport_outbound'?'会場到着予定':'帰宅予定'}</label><input type="time" value="${d.arrivalTime||''}" ${IS_EDITABLE?`onchange="setTransportTimes('${t.id}','${c.key}','arrivalTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>${c.key==='transport_outbound'?'出発時刻':'会場を出る時刻'}</label><input type="time" value="${d.departureTime||''}" ${IS_EDITABLE?`onblur="setTransportTimes('${t.id}','${c.key}','departureTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>${c.key==='transport_outbound'?'会場到着予定':'帰宅予定'}</label><input type="time" value="${d.arrivalTime||''}" ${IS_EDITABLE?`onblur="setTransportTimes('${t.id}','${c.key}','arrivalTime',this.value)"`:'disabled'}></div>
     </div>` : '';
 
   // 交通(往路)で、まだ予約先が決まっていない場合、レンタカー・航空券への導線を出す
@@ -2191,7 +2191,7 @@ function catPanelContent(t, c){
   const placeTimeBlock = (c.key==='food' || c.key==='other') ? `
     <div class="field-row" style="margin-top:2px;">
       <div class="field"><label>${c.key==='food'?'お店の名前':'場所の名前'}</label><input value="${(d.placeName||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','${c.key}','placeName',this.value)"`:'disabled'} placeholder="${c.key==='food'?'例）餃子の王将 仙台店':'例）仙台市博物館'}"></div>
-      <div class="field"><label>予定時刻</label><input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','${c.key}','reservationTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>予定時刻</label><input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onblur="setPlaceAndTime('${t.id}','${c.key}','reservationTime',this.value)"`:'disabled'}></div>
     </div>` : '';
 
   // 飲食パネルで、まだお店が決まっていない場合、食べログ・ホットペッパーグルメへの導線を出す
@@ -2222,7 +2222,7 @@ function catPanelContent(t, c){
   const hotelTimeBlock = c.key==='hotel' ? `
     <div class="field" style="margin-top:2px;">
       <label>到着予定時刻</label>
-      <input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','hotel','reservationTime',this.value)"`:'disabled'}>
+      <input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onblur="setPlaceAndTime('${t.id}','hotel','reservationTime',this.value)"`:'disabled'}>
     </div>` : '';
 
   const catBannerBlock = getCatBannerAds(c.key).length ? (()=>{
@@ -2268,7 +2268,7 @@ function catPanelContent(t, c){
               <div class="field"><label>着駅</label><input value="${(leg.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
             </div>
             <div class="field-row">
-              <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
+              <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onblur="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
               <div class="field"><label>この区間の金額</label><input type="number" min="0" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
             </div>
             <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLegLink('${t.id}','${c.key}',${i},this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
@@ -2303,7 +2303,7 @@ function catPanelContent(t, c){
       ${saleBlock}
       <div class="field-row">
         <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="${methodPlaceholder(c.key)}"></div>
-        <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
+        <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onblur="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
       ${hotelSearchBlock}
       ${transportSearchBlock}
@@ -3096,8 +3096,8 @@ function renderSpendingSummary(){
     wrap.innerHTML = tabsHtml + `
       <div class="spending-box">
         <div class="field-row">
-          <div class="field"><label>開始日</label><input type="date" value="${spendingRangeStart}" onchange="setSpendingRange('start',this.value)"></div>
-          <div class="field"><label>終了日</label><input type="date" value="${spendingRangeEnd}" onchange="setSpendingRange('end',this.value)"></div>
+          <div class="field"><label>開始日</label><input type="date" value="${spendingRangeStart}" onblur="setSpendingRange('start',this.value)"></div>
+          <div class="field"><label>終了日</label><input type="date" value="${spendingRangeEnd}" onblur="setSpendingRange('end',this.value)"></div>
         </div>
         <div class="spending-total">この期間の合計：<b>¥${total.toLocaleString()}</b></div>
       </div>`;
