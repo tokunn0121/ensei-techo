@@ -419,8 +419,8 @@
   .legs-total{ font-size:12px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:8px 12px; border-radius:8px; margin-bottom:8px; }
   .legs-total b{ font-family:var(--font-num); }
   .link-open-btn{ display:block; text-align:center; font-size:12.5px; font-weight:700; color:#fff; background:var(--sage); padding:10px; border-radius:10px; text-decoration:none; margin-top:4px; position:relative; }
-  .link-open-btn.is-pr{ padding-right:34px; } /* PRバッジ分の余白 */
-  .link-open-btn .pr-badge-inline{ position:absolute; top:50%; right:8px; transform:translateY(-50%); background:rgba(255,255,255,0.9); color:#5a4213; font-family:var(--font-num); font-size:9px; font-weight:700; padding:1px 5px; border-radius:6px; }
+  .link-open-btn.is-pr{ overflow:visible; } /* バッジがボタンの外にはみ出て表示されるようにする */
+  .link-open-btn .pr-badge-inline{ position:absolute; top:-7px; right:-6px; background:var(--butter); color:#5a4213; font-family:var(--font-num); font-size:9px; font-weight:700; padding:1px 6px; border-radius:8px; white-space:nowrap; }
   .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
   .cat-panel .pr-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
   .copy-btn{ font-size:11.5px; color:var(--sky); background:#fff; border:1.5px dashed var(--sky); border-radius:10px; padding:9px 10px; cursor:pointer; text-align:left; font-family:var(--font-body); }
@@ -733,7 +733,7 @@
     </div>
     <div class="row">
       <div class="field"><label>競技</label>
-        <select id="f-sport" onchange="toggleCustomSport()">
+        <select id="f-sport" onchange="toggleCustomSport()" data-restore-key="toggleCustomSport()">
           <option>バスケットボール</option>
           <option>サッカー</option>
           <option>野球</option>
@@ -748,9 +748,9 @@
       <div class="field">
         <label>応援チーム</label>
         <div id="f-league-wrap" style="display:none; margin-bottom:8px;">
-          <select id="f-league-select" onchange="handleLeagueSelectChange()" style="font-size:16px;"></select>
+          <select id="f-league-select" onchange="handleLeagueSelectChange()" data-restore-key="handleLeagueSelectChange()" style="font-size:16px;"></select>
         </div>
-      <select id="f-team-select" onchange="handleTeamSelectChange()" style="font-size:16px; display:block;">
+      <select id="f-team-select" onchange="handleTeamSelectChange()" data-restore-key="handleTeamSelectChange()" style="font-size:16px; display:block;">
           <option value="">チームを選択してください</option>
         </select>
         <input id="f-team" placeholder="チーム名を入力" oninput="handleTeamInput()" autocomplete="off" style="font-size:16px; display:none; margin-top:6px;">
@@ -762,10 +762,10 @@
       <div id="f-opponent-league-wrap" style="display:none; margin-bottom:8px;">
         <a href="javascript:void(0)" id="opponent-league-toggle-link" onclick="toggleOpponentLeaguePicker()" style="font-size:11.5px; color:var(--rose-deep); text-decoration:underline;">別リーグの相手と対戦する場合はこちら</a>
         <div id="opponent-league-picker" style="display:none; margin-top:6px;">
-          <select id="f-opponent-league-select" onchange="handleOpponentLeagueChange()" style="font-size:16px;"></select>
+          <select id="f-opponent-league-select" onchange="handleOpponentLeagueChange()" data-restore-key="handleOpponentLeagueChange()" style="font-size:16px;"></select>
         </div>
       </div>
-      <select id="f-match-select" onchange="handleOpponentSelectChange()" style="font-size:16px; display:block;">
+      <select id="f-match-select" onchange="handleOpponentSelectChange()" data-restore-key="handleOpponentSelectChange()" style="font-size:16px; display:block;">
         <option value="">相手チームを選択してください</option>
       </select>
       <input id="f-match" placeholder="相手チーム名を入力" oninput="handleOpponentInput()" autocomplete="off" style="font-size:16px; display:none; margin-top:6px;">
@@ -1412,7 +1412,6 @@ function handleOpponentInput(){
 // テキストリンク形式で表示するPR（各カテゴリの主要リンクのみ）
 const PR_LINKS_FALLBACK = {
   hotel: [
-    {label:'楽天トラベルで探す【PR】', url:'https://af.moshimo.com/af/c/click?a_id=5713301&p_id=55&pc_id=55&pl_id=624'},
     {label:'JTBで宿・ツアーを探す【PR】', url:'https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDSJJAQ%2B15A4%2B1TIR4H'},
   ],
   transport_outbound: [],
@@ -1431,14 +1430,10 @@ const CAT_BANNER_ADS_FALLBACK = {
     `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KU%2BLFMK2%2B5RZ8%2B5YJRM" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">WAON POINTがたまる！【イオンコンパストラベルモール】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
   ],
   transport_outbound: [
-    `<a href="https://px.a8.net/svt/ejp?a8mat=4B88SV%2B1HL182%2B3UZC%2B60WN5" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">国内格安航空券を10秒検索【格安航空券モール】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
-    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE2NWKY%2B1EQO%2BTV3PD" rel="nofollow" target="_blank"><img border="0" width="234" height="60" alt="たびらい レンタカー比較" src="https://www25.a8.net/svt/bgt?aid=260726140851&wid=001&eno=01&mid=s00000006576005016000&mc=1" style="max-width:100%; height:auto;"></a>`,
     `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE0VLRM%2BAD2%2B3H18R6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">夜行・高速バスの予約なら【エアトリ】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
     `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDZOQK2%2B43U8%2BHV7V6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">月額無料の超おトクなカーシェア「EARTHCAR」<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
   ],
   transport_return: [
-    `<a href="https://px.a8.net/svt/ejp?a8mat=4B88SV%2B1HL182%2B3UZC%2B60WN5" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">国内格安航空券を10秒検索【格安航空券モール】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
-    `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE2NWKY%2B1EQO%2BTV3PD" rel="nofollow" target="_blank"><img border="0" width="234" height="60" alt="たびらい レンタカー比較" src="https://www25.a8.net/svt/bgt?aid=260726140851&wid=001&eno=01&mid=s00000006576005016000&mc=1" style="max-width:100%; height:auto;"></a>`,
     `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BE0VLRM%2BAD2%2B3H18R6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">夜行・高速バスの予約なら【エアトリ】<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
     `<a href="https://px.a8.net/svt/ejp?a8mat=4B89KS%2BDZOQK2%2B43U8%2BHV7V6" rel="nofollow" target="_blank" style="display:block; font-size:12.5px; font-weight:700; color:var(--text); background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; padding:14px; text-align:center;">月額無料の超おトクなカーシェア「EARTHCAR」<span style="color:var(--text-faint); font-weight:400;">【PR】</span></a>`,
   ],
@@ -1870,7 +1865,7 @@ function renderFilters(){
     controlRow.innerHTML = `
       <div class="sort-select-wrap">
         <label class="sort-select-label">並び替え</label>
-        <select class="sort-select" onchange="setSortMode(this.value)">
+        <select class="sort-select" onchange="setSortMode(this.value)" data-restore-key="setSortMode(this.value)">
           <option value="date" ${sortMode==='date'?'selected':''}>📅 試合日順</option>
           <option value="progress" ${sortMode==='progress'?'selected':''}>⚠️ 準備が遅れている順</option>
         </select>
@@ -1901,7 +1896,6 @@ function setCardViewMode(m){ cardViewMode = m; Settings.set('cardViewMode', m); 
 function toggleExpand(tripId){
   if(expandedTrips.has(tripId)) expandedTrips.delete(tripId); else expandedTrips.add(tripId);
   render();
-  setTimeout(initCategoryBannerRotators, 50);
 }
 
 function statusSegment(t, c){
@@ -2017,6 +2011,7 @@ function getTimelineItems(t){
   const hotel = t.detail.hotel || {};
   const items = [];
   if(ob.departureTime) items.push({ time: ob.departureTime, icon:'🚃', label:'出発' });
+  if(ob.vehicleDepartureTime) items.push({ time: ob.vehicleDepartureTime, icon:'🚄', label:'電車・飛行機の発車' });
   if(ob.arrivalTime) items.push({ time: ob.arrivalTime, icon:'📍', label:'会場到着' });
   if(t.gateOpenTime) items.push({ time: t.gateOpenTime, icon:'🚪', label:'開場' });
   if(t.showStartTime) items.push({ time: t.showStartTime, icon:'🎉', label:'演出開始' });
@@ -2024,6 +2019,7 @@ function getTimelineItems(t){
   if(food.reservationTime) items.push({ time: food.reservationTime, icon:'🍜', label: food.placeName ? `${food.placeName}` : '食事' });
   if(other.reservationTime) items.push({ time: other.reservationTime, icon:'📌', label: other.placeName ? `${other.placeName}` : '予定' });
   if(rt.departureTime) items.push({ time: rt.departureTime, icon:'🚅', label:'会場を出る' });
+  if(rt.vehicleDepartureTime) items.push({ time: rt.vehicleDepartureTime, icon:'🚄', label:'電車・飛行機の発車' });
   if(rt.arrivalTime) items.push({ time: rt.arrivalTime, icon:'🏠', label:'帰宅予定' });
   if(hotel.reservationTime) items.push({ time: hotel.reservationTime, icon:'🏨', label: hotel.method ? `${hotel.method}へ` : 'ホテルへ' });
   return resolveTimelineOrder(items);
@@ -2090,7 +2086,7 @@ function renderPackingListSection(t){
           const yahooUrl = yahooShoppingSearchUrl(item.text);
           return `
           <div class="packing-item">
-            <input type="checkbox" ${item.checked?'checked':''} ${IS_EDITABLE?`onchange="togglePackingItem('${t.id}',${idx})"`:'disabled'}>
+            <input type="checkbox" ${item.checked?'checked':''} ${IS_EDITABLE?`onchange="togglePackingItem('${t.id}',${idx})" data-restore-key="togglePackingItem('${t.id}',${idx})"`:'disabled'}>
             <span class="packing-item-text ${item.checked?'checked':''}" ${IS_EDITABLE?`onclick="togglePackingItem('${t.id}',${idx})"`:''} style="${IS_EDITABLE?'cursor:pointer;':''}">${escapeHtml(item.text)}</span>
             ${rakutenUrl ? `<a href="${rakutenUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();" class="packing-item-shop" title="楽天市場で探す">🛒</a>` : ''}
             ${yahooUrl ? `<a href="${yahooUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation();" class="packing-item-shop" title="Yahoo!ショッピングで探す">🛍️</a>` : ''}
@@ -2130,14 +2126,14 @@ function renderAttendeesSection(t, isPast){
         ${attendees.map(a => `
           <div class="att-row">
             <span class="att-name">${escapeHtml(a.name)}</span>
-            <span class="att-status-badge ${statusClass[a.status]||''}">${statusLabel[a.status]||a.status}</span>
+            <span class="att-status-badge ${statusClass[a.status]||''}" ${IS_EDITABLE?`onclick="cycleTripAttendee('${t.id}','${a.name.replace(/'/g,"\\'")}','${a.status}')" style="cursor:pointer;" title="タップで切り替え"`:''}>${statusLabel[a.status]||a.status}</span>
             ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:24px; height:24px; font-size:11px;" onclick="removeTripAttendee('${t.id}','${a.name.replace(/'/g,"\\'")}')">×</button>` : ''}
           </div>`).join('')}
         ${(IS_EDITABLE) ? `
         <div class="att-add-row">
           ${knownNames.length ? `
-          <select id="att-known-${t.id}" onchange="if(this.value){ document.getElementById('att-input-${t.id}').value = this.value; }" style="font-size:16px;">
-            <option value="">よく使う名前から選ぶ</option>
+          <select id="att-known-${t.id}" onchange="if(this.value){ setTripAttendee('${t.id}',this.value,'going'); this.value=''; }" data-restore-key="if(this.value){ setTripAttendee('${t.id}',this.value,'going'); this.value=''; }" style="font-size:16px;">
+            <option value="">よく使う名前から選ぶ（選ぶと${isPast?'「行った」':'「行く」'}で即登録）</option>
             ${knownNames.map(n=>`<option value="${n}">${n}</option>`).join('')}
           </select>` : ''}
           <input type="text" id="att-input-${t.id}" placeholder="名前を入力（例：パパ）" style="font-size:16px;">
@@ -2158,50 +2154,53 @@ function catPanelContent(t, c){
     <div style="background:var(--butter-wash,#FFF7E6); border:1.5px dashed var(--butter,#E0B84A); border-radius:10px; padding:10px 12px; margin-top:2px;">
       <div style="font-size:11.5px; font-weight:700; color:#8a6d1f; margin-bottom:6px;">🔔 チケット発売日リマインダー</div>
       <div class="field-row">
-        <div class="field"><label>発売日</label><input type="date" value="${d.saleDate||''}" ${IS_EDITABLE?`onblur="updateSaleInfo('${t.id}',this.value,null,null)"`:'disabled'}></div>
-        <div class="field"><label>発売時刻</label><input type="time" value="${d.saleTime||''}" ${IS_EDITABLE?`onblur="updateSaleInfo('${t.id}',null,this.value,null)"`:'disabled'}></div>
+        <div class="field"><label>発売日</label><input type="date" value="${d.saleDate||''}" ${IS_EDITABLE?`onblur="updateSaleInfo('${t.id}',this.value,null,null)" data-restore-key="updateSaleInfo('${t.id}',this.value,null,null)"`:'disabled'}></div>
+        <div class="field"><label>発売時刻</label><input type="time" value="${d.saleTime||''}" ${IS_EDITABLE?`onblur="updateSaleInfo('${t.id}',null,this.value,null)" data-restore-key="updateSaleInfo('${t.id}',null,this.value,null)"`:'disabled'}></div>
       </div>
-      ${IS_EDITABLE ? `<label class="done-toggle" style="margin-top:6px;"><input type="checkbox" ${d.notifyOnSale?'checked':''} onchange="handleNotifyToggle('${t.id}',this)" ${(!d.saleDate||!d.saleTime)?'disabled':''}> この時間に通知する（このブラウザを開いている間）</label>` : ''}
+      ${IS_EDITABLE ? `<label class="done-toggle" style="margin-top:6px;"><input type="checkbox" ${d.notifyOnSale?'checked':''} onchange="handleNotifyToggle('${t.id}',this)" data-restore-key="handleNotifyToggle('${t.id}',this)" ${(!d.saleDate||!d.saleTime)?'disabled':''}> この時間に通知する（このブラウザを開いている間）</label>` : ''}
       ${d.saleDate && d.saleTime ? `<div style="font-size:10.5px; color:#8a6d1f; margin-top:4px;">${d.notifyOnSale ? '✅ 通知予約済み' : '通知はオフです'}</div>` : ''}
     </div>` : '';
 
   // チケットパネルに、開場時間・演出開始時刻（当日タイムライン用、任意項目）を出す
   const venueTimesBlock = c.key==='ticket' ? `
     <div class="field-row" style="margin-top:2px;">
-      <div class="field"><label>開場時間</label><input type="time" value="${t.gateOpenTime||''}" ${IS_EDITABLE?`onblur="setTripVenueTimes('${t.id}','gateOpenTime',this.value)"`:'disabled'}></div>
-      <div class="field"><label>演出開始</label><input type="time" value="${t.showStartTime||''}" ${IS_EDITABLE?`onblur="setTripVenueTimes('${t.id}','showStartTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>開場時間</label><input type="time" value="${t.gateOpenTime||''}" ${IS_EDITABLE?`onblur="setTripVenueTimes('${t.id}','gateOpenTime',this.value)" data-restore-key="setTripVenueTimes('${t.id}','gateOpenTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>演出開始</label><input type="time" value="${t.showStartTime||''}" ${IS_EDITABLE?`onblur="setTripVenueTimes('${t.id}','showStartTime',this.value)" data-restore-key="setTripVenueTimes('${t.id}','showStartTime',this.value)"`:'disabled'}></div>
     </div>` : '';
 
   // 交通(往路・復路)パネルに、出発・到着予定時刻（当日タイムライン用、任意項目）を出す
   const transportTimesBlock = (c.key==='transport_outbound' || c.key==='transport_return') ? `
     <div class="field-row" style="margin-top:2px;">
-      <div class="field"><label>${c.key==='transport_outbound'?'出発時刻':'会場を出る時刻'}</label><input type="time" value="${d.departureTime||''}" ${IS_EDITABLE?`onblur="setTransportTimes('${t.id}','${c.key}','departureTime',this.value)"`:'disabled'}></div>
-      <div class="field"><label>${c.key==='transport_outbound'?'会場到着予定':'帰宅予定'}</label><input type="time" value="${d.arrivalTime||''}" ${IS_EDITABLE?`onblur="setTransportTimes('${t.id}','${c.key}','arrivalTime',this.value)"`:'disabled'}></div>
-    </div>` : '';
+      <div class="field"><label>${c.key==='transport_outbound'?'出発時刻':'会場を出る時刻'}</label><input type="time" value="${d.departureTime||''}" ${IS_EDITABLE?`onblur="setTransportTimes('${t.id}','${c.key}','departureTime',this.value)" data-restore-key="setTransportTimes('${t.id}','${c.key}','departureTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>電車・飛行機の発車時刻</label><input type="time" value="${d.vehicleDepartureTime||''}" ${IS_EDITABLE?`onblur="setVehicleDepartureTime('${t.id}','${c.key}',this.value)" data-restore-key="setVehicleDepartureTime('${t.id}','${c.key}',this.value)"`:'disabled'}></div>
+    </div>
+    <div class="field" style="margin-top:6px;"><label>${c.key==='transport_outbound'?'会場到着予定':'帰宅予定'}</label><input type="time" value="${d.arrivalTime||''}" ${IS_EDITABLE?`onblur="setTransportTimes('${t.id}','${c.key}','arrivalTime',this.value)" data-restore-key="setTransportTimes('${t.id}','${c.key}','arrivalTime',this.value)"`:'disabled'}></div>` : '';
 
   // 交通(往路)で、まだ予約先が決まっていない場合、レンタカー・航空券への導線を出す
   // （日付・行き先を指定した検索URLの形式が未確認のため、現時点ではトップページへの汎用リンク）
   const transportSearchBlock = (c.key==='transport_outbound' && !(d.method||'').trim()) ? `
-    <div style="display:flex; gap:8px; margin-bottom:10px;">
-      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🚗 レンタカーを探す<span class="pr-badge-inline">PR</span></a>
-      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686889" target="_blank" rel="nofollow noopener" onclick="event.stopPropagation();">✈️ 航空券を探す<span class="pr-badge-inline">PR</span></a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686889" height="1" width="1" style="border:none; display:none;" alt="">
-    </div>` : '';
+    <div style="display:flex; gap:8px; margin-bottom:2px;">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation();">🚗 レンタカーを探す</a>
+      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686889" target="_blank" rel="nofollow noopener" onclick="event.stopPropagation();">✈️ 航空券を探す</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686889" height="1" width="1" style="border:none; display:none;" alt="">
+    </div>
+    <div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-bottom:10px;">上記2つは提携サイトへのリンクです【PR】</div>` : '';
 
   // 飲食・その他パネルに、お店の名前・来店予定時刻（当日タイムライン＆ルート検索用、任意項目）を出す
   const placeTimeBlock = (c.key==='food' || c.key==='other') ? `
     <div class="field-row" style="margin-top:2px;">
-      <div class="field"><label>${c.key==='food'?'お店の名前':'場所の名前'}</label><input value="${(d.placeName||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','${c.key}','placeName',this.value)"`:'disabled'} placeholder="${c.key==='food'?'例）餃子の王将 仙台店':'例）仙台市博物館'}"></div>
-      <div class="field"><label>予定時刻</label><input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onblur="setPlaceAndTime('${t.id}','${c.key}','reservationTime',this.value)"`:'disabled'}></div>
+      <div class="field"><label>${c.key==='food'?'お店の名前':'場所の名前'}</label><input value="${(d.placeName||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="setPlaceAndTime('${t.id}','${c.key}','placeName',this.value)" data-restore-key="setPlaceAndTime('${t.id}','${c.key}','placeName',this.value)"`:'disabled'} placeholder="${c.key==='food'?'例）餃子の王将 仙台店':'例）仙台市博物館'}"></div>
+      <div class="field"><label>予定時刻</label><input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onblur="setPlaceAndTime('${t.id}','${c.key}','reservationTime',this.value)" data-restore-key="setPlaceAndTime('${t.id}','${c.key}','reservationTime',this.value)"`:'disabled'}></div>
     </div>` : '';
 
   // 飲食パネルで、まだお店が決まっていない場合、食べログ・ホットペッパーグルメへの導線を出す
   // （バリューコマースの参照リンク。行き先を指定できない固定リンクのため、各サイトのトップページへ遷移する）
   const gourmetSearchBlock = (c.key==='food' && !(d.placeName||'').trim()) ? `
-    <div style="display:flex; gap:6px; margin-bottom:10px;">
-      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 26px 10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686842" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ<span class="pr-badge-inline">PR</span></a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686842" height="1" width="1" style="border:none; display:none;" alt="">
-      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 26px 10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー<span class="pr-badge-inline">PR</span></a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
-      <a class="link-open-btn is-pr" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 26px 10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">✨ OZmall<span class="pr-badge-inline">PR</span></a>
-    </div>` : '';
+    <div style="display:flex; gap:6px; margin-bottom:2px;">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686842" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686842" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">✨ OZmall</a>
+    </div>
+    <div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-bottom:10px;">上記3つは提携サイトへのリンクです【PR】</div>` : '';
 
   // 場所の名前が分かっているカテゴリ（飲食・その他・宿泊）には、現在地からのルート検索リンクを出す
   const routeDestination = c.key==='hotel' ? d.method : (c.key==='food' || c.key==='other') ? d.placeName : '';
@@ -2222,7 +2221,7 @@ function catPanelContent(t, c){
   const hotelTimeBlock = c.key==='hotel' ? `
     <div class="field" style="margin-top:2px;">
       <label>到着予定時刻</label>
-      <input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onblur="setPlaceAndTime('${t.id}','hotel','reservationTime',this.value)"`:'disabled'}>
+      <input type="time" value="${d.reservationTime||''}" ${IS_EDITABLE?`onblur="setPlaceAndTime('${t.id}','hotel','reservationTime',this.value)" data-restore-key="setPlaceAndTime('${t.id}','hotel','reservationTime',this.value)"`:'disabled'}>
     </div>` : '';
 
   const catBannerBlock = getCatBannerAds(c.key).length ? (()=>{
@@ -2248,8 +2247,8 @@ function catPanelContent(t, c){
     <details class="station-details" ${isStationOpen ? 'open' : ''} ontoggle="if(this.open) stationDetailsOpen.add('${stationKey}'); else stationDetailsOpen.delete('${stationKey}');">
       <summary>🚉 発着駅・乗り継ぎを追加${hasStationData ? '' : '（任意）'}</summary>
       <div class="field-row" style="margin-top:8px;">
-        <div class="field"><label>発駅</label><input value="${(d.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','departureStation',this.value)"`:'disabled'} placeholder="例）東京"></div>
-        <div class="field"><label>着駅</label><input value="${(d.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
+        <div class="field"><label>発駅</label><input value="${(d.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','departureStation',this.value)" data-restore-key="updateDetail('${t.id}','${c.key}','departureStation',this.value)"`:'disabled'} placeholder="例）東京"></div>
+        <div class="field"><label>着駅</label><input value="${(d.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)" data-restore-key="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
       </div>
       ${(d.departureStation && d.arrivalStation) ? `<a class="link-open-btn" style="margin-bottom:10px;" href="https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(d.departureStation)}&to=${encodeURIComponent(d.arrivalStation)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🚃 乗換案内で経路を調べる</a>` : ''}
       <div class="legs-box">
@@ -2259,19 +2258,19 @@ function catPanelContent(t, c){
           return `
           <div class="leg-card">
             <div class="leg-card-top">
-              <input class="leg-method" value="${(leg.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'method',this.value)"`:'disabled'} placeholder="例）特急ひだ">
+              <input class="leg-method" value="${(leg.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'method',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'method',this.value)"`:'disabled'} placeholder="例）特急ひだ">
               <span class="leg-status-dot ${legBooked?'done':'pending'}"></span>
               ${IS_EDITABLE ? `<button type="button" onclick="removeLeg('${t.id}','${c.key}',${i})" class="leg-remove">×</button>` : ''}
             </div>
             <div class="field-row">
-              <div class="field"><label>発駅</label><input value="${(leg.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)"`:'disabled'} placeholder="例）名古屋"></div>
-              <div class="field"><label>着駅</label><input value="${(leg.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
+              <div class="field"><label>発駅</label><input value="${(leg.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)"`:'disabled'} placeholder="例）名古屋"></div>
+              <div class="field"><label>着駅</label><input value="${(leg.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
             </div>
             <div class="field-row">
-              <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onblur="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
-              <div class="field"><label>この区間の金額</label><input type="number" min="0" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
+              <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onblur="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
+              <div class="field"><label>この区間の金額</label><input type="number" min="0" value="${leg.cost||''}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'cost',this.value)"`:'disabled'} placeholder="円"></div>
             </div>
-            <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLegLink('${t.id}','${c.key}',${i},this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+            <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(leg.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLegLink('${t.id}','${c.key}',${i},this.value)" data-restore-key="updateLegLink('${t.id}','${c.key}',${i},this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
             ${renderLinkAction(leg.link, '予約ページ')}
           </div>`;
         }).join('')}
@@ -2288,13 +2287,12 @@ function catPanelContent(t, c){
         ${placeTimeBlock}
         ${gourmetSearchBlock}
         ${routeBlock}
-        <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
+        <div class="field"><label>メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateSimple('${t.id}','${c.key}',this.value)" data-restore-key="updateSimple('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
         ${(c.key==='food' || c.key==='other') ? `
-        <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは電話番号など"></div>
+        <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)" data-restore-key="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは電話番号など"></div>
         ${renderLinkAction(d.link, c.key==='food'?'お店のページ':'リンク先')}
         ` : ''}
         ${segment}
-        ${c.key==='food' ? `<div class="pr-row">${getPrLinks('food').map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
         ${c.key==='other' ? `<div class="pr-row">${getPrLinks('other').map(l=>`<a class="pr-btn" href="${l.url}" target="_blank" rel="noopener" onclick="event.stopPropagation(); logClick('${t.id}','${c.key}','${l.label.replace(/'/g,"\\'")}')">${l.label}<span class="pr-badge">PR</span></a>`).join('')}</div>` : ''}
       </div>`;
   }
@@ -2302,8 +2300,8 @@ function catPanelContent(t, c){
     <div class="cat-panel">
       ${saleBlock}
       <div class="field-row">
-        <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="${methodPlaceholder(c.key)}"></div>
-        <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onblur="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
+        <div class="field"><label>予約先・方法</label><input value="${(d.method||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','method',this.value)" data-restore-key="updateDetail('${t.id}','${c.key}','method',this.value)"`:'disabled'} placeholder="${methodPlaceholder(c.key)}"></div>
+        <div class="field"><label>予約日</label><input type="date" value="${d.bookedDate||''}" ${IS_EDITABLE?`onblur="updateDetail('${t.id}','${c.key}','bookedDate',this.value)" data-restore-key="updateDetail('${t.id}','${c.key}','bookedDate',this.value)"`:'disabled'}></div>
       </div>
       ${hotelSearchBlock}
       ${transportSearchBlock}
@@ -2314,10 +2312,10 @@ function catPanelContent(t, c){
       ${routeBlock}
       ${stationBlock}
       <div class="field-row">
-        <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" min="0" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
-        <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
+        <div class="field"><label>金額${(d.legs||[]).length ? '<span style="font-weight:400; color:var(--text-faint);">（乗り継ぎ内訳から自動計算）</span>' : ''}</label><input type="number" min="0" value="${d.cost||''}" ${(IS_EDITABLE && !(d.legs||[]).length)?`onchange="updateDetail('${t.id}','${c.key}','cost',this.value)" data-restore-key="updateDetail('${t.id}','${c.key}','cost',this.value)"`:'disabled'} placeholder="円"></div>
+        <div class="field"><label>詳細メモ</label><input value="${(d.memo||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}" data-restore-key="${c.key==='ticket'?`updateTicketMemo('${t.id}',this.value)`:`updateDetail('${t.id}','${c.key}','memo',this.value)`}"`:'disabled'} placeholder="${memoPlaceholder(c.key)}"></div>
       </div>
-      <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
+      <div class="field"><label>${linkFieldLabel(c.key)}</label><input value="${(d.link||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLinkField('${t.id}','${c.key}',this.value)" data-restore-key="updateLinkField('${t.id}','${c.key}',this.value)"`:'disabled'} placeholder="URLまたは予約番号"></div>
       ${renderLinkAction(d.link, '予約ページ')}
       ${segment}
       ${copyOutboundBlock}
@@ -2419,7 +2417,7 @@ function renderTicketCard(t, isPast){
           <span class="label">${BOOKABLE_CATS.some(k=>t.detail[k]?.cost) ? '実績金額' : '想定予算'}</span>
           <span class="val">¥${tripSpend(t).toLocaleString()}</span>
         </div>
-        <div class="cat-strip">
+        <div class="cat-strip" id="cat-strip-${t.id}">
           ${CATS.map(c=>{
             const done = t.status[c.key];
             const notNeeded = !!t.detail[c.key]?.notNeeded;
@@ -2459,7 +2457,7 @@ function renderTicketCard(t, isPast){
             <button type="button" class="result-btn result-draw ${t.result==='draw'?'active':''}" ${IS_EDITABLE?`onclick="setTripResult('${t.id}','draw')"`:'disabled'}>➖ 引き分け</button>
           </div>
           <div class="journal-label" style="margin-top:12px;">📝 この遠征の思い出</div>
-          <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)"`:'disabled'}>${escapeHtml(t.journalMemo)}</textarea>
+          <textarea class="journal-textarea" placeholder="何を食べた、どうだった、などの記録を残せます" ${IS_EDITABLE?`onchange="setTripJournal('${t.id}',this.value)" data-restore-key="setTripJournal('${t.id}',this.value)"`:'disabled'}>${escapeHtml(t.journalMemo)}</textarea>
         </div>` : ''}
         <button class="card-share-btn" onclick="shareTrip('${t.id}')">📤 家族に共有する</button>
       </div>` : '';
@@ -2545,7 +2543,6 @@ function toggleCat(tripId, key){
     activeCat[tripId] = key; // 別のカテゴリに切り替え（他は自動的に閉じる＝タブのような挙動）
   }
   render();
-  setTimeout(initCategoryBannerRotators, 50);
 }
 
 // 予算上限機能は「可視化するとプレッシャーになる」というフィードバックにより廃止しました。
@@ -2596,6 +2593,25 @@ async function setTransportTimes(tripId, catKey, field, val){
       p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_category: catKey,
       p_departure_time: field==='departureTime' ? (val||null) : other,
       p_arrival_time: field==='arrivalTime' ? (val||null) : other
+    });
+    if(error) throw error;
+    setTimeout(render, 0);
+  }catch(e){
+    console.error(e);
+    showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
+  }
+}
+// 電車・飛行機自体の発車時刻を保存する（交通(往路・復路)向け、当日タイムライン用）
+// 「会場を出る時刻／自宅を出る時刻」(departureTime)とは別の、乗り物自体の発車時刻
+async function setVehicleDepartureTime(tripId, catKey, val){
+  if(!IS_EDITABLE) return;
+  const t = trips.find(x=>x.id===tripId);
+  if(!t) return;
+  t.detail[catKey].vehicleDepartureTime = val;
+  try{
+    const { error } = await sb.rpc('set_vehicle_departure_time', {
+      p_edit_token: EDIT_TOKEN, p_trip_id: tripId, p_category: catKey,
+      p_vehicle_departure_time: val || null
     });
     if(error) throw error;
     setTimeout(render, 0);
@@ -2678,6 +2694,13 @@ async function setTripAttendee(tripId, name, status){
     console.error(e);
     showToast('保存に失敗しました。通信環境をご確認のうえ、もう一度お試しください。');
   }
+}
+// 既に登録済みの参加者のステータスを、タップのたびに順番に切り替える（行く→未定→行かない→行く…）
+// 一度削除してから入力し直す手間を無くすため
+function cycleTripAttendee(tripId, name, currentStatus){
+  const order = ['going', 'maybe', 'not_going'];
+  const next = order[(order.indexOf(currentStatus) + 1) % order.length];
+  setTripAttendee(tripId, name, next);
 }
 function removeTripAttendee(tripId, name){
   if(!IS_EDITABLE) return;
@@ -2839,7 +2862,15 @@ function setCatState(tripId, key, state){
   const patch = { notNeeded, is_booked: isBooked };
   // 予約日は自動で入れない（実際に予約した日を手動で入力してもらう）
   t.detail[key] = { ...t.detail[key], notNeeded };
+  // 未予約/予約済み/対象外のいずれかを選んだ時点で「このカテゴリの入力は完了した」とみなし、
+  // パネルを閉じてカテゴリ一覧の位置まで自動でスクロールして戻す。
+  // これが無いと、保存した後もパネルが開いたままで、次のカテゴリを選ぶために
+  // 手動で閉じてから上にスクロールし直す、という手間が毎回発生してしまう。
+  delete activeCat[tripId];
   saveBookingDetail(tripId, key, patch, true);
+  setTimeout(() => {
+    document.getElementById(`cat-strip-${tripId}`)?.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 60); // render()（saveBookingDetail内でわずかに遅延実行される）が終わってからスクロールする
 }
 
 // 未予約のカテゴリを一括で「予約済み」にする（1件ずつタップする手間を省く）
@@ -3008,6 +3039,9 @@ async function undoDeleteTrip(){
       if(tdRestore && (tdRestore.departureTime || tdRestore.arrivalTime)){
         await sb.rpc('set_transport_times', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_category: tKey, p_departure_time: tdRestore.departureTime||null, p_arrival_time: tdRestore.arrivalTime||null });
       }
+      if(tdRestore && tdRestore.vehicleDepartureTime){
+        await sb.rpc('set_vehicle_departure_time', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_category: tKey, p_vehicle_departure_time: tdRestore.vehicleDepartureTime });
+      }
     }
     for(const key of ['food','other','hotel']){
       const pd = t.detail[key];
@@ -3096,8 +3130,8 @@ function renderSpendingSummary(){
     wrap.innerHTML = tabsHtml + `
       <div class="spending-box">
         <div class="field-row">
-          <div class="field"><label>開始日</label><input type="date" value="${spendingRangeStart}" onblur="setSpendingRange('start',this.value)"></div>
-          <div class="field"><label>終了日</label><input type="date" value="${spendingRangeEnd}" onblur="setSpendingRange('end',this.value)"></div>
+          <div class="field"><label>開始日</label><input type="date" value="${spendingRangeStart}" onblur="setSpendingRange('start',this.value)" data-restore-key="setSpendingRange('start',this.value)"></div>
+          <div class="field"><label>終了日</label><input type="date" value="${spendingRangeEnd}" onblur="setSpendingRange('end',this.value)" data-restore-key="setSpendingRange('end',this.value)"></div>
         </div>
         <div class="spending-total">この期間の合計：<b>¥${total.toLocaleString()}</b></div>
       </div>`;
@@ -3633,14 +3667,19 @@ async function submitTrip(keepOpen){
       render();
 
       // 未訪問のスタジアムなら、達成感の通知とあわせて交通の予約欄を開いておく（自然な形で予約導線・広告に繋げる）
-      if(isNewVenue && !isDayTrip){
+      // ただし「登録して続けて追加」で連続入力している最中は、パネルが勝手に開いて
+      // そちらにスクロールされると、連続登録のリズムが毎回中断されてしまう
+      // （特にサッカーのようにアウェイ会場が試合ごとに変わる競技で、何試合も続けて登録する時に顕著）。
+      // 続けて登録中は通知だけにとどめ、パネルは開かない。
+      if(isNewVenue && !isDayTrip && !keepOpen){
         setTimeout(()=>{
           activeCat[newId] = 'transport_outbound';
           render();
-          setTimeout(initCategoryBannerRotators, 50);
           focusTrip(newId);
           showToast(`🆕 ${newVenueFound} は初めてのスタジアムです！終了後にスタンプが貯まります`, 3200);
-        }, keepOpen ? 0 : 400);
+        }, 400);
+      }else if(isNewVenue && !isDayTrip && keepOpen){
+        showToast(`🆕 ${newVenueFound} は初めてのスタジアムです！終了後にスタンプが貯まります`, 3200);
       }
     }
   }catch(e){
@@ -4260,7 +4299,7 @@ function renderScheduleImportResult(parsed){
     return `
       <div class="ig-card" id="ig-card-${i}" style="background:${isChecked?'#fff':'var(--surface-2)'}; border:1.5px solid ${isChecked?'var(--rose)':'var(--line)'}; border-radius:10px; padding:10px 12px; margin-bottom:8px;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <input type="checkbox" id="ig${i}" ${isChecked?'checked':''} onchange="updateScheduleImportCount(); document.getElementById('ig-card-${i}').style.background=this.checked?'#fff':'var(--surface-2)'; document.getElementById('ig-card-${i}').style.borderColor=this.checked?'var(--rose)':'var(--line)';" style="width:18px; height:18px; accent-color:var(--rose); flex-shrink:0;">
+          <input type="checkbox" id="ig${i}" ${isChecked?'checked':''} onchange="updateScheduleImportCount(); document.getElementById('ig-card-${i}').style.background=this.checked?'#fff':'var(--surface-2)'; document.getElementById('ig-card-${i}').style.borderColor=this.checked?'var(--rose)':'var(--line)';" data-restore-key="updateScheduleImportCount(); document.getElementById('ig-card-${i}').style.background=this.checked?'#fff':'var(--surface-2)'; document.getElementById('ig-card-${i}').style.borderColor=this.checked?'var(--rose)':'var(--line)';" style="width:18px; height:18px; accent-color:var(--rose); flex-shrink:0;">
           <span style="font-size:14px; font-weight:900; color:var(--text);">${dateLabel}</span>
           <span style="font-size:13px; color:var(--text-dim); font-weight:700;">vs ${g.opponent||'対戦相手未定'}</span>
         </div>
@@ -4389,13 +4428,45 @@ async function confirmScheduleImport(){
 }
 
 function render(){
+  // render()は入力欄を含むカード全体のHTMLを毎回作り直すため、何もしないと
+  // 入力中だった要素ごとDOMから消えてしまい、フォーカスが失われる（＝スマホのキーボードが
+  // 閉じてしまう）。そこで、再描画の前後でフォーカス位置・カーソル位置を保存/復元する。
+  const active = document.activeElement;
+  let restoreKey = null, restoreSelStart = null, restoreSelEnd = null;
+  if(active && active.dataset && active.dataset.restoreKey){
+    restoreKey = active.dataset.restoreKey;
+    if(typeof active.selectionStart === 'number'){
+      restoreSelStart = active.selectionStart;
+      restoreSelEnd = active.selectionEnd;
+    }
+  }
   renderHero();
   renderSaleAlerts();
   renderAlerts();
   renderSummary();
   renderRecent();
   renderFilters();
+  // renderGrid()はカテゴリパネル（とその中の広告ローテーター）を含むDOMを丸ごと作り直すため、
+  // 先に既存のローテーターを全て止めておく。でないと、古いDOM要素に対して
+  // setIntervalが動き続ける「タイマーリーク」が、カテゴリパネルを開閉するたびに積み重なってしまう
+  // （スケジュール一括登録のオーバーレイで一度見つけたのと同種の問題）。
+  if(window.__adRotators){
+    Object.values(window.__adRotators).forEach(r => r.stop && r.stop());
+  }
   renderGrid();
+  if(restoreKey){
+    // CSS.escape で、キー文字列に含まれる特殊文字（引用符など）がセレクタを壊さないようにする
+    const el = document.querySelector(`[data-restore-key="${CSS.escape(restoreKey)}"]`);
+    if(el){
+      el.focus({ preventScroll: true });
+      if(restoreSelStart !== null && typeof el.setSelectionRange === 'function'){
+        try{ el.setSelectionRange(restoreSelStart, restoreSelEnd); }catch(e){ /* 一部のinput type（date/time等）では未対応のため無視 */ }
+      }
+    }
+  }
+  // renderGrid()が作り直した中に、まだ開いているカテゴリパネルがあれば、その広告枠を再初期化する。
+  // （render()を呼ぶ箇所ごとに個別にsetTimeoutしていたが、呼び忘れの温床になるため、ここに一本化する）
+  setTimeout(initCategoryBannerRotators, 50);
 }
 
 /* ---------- data model mapping: DB row <-> UI shape ---------- */
@@ -4410,7 +4481,8 @@ function normalizeTrip(raw){
       ? { ...base, method: bd.method || '', bookedDate: bd.booked_at || '', cost: bd.cost || 0,
           saleDate: bd.sale_date || '', saleTime: bd.sale_time ? String(bd.sale_time).slice(0,5) : '', notifyOnSale: !!bd.notify_on_sale,
           departureStation: bd.departure_station || '', arrivalStation: bd.arrival_station || '', legs: Array.isArray(bd.legs) ? bd.legs : [],
-          departureTime: bd.departure_time ? String(bd.departure_time).slice(0,5) : '', arrivalTime: bd.arrival_time ? String(bd.arrival_time).slice(0,5) : '' }
+          departureTime: bd.departure_time ? String(bd.departure_time).slice(0,5) : '', arrivalTime: bd.arrival_time ? String(bd.arrival_time).slice(0,5) : '',
+          vehicleDepartureTime: bd.vehicle_departure_time ? String(bd.vehicle_departure_time).slice(0,5) : '' }
       : base;
   });
   return {
@@ -4521,7 +4593,7 @@ function openSettingsPanel(){
       <div class="theme-color-presets">
         ${THEME_COLOR_PRESETS.map(c=>`<button type="button" class="theme-color-swatch" style="background:${c};" onclick="saveThemeColor('${c}')" title="${c}"></button>`).join('')}
         <label class="theme-color-swatch theme-color-custom" title="自由に選ぶ">
-          🎨<input type="color" onchange="saveThemeColor(this.value)" style="opacity:0; position:absolute; width:1px; height:1px;">
+          🎨<input type="color" onchange="saveThemeColor(this.value)" data-restore-key="saveThemeColor(this.value)" style="opacity:0; position:absolute; width:1px; height:1px;">
         </label>
       </div>
     </div>` : ''}
