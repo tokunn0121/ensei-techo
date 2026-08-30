@@ -869,6 +869,22 @@ const Settings = {
     delete all[key];
     this._save();
   },
+  // 天気予報のキャッシュ（weather_都市名_日付、という形式のキー）は削除する処理が無いまま
+  // 溜まり続ける設計だったため、既に試合日が過ぎたキャッシュを起動時に一度だけ掃除する
+  cleanupExpiredWeatherCache(){
+    const all = this._load();
+    const today = new Date().toISOString().slice(0,10);
+    let changed = false;
+    Object.keys(all).forEach(key=>{
+      if(!key.startsWith('weather_')) return;
+      const dateMatch = key.match(/_(\d{4}-\d{2}-\d{2})$/);
+      if(dateMatch && dateMatch[1] < today){
+        delete all[key];
+        changed = true;
+      }
+    });
+    if(changed) this._save();
+  },
   // 旧バージョンで別々のキーに保存していたデータを、初回起動時だけ新しい形式に移行する
   migrateLegacyKeys(){
     try{
@@ -1716,6 +1732,22 @@ function escapeHtml(str){
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+// onclick="...('${value}')" のように、HTML属性値（ダブルクォートで囲む）の中に、
+// さらにJS文字列リテラル（シングルクォートで囲む）としてユーザー入力を埋め込む場合専用のエスケープ。
+// .replace(/'/g,"\\'") だけ（シングルクォートのみ対応）だと、値にダブルクォートが含まれていた時、
+// 属性値そのものが途中で終わってしまい、後続の文字列が新しいHTML属性として解釈されてしまう
+// （例えば "onmouseover=alert(1) のような文字列で、意図しない属性が追加できてしまう）。
+// そのため、JS文字列としてのエスケープ（\・'）と、HTML属性値としてのエスケープ（"・<・>）の
+// 両方を、正しい順序（JS文字列として組み立ててから、HTML属性値として囲む）で行う。
+function escapeJsAttr(str){
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 function fmtDate(iso){
   if(!iso) return {md:'--', dow:''};
@@ -1772,7 +1804,7 @@ function renderHero(){
       <div>
         <div class="htitle">最近の遠征</div>
         <div class="hmatch">${escapeHtml(t.team)} ${escapeHtml(t.match)}</div>
-        <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
+        <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${escapeHtml(t.venue)}</div>
         ${t.result ? `<div class="hall-set">${t.result==='win'?'🎉 勝利':t.result==='loss'?'😢 敗戦':'△ 引き分け'}</div>` : ''}
       </div>
       <div class="hcountdown">
@@ -1796,8 +1828,8 @@ function renderHero(){
       <div>
         <div class="htitle">次の遠征${isToday?' <span class="today-badge">GAME DAY</span>':''}</div>
         <div class="hmatch">${escapeHtml(t.team)} ${escapeHtml(t.match)}</div>
-        <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
-        <div id="hero-weather"></div>
+        <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${escapeHtml(t.venue)}</div>
+        <div id="hero-weather" data-for-trip="${t.id}"></div>
         ${earliestItem ? `<div class="htoday-time">${earliestItem.icon} ${earliestItem.time} ${escapeHtml(earliestItem.label)}</div>` : ''}
         ${pending.length
           ? `<div class="hpending">${pending.map(k=>`<span>${catInfo(k).icon} ${catInfo(k).label}が未予約</span>`).join('')}</div>`
@@ -1813,9 +1845,18 @@ function renderHero(){
   if(t.venue && getVenueCityForWeather(t.venue)){
     fetchWeatherForVenue(t.venue, t.date).then(w=>{
       const slot = document.getElementById('hero-weather');
-      if(!w || !slot) return;
+      // 取得が完了するまでの間に、別の試合に切り替わっている可能性がある
+      // （フィルター切り替え等でrenderHero()が短時間に複数回呼ばれるケース）。
+      // 今表示されている天気欄が、まだこの試合（t.id）のものかを確認してから反映する。
+      // でないと、後から届いた古い試合の天気予報が、別の試合の欄に誤って表示されてしまう。
+      if(!w || !slot || slot.dataset.forTrip !== t.id) return;
       const [icon, label] = weatherCodeToInfo(w.code);
-      slot.innerHTML = `<div class="hweather">${icon} ${label}　${w.tempMin}〜${w.tempMax}℃　☂️降水確率${w.precipProb}%<span class="hweather-credit">Weather by Open-Meteo.com</span></div>`;
+      // 雨系の天気コードの場合だけ、傘の購入提案を控えめに添える
+      // （雨予報を見て「傘を持っていく/買う」と考えるのは自然な流れなので、必要な人には便利、
+      // 不要な人には次の行の小さな1行なのでほぼ気にならない、というバランスを意識した）
+      const isRainy = [51,53,55,61,63,65,80,81,82,95,96,99].includes(w.code);
+      const umbrellaUrl = isRainy ? rakutenIchibaSearchUrl('折りたたみ傘') : null;
+      slot.innerHTML = `<div class="hweather">${icon} ${label}　${w.tempMin}〜${w.tempMax}℃　☂️降水確率${w.precipProb}%<span class="hweather-credit">Weather by Open-Meteo.com</span></div>${umbrellaUrl ? `<a href="${umbrellaUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc style="font-size:11px; color:var(--rose-deep); text-decoration:underline;">☂️ 傘の準備はお済みですか？（楽天市場で探す）<span style="font-size:9px; color:var(--text-faint); text-decoration:none;">【PR】</span></a>` : ''}`;
     });
   }
 }
@@ -1873,7 +1914,7 @@ function renderAlerts(){
       const c = catInfo(it.key);
       const d = daysUntil(it.trip.date);
       return `<div class="alert-row" onclick="focusTrip('${it.trip.id}','${it.key}')">
-        <div class="a-l"><span class="a-cat">${c.icon}</span><span class="a-title">${it.trip.match} の${c.label}が未予約</span></div>
+        <div class="a-l"><span class="a-cat">${c.icon}</span><span class="a-title">${escapeHtml(it.trip.match)} の${c.label}が未予約</span></div>
         <span class="a-days ${d===0?'a-days-now':''}">${d===0?'⚠️ 今日中に':`あと${d}日`}</span>
       </div>`;
     }).join('')}
@@ -1886,11 +1927,32 @@ function focusTrip(tripId, key){
   if(key){
     activeCat[tripId] = key;
   }
-  // 対象が過去の遠征の場合、showPastがfalseのままだとカード自体がDOM上に描画されず、
-  // 下のscrollIntoViewが要素を見つけられずサイレントに失敗してしまう
-  // （カレンダーから過去の試合の「詳細を見る」を押しても反応しない、という不具合の原因だった）
   const targetTrip = trips.find(x=>x.id===tripId);
-  if(targetTrip && tripEndDate(targetTrip) < TODAY) showPast = true;
+  if(targetTrip){
+    // 対象の遠征が、現在の絞り込み条件（競技・チーム・検索キーワード・過去/未来フィルター）の
+    // せいでカード一覧に表示されない状態になっていないか判定する。1つ1つの条件を個別に
+    // 気にするのではなく、実際にrenderGridが使うのと同じロジックで判定することで、
+    // 今後フィルターの種類が増えても、同じ理屈で正しく機能し続けるようにしている。
+    const q = searchQuery.trim().toLowerCase();
+    const wouldBeFiltered =
+      (sportFilter!=='ALL' && targetTrip.sport!==sportFilter) ||
+      (teamFilter!=='ALL' && targetTrip.team!==teamFilter) ||
+      (q && !targetTrip.team.toLowerCase().includes(q) && !(targetTrip.match||'').toLowerCase().includes(q) && !(targetTrip.venue||'').toLowerCase().includes(q) && !(targetTrip.journalMemo||'').toLowerCase().includes(q));
+    if(wouldBeFiltered){
+      sportFilter = 'ALL'; teamFilter = 'ALL'; searchQuery = '';
+      const searchInput = document.getElementById('trip-search');
+      if(searchInput) searchInput.value = '';
+      const clearBtn = document.getElementById('search-clear-btn');
+      if(clearBtn) clearBtn.style.display = 'none';
+    }
+    // 過去の遠征の場合、showPastがfalseのままだとカード自体がDOM上に描画されず、
+    // 下のscrollIntoViewが要素を見つけられずサイレントに失敗してしまう
+    // （カレンダーから過去の試合の「詳細を見る」を押しても反応しない、という不具合の原因だった）
+    if(tripEndDate(targetTrip) < TODAY) showPast = true;
+    // timeFilterが'upcoming'のままだと、'past'専用の絞り込み状態と噛み合わないケースは無いが、
+    // 念のため対象が確実に表示される状態に倒しておく
+    else if(timeFilter==='past') timeFilter = 'upcoming';
+  }
   focusExpandTripId = tripId; // この1回の描画だけ強制的に展開する
   render();
   focusExpandTripId = null; // 描画済みのHTMLはそのまま残るが、次回以降の描画では記録に残らないため自然に畳まれる
@@ -1936,7 +1998,7 @@ function renderRecent(){
   const html = entries.length ? entries.map(e=>{
     const c = catInfo(e.key);
     return `<div class="item">
-      <div class="l"><span class="cat">${c.icon} ${c.label}</span>${e.trip.match}（${fmtDate(e.trip.date).md}）— ${e.method||'方法未記入'}</div>
+      <div class="l"><span class="cat">${c.icon} ${c.label}</span>${escapeHtml(e.trip.match)}（${fmtDate(e.trip.date).md}）— ${escapeHtml(e.method)||'方法未記入'}</div>
       <div class="r">${fmtShort(e.bookedDate)}</div>
     </div>`;
   }).join('') : `<div class="empty">まだ予約記録がありません。カードから予約先・予約日を記録できます。</div>`;
@@ -1958,7 +2020,7 @@ function renderFilters(){
   const sportsByUsage = Object.keys(sportCounts).sort((a,b) => sportCounts[b]-sportCounts[a]);
   const sports = ['ALL', ...sportsByUsage];
   document.getElementById('filters').innerHTML = sports.map(s=>
-    `<div class="chip ${sportFilter===s?'active':''}" onclick="setFilter('${s}')">${s==='ALL'?'すべて':s}</div>`
+    `<div class="chip ${sportFilter===s?'active':''}" onclick="setFilter('${escapeJsAttr(s)}')">${s==='ALL'?'すべて':escapeHtml(s)}</div>`
   ).join('');
 
   // 選んでいる競技の中に複数チームがある場合だけ、チーム別の絞り込みも出す（複数チームを応援している方向け）
@@ -1971,7 +2033,7 @@ function renderFilters(){
       if(teamsByUsage.length > 1){
         teamFilterRow.style.display = 'flex';
         teamFilterRow.innerHTML = ['ALL', ...teamsByUsage].map(tm=>
-          `<div class="chip chip-sub ${teamFilter===tm?'active':''}" onclick="setTeamFilter('${tm.replace(/'/g,"\\'")}')">${tm==='ALL'?'すべてのチーム':tm}</div>`
+          `<div class="chip chip-sub ${teamFilter===tm?'active':''}" onclick="setTeamFilter('${escapeJsAttr(tm)}')">${tm==='ALL'?'すべてのチーム':escapeHtml(tm)}</div>`
         ).join('');
       }else{
         teamFilterRow.style.display = 'none';
@@ -2269,8 +2331,8 @@ function renderAttendeesSection(t, isPast){
         ${attendees.map(a => `
           <div class="att-row">
             <span class="att-name">${escapeHtml(a.name)}</span>
-            <span class="att-status-badge ${statusClass[a.status]||''}" ${IS_EDITABLE?`onclick="cycleTripAttendee('${t.id}','${a.name.replace(/'/g,"\\'")}','${a.status}')" style="cursor:pointer;" title="タップで切り替え"`:''}>${statusLabel[a.status]||a.status}</span>
-            ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:24px; height:24px; font-size:11px;" onclick="removeTripAttendee('${t.id}','${a.name.replace(/'/g,"\\'")}')">×</button>` : ''}
+            <span class="att-status-badge ${statusClass[a.status]||''}" ${IS_EDITABLE?`onclick="cycleTripAttendee('${t.id}','${escapeJsAttr(a.name)}','${a.status}')" style="cursor:pointer;" title="タップで切り替え"`:''}>${statusLabel[a.status]||a.status}</span>
+            ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:24px; height:24px; font-size:11px;" onclick="removeTripAttendee('${t.id}','${escapeJsAttr(a.name)}')">×</button>` : ''}
           </div>`).join('')}
         ${(IS_EDITABLE) ? `
         <div class="att-add-row">
@@ -2339,7 +2401,7 @@ function catPanelContent(t, c){
   // （バリューコマースの参照リンク。行き先を指定できない固定リンクのため、各サイトのトップページへ遷移する）
   const gourmetSearchBlock = (c.key==='food' && !(d.placeName||'').trim()) ? `
     <div style="display:flex; gap:6px; margin-bottom:2px;">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686842" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686842" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892688295" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892688295" height="1" width="1" style="border:none; display:none;" alt="">
       <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
       <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation();">✨ OZmall</a>
     </div>
@@ -2459,7 +2521,7 @@ function catPanelContent(t, c){
       </div>
       ${hotelSearchBlock}
       ${transportSearchBlock}
-      ${(()=>{ if(d.method || !IS_EDITABLE) return ''; if(['transport_outbound','transport_return','hotel'].includes(c.key)) return ''; /* この3カテゴリは「⚡いつもの一括入力」がカード上にあるため、二重になるチップは出さない */ const lastMethod = getLastUsedValue(t.sport, t.team, c.key, 'method'); return lastMethod ? `<button type="button" class="quick-fill-chip" onclick="updateDetail('${t.id}','${c.key}','method','${lastMethod.replace(/'/g,"\\'")}')">↺ 前回と同じ「${lastMethod}」を使う</button>` : ''; })()}
+      ${(()=>{ if(d.method || !IS_EDITABLE) return ''; if(['transport_outbound','transport_return','hotel'].includes(c.key)) return ''; /* この3カテゴリは「⚡いつもの一括入力」がカード上にあるため、二重になるチップは出さない */ const lastMethod = getLastUsedValue(t.sport, t.team, c.key, 'method'); return lastMethod ? `<button type="button" class="quick-fill-chip" onclick="updateDetail('${t.id}','${c.key}','method','${escapeJsAttr(lastMethod)}')">↺ 前回と同じ「${lastMethod}」を使う</button>` : ''; })()}
       ${venueTimesBlock}
       ${transportTimesBlock}
       ${hotelTimeBlock}
@@ -2534,7 +2596,7 @@ function renderTicketCard(t, isPast, usualPatternCache){
           <div class="venue-row">
             <span class="venue">${escapeHtml(t.venue)}</span>
             ${t.venue ? `<a class="map-badge" href="${routeFromCurrentLocationUrl(t.venue)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🗺️ ルート検索</a>` : ''}
-            ${t.venue ? `<button type="button" class="venue-copy-badge" onclick="event.stopPropagation(); copyVenueName('${t.venue.replace(/'/g,"\\'")}')" title="会場名をコピー">📋</button>` : ''}
+            ${t.venue ? `<button type="button" class="venue-copy-badge" onclick="event.stopPropagation(); copyVenueName('${escapeJsAttr(t.venue)}')" title="会場名をコピー">📋</button>` : ''}
           </div>
           ${isPast ? `<span class="past-badge">終了</span>` : ''}
           ${t.isCancelled ? `<span class="cancelled-badge" ${IS_EDITABLE?`onclick="event.stopPropagation(); setTripCancelled('${t.id}', false)" style="cursor:pointer;" title="タップで解除"`:''}>中止・延期${IS_EDITABLE?' ✕':''}</span>` : ''}
@@ -3082,7 +3144,7 @@ function renderLinkAction(value, label){
     const url = /^https?:\/\//i.test(v) ? v : `https://${v}`;
     return `<a href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="link-open-btn">🔗 ${label}を開く</a>`;
   }
-  return `<button type="button" onclick="event.stopPropagation(); copyTextToClipboard('${v.replace(/'/g,"\\'")}', '✓ 予約番号をコピーしました')" class="link-open-btn" style="border:none; width:100%; cursor:pointer;">📋 予約番号をコピー（${v}）</button>`;
+  return `<button type="button" onclick="event.stopPropagation(); copyTextToClipboard('${escapeJsAttr(v)}', '✓ 予約番号をコピーしました')" class="link-open-btn" style="border:none; width:100%; cursor:pointer;">📋 予約番号をコピー（${v}）</button>`;
 }
 
 function updateLinkField(tripId, key, val){
@@ -3203,7 +3265,7 @@ async function undoDeleteTrip(){
       });
     }
     if(t.result){ await sb.rpc('set_trip_result', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_result: t.result }); }
-    if(t.journalMemo){ await sb.rpc('set_trip_journal', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_memo: t.journalMemo }); }
+    if(t.journalMemo){ await sb.rpc('set_trip_journal', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_journal_memo: t.journalMemo }); }
     if(t.isCancelled){ await sb.rpc('set_trip_cancelled', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_cancelled: true }); }
     if(t.gateOpenTime || t.showStartTime){ await sb.rpc('set_trip_venue_times', { p_edit_token: EDIT_TOKEN, p_trip_id: newId, p_gate_open_time: t.gateOpenTime||null, p_show_start_time: t.showStartTime||null }); }
     for(const tKey of ['transport_outbound','transport_return']){
@@ -3415,8 +3477,8 @@ function renderHistory(){
     <div class="hrow" onclick="switchTab('cards'); focusTrip('${e.trip.id}','${e.key}');" style="cursor:pointer;">
       <div class="hcat">${c.icon}</div>
       <div class="hmain">
-        <div class="m1">${e.trip.match}<span style="color:var(--text-dim); font-weight:400;"> ／ ${c.label}</span></div>
-        <div class="m2">${e.method || '予約先未記入'}${e.memo? ' ・ '+e.memo : ''} ・ 試合日 ${g.md}</div>
+        <div class="m1">${escapeHtml(e.trip.match)}<span style="color:var(--text-dim); font-weight:400;"> ／ ${c.label}</span></div>
+        <div class="m2">${escapeHtml(e.method) || '予約先未記入'}${e.memo? ' ・ '+escapeHtml(e.memo) : ''} ・ 試合日 ${g.md}</div>
       </div>
       <div class="hbooked">
         <div class="bd">${fmtShort(e.bookedDate)}</div>
@@ -3498,7 +3560,7 @@ function renderStamps(){
     const resultBlock = Object.keys(byTeamResult).length ? `
       <div class="stamp-results">
         ${Object.entries(byTeamResult).map(([team, r])=>
-          `<div class="stamp-result-row"><span class="stamp-result-team">${team}</span><span class="stamp-result-score">${r.win}勝${r.loss}敗${r.draw?r.draw+'分':''}</span></div>`
+          `<div class="stamp-result-row"><span class="stamp-result-team">${escapeHtml(team)}</span><span class="stamp-result-score">${r.win}勝${r.loss}敗${r.draw?r.draw+'分':''}</span></div>`
         ).join('')}
       </div>` : '';
 
@@ -3711,8 +3773,15 @@ function openModal(tripId){
     document.getElementById('f-team').value=''; document.getElementById('f-match').value='';
     document.getElementById('f-team').style.display='none'; document.getElementById('f-team-select').style.display='block';
     document.getElementById('f-match').style.display='none'; document.getElementById('f-match-select').style.display='block';
-    document.getElementById('f-sport').value = getMostUsedSport() || 'バスケットボール';
-    document.getElementById('f-sport-custom-wrap').style.display = 'none';
+    // 最もよく使う競技を自動選択する。ただし「その他」で自由入力したカスタム競技名（例：卓球）の場合、
+    // <select id="f-sport">にはその名前の選択肢自体が存在しないため、そのままではうまく反映されない。
+    // 「その他」を選び、カスタム名の欄にも前回の値を埋めておくことで、毎回入力し直す手間を無くす
+    // （複製時に使っている判定ロジックと同じ考え方）。
+    const mostUsedSport = getMostUsedSport();
+    const isKnownMostUsed = mostUsedSport && KNOWN_SPORTS.includes(mostUsedSport);
+    document.getElementById('f-sport').value = isKnownMostUsed ? mostUsedSport : (mostUsedSport ? 'その他' : 'バスケットボール');
+    document.getElementById('f-sport-custom-wrap').style.display = (!isKnownMostUsed && mostUsedSport) ? 'block' : 'none';
+    document.getElementById('f-sport-custom').value = (!isKnownMostUsed && mostUsedSport) ? mostUsedSport : '';
     renderTeamDatalist();
   }
   document.getElementById('overlay').classList.add('open');
@@ -4251,10 +4320,10 @@ function renderCalFilterChips(){
   const teams = ['ALL', ...new Set(teamsInSport.map(t=>t.team))];
   box.innerHTML = `
     <div class="cal-chip-row">
-      ${sports.map(s=>`<div class="cal-chip ${calFilterSport===s?'active':''}" onclick="setCalSportFilter('${s.replace(/'/g,"\\'")}')">${s==='ALL'?'すべての競技':s}</div>`).join('')}
+      ${sports.map(s=>`<div class="cal-chip ${calFilterSport===s?'active':''}" onclick="setCalSportFilter('${escapeJsAttr(s)}')">${s==='ALL'?'すべての競技':escapeHtml(s)}</div>`).join('')}
     </div>
     ${teams.length>2 ? `<div class="cal-chip-row" style="margin-top:6px;">
-      ${teams.map(t=>`<div class="cal-chip ${calFilterTeam===t?'active':''}" style="border-style:dashed;" onclick="setCalTeamFilter('${t.replace(/'/g,"\\'")}')">${t==='ALL'?'すべてのチーム':t}</div>`).join('')}
+      ${teams.map(t=>`<div class="cal-chip ${calFilterTeam===t?'active':''}" style="border-style:dashed;" onclick="setCalTeamFilter('${escapeJsAttr(t)}')">${t==='ALL'?'すべてのチーム':escapeHtml(t)}</div>`).join('')}
     </div>` : ''}
   `;
 }
@@ -4820,8 +4889,8 @@ function openSettingsPanel(){
       <div style="font-size:12.5px; font-weight:700; color:var(--text-dim); margin-bottom:8px;">⭐ 記憶している応援チーム</div>
       ${favEntries.length ? favEntries.map(([sport,team])=>`
         <div style="display:flex; align-items:center; justify-content:space-between; background:var(--surface-2); border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:12.5px;">
-          <span>${sportIcon(sport)} ${sport}：<b>${team}</b></span>
-          <button onclick="clearFavoriteTeamUI('${sport.replace(/'/g,"\\'")}')" style="background:none; border:none; color:var(--text-faint); font-size:11px; cursor:pointer; text-decoration:underline;">忘れる</button>
+          <span>${sportIcon(sport)} ${escapeHtml(sport)}：<b>${escapeHtml(team)}</b></span>
+          <button onclick="clearFavoriteTeamUI('${escapeJsAttr(sport)}')" style="background:none; border:none; color:var(--text-faint); font-size:11px; cursor:pointer; text-decoration:underline;">忘れる</button>
         </div>`).join('') : `<div style="font-size:11.5px; color:var(--text-faint);">まだありません。遠征を登録すると自動で記憶されます。</div>`}
     </div>
     <div style="border-top:1px solid var(--line); padding-top:14px;">
@@ -4865,14 +4934,14 @@ function openSharePopup(){
   if(IS_EDITABLE){
     modeLabel.textContent = '';
     editSection.innerHTML = `
-      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\\'")}','edit')">
+      <button class="share-action-btn" onclick="popupCopy('${escapeJsAttr(editUrl)}','edit')">
         <span class="sab-icon">✏️</span>
         <span class="sab-body">
           <div class="sab-title">編集リンクをコピー</div>
           <div class="sab-sub">家族・一緒に管理する人へ（編集できます）</div>
         </span>
       </button>
-      <button class="share-action-btn" onclick="toggleQrCode('edit','${editUrl.replace(/'/g,"\\'")}')">
+      <button class="share-action-btn" onclick="toggleQrCode('edit','${escapeJsAttr(editUrl)}')">
         <span class="sab-icon">📱</span>
         <span class="sab-body">
           <div class="sab-title">編集リンクのQRコードを表示</div>
@@ -4881,14 +4950,14 @@ function openSharePopup(){
       </button>
       <div id="qr-box-edit" style="display:none;"></div>`;
     viewSection.innerHTML = shareUrl ? `
-      <button class="share-action-btn" onclick="popupCopy('${shareUrl.replace(/'/g,"\\'")}','view')">
+      <button class="share-action-btn" onclick="popupCopy('${escapeJsAttr(shareUrl)}','view')">
         <span class="sab-icon">👀</span>
         <span class="sab-body">
           <div class="sab-title">閲覧専用リンクをコピー</div>
           <div class="sab-sub">友達・SNS公開用（編集不可・安心）</div>
         </span>
       </button>
-      <button class="share-action-btn" onclick="toggleQrCode('view','${shareUrl.replace(/'/g,"\\'")}')">
+      <button class="share-action-btn" onclick="toggleQrCode('view','${escapeJsAttr(shareUrl)}')">
         <span class="sab-icon">📱</span>
         <span class="sab-body">
           <div class="sab-title">閲覧専用リンクのQRコードを表示</div>
@@ -4900,14 +4969,14 @@ function openSharePopup(){
     modeLabel.textContent = 'これは閲覧専用リンクです';
     editSection.innerHTML = '';
     viewSection.innerHTML = `
-      <button class="share-action-btn" onclick="popupCopy('${editUrl.replace(/'/g,"\\'")}','view')">
+      <button class="share-action-btn" onclick="popupCopy('${escapeJsAttr(editUrl)}','view')">
         <span class="sab-icon">🔗</span>
         <span class="sab-body">
           <div class="sab-title">このリンクをコピー</div>
           <div class="sab-sub">閲覧専用リンク（相手は編集できません）</div>
         </span>
       </button>
-      <button class="share-action-btn" onclick="toggleQrCode('view','${editUrl.replace(/'/g,"\\'")}')">
+      <button class="share-action-btn" onclick="toggleQrCode('view','${escapeJsAttr(editUrl)}')">
         <span class="sab-icon">📱</span>
         <span class="sab-body">
           <div class="sab-title">QRコードを表示</div>
@@ -4920,7 +4989,7 @@ function openSharePopup(){
   // LINEでの直接共有（今開いているリンクをそのまま送る）
   if(lineSection){
     lineSection.innerHTML = `
-      <button class="share-action-btn" onclick="shareViaLine('${editUrl.replace(/'/g,"\\'")}')">
+      <button class="share-action-btn" onclick="shareViaLine('${escapeJsAttr(editUrl)}')">
         <span class="sab-icon">💬</span>
         <span class="sab-body">
           <div class="sab-title">LINEで送る</div>
@@ -5171,6 +5240,7 @@ async function startApp(){
   if(!isOfflineView) setTimeout(checkDayBeforeReminder, 800); // 他の初期表示と重ならないよう少し遅らせる
   scanAndScheduleAllNotifications();
   initBannerRotator();
+  Settings.cleanupExpiredWeatherCache();
 }
 
 async function initApp(){
