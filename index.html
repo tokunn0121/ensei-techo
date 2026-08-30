@@ -114,8 +114,12 @@
   .hero .htitle{ font-size:11.5px; font-weight:700; color:var(--rose-deep); letter-spacing:.06em; }
   .hero .hmatch{ font-family:var(--font-display); font-weight:700; font-size:18.5px; margin-top:5px; }
   .hero .hmeta{ font-size:12.5px; color:var(--text-dim); margin-top:4px; }
-  .today-badge{ display:inline-block; font-size:10px; font-weight:900; color:#fff; background:var(--rose); padding:2px 8px; border-radius:999px; letter-spacing:0; vertical-align:middle; white-space:nowrap; }
-  .today-badge-sm{ font-size:9px; padding:1px 6px; }
+  .hweather{ font-size:12.5px; color:var(--text-dim); margin-top:4px; }
+  .hweather-credit{ font-size:9px; color:var(--text-faint); margin-left:6px; }
+  .today-badge{ display:inline-flex; align-items:center; gap:3px; font-size:10px; font-weight:900; font-family:var(--font-num); color:#fff; background:linear-gradient(115deg, var(--rose) 0%, var(--rose-deep) 55%, #C2185B 100%); padding:3px 9px 3px 7px; border-radius:999px; letter-spacing:0.06em; vertical-align:middle; white-space:nowrap; text-transform:uppercase; box-shadow:0 2px 6px rgba(194,24,91,0.35); animation:gameday-pulse 1.8s ease-in-out infinite; }
+  .today-badge::before{ content:'🔥'; font-size:9px; filter:grayscale(0) saturate(1.4); }
+  .today-badge-sm{ font-size:8.5px; padding:2px 7px 2px 6px; }
+  @keyframes gameday-pulse{ 0%,100%{ transform:scale(1); box-shadow:0 2px 6px rgba(194,24,91,0.35); } 50%{ transform:scale(1.06); box-shadow:0 2px 10px rgba(194,24,91,0.55); } }
   .htoday-time{ font-size:12.5px; font-weight:700; color:var(--rose-deep); margin-top:6px; background:var(--rose-wash); display:inline-block; padding:4px 10px; border-radius:8px; }
   .tcr-today-time{ font-size:10.5px; font-weight:700; color:var(--rose-deep); margin-top:3px; }
   .hero .hpending{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
@@ -123,6 +127,7 @@
   .hero .hall-set{ font-size:11.5px; color:var(--sage); font-weight:700; margin-top:10px; }
   .hero .hcountdown{ text-align:right; flex-shrink:0; }
   .hero .hcountdown .num{ font-family:var(--font-num); font-size:32px; font-weight:700; color:var(--rose-deep); line-height:1; }
+  .hero .hcountdown .num.num-gameday{ font-size:22px; font-weight:900; letter-spacing:0.03em; background:linear-gradient(115deg, var(--rose) 0%, #C2185B 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
   .hero .hcountdown .lbl{ font-size:11px; color:var(--text-dim); margin-top:3px; }
 
   /* ---------- alerts ---------- */
@@ -136,6 +141,8 @@
   .alert-row .a-cat{ font-size:16px; }
   .alert-row-sale .a-days{ color:#8a6d1f; font-weight:700; }
   .alert-row .a-days{ font-family:var(--font-num); font-weight:600; font-size:12px; color:var(--rose-deep); background:var(--rose-wash); padding:3px 9px; border-radius:999px; }
+  .alert-row .a-days.a-days-now{ color:#fff; background:linear-gradient(115deg, var(--butter,#E0B84A) 0%, #C77D1E 100%); font-weight:900; box-shadow:0 2px 6px rgba(199,125,30,0.4); animation:sale-now-pulse 1.8s ease-in-out infinite; }
+  @keyframes sale-now-pulse{ 0%,100%{ transform:scale(1); box-shadow:0 2px 6px rgba(199,125,30,0.4); } 50%{ transform:scale(1.06); box-shadow:0 2px 10px rgba(199,125,30,0.6); } }
   .alerts .all-clear{ color:var(--sage); font-size:13px; padding:6px 0; font-weight:600; }
   .alerts .more{ font-size:11.5px; color:var(--text-faint); padding-top:6px; }
 
@@ -906,6 +913,7 @@ let budgetCap = 0;
 let packingTemplate = []; // 手帳全体で共通の持ち物テンプレート（文字列の配列）。新規遠征作成時に自動でコピーされる
 let copySource = { tripId:null, key:null };
 let showPast = false;
+let timeFilter = 'upcoming'; // 'upcoming'（既存動作：未来は常時表示、過去は折りたたみ） | 'past'（過去のみ表示） | 'all'（両方常に展開）
 
 let TOKEN = null;          // URLに載っているトークン（閲覧用・編集用どちらか）
 let EDIT_TOKEN = null;     // 編集可能な場合のみセットされる
@@ -1151,6 +1159,20 @@ function pastVenueOptionsHtml(sport){
   return pastVenues.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">`).join('');
 }
 
+// このチームでの直近3件が全て同じHOME/AWAYだった場合のみ、自動的に事前選択しておく
+// （ホーム戦しか行かない人には毎回のボタン操作を省ける一方、ホーム・アウェイが
+// 入り混じる人には自動選択せず、誤操作のリスクを避ける）。
+// openModal（モーダルを新規に開いた時）だけでなく、「登録して続けて追加」で
+// 連続登録している最中（モーダルを開き直さずフィールドだけリセットする）にも
+// 同じ判定をかけ直す必要があるため、共通関数として切り出している。
+function tryAutoHomeAway(sport, team, myArena){
+  const recentSameTeam = [...trips].filter(x=>x.sport===sport && x.team===team && !x.isCancelled)
+    .sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,3);
+  if(recentSameTeam.length<2) return;
+  const modes = recentSameTeam.map(x => (myArena && x.venue===myArena) ? 'HOME' : 'AWAY');
+  if(modes.every(mo=>mo==='HOME')) setTimeout(()=>setHomeAway('HOME', true), 0);
+  else if(modes.every(mo=>mo==='AWAY')) setTimeout(()=>setHomeAway('AWAY', true), 0);
+}
 function renderTeamDatalist(){
   const sport = document.getElementById('f-sport').value;
   const teams = TEAM_DATA[sport] || [];
@@ -1203,13 +1225,18 @@ function renderTeamDatalist(){
   applyPlaceholders(sport);
 
   // 記憶している「この競技での応援チーム」があれば自動選択する（新規登録時のみ。編集時はfillModalFieldsが別途値をセットする）
-  if(!editingTripId){
+  // 複製中（duplicateTemplateDetailがセットされている間）は、duplicateTrip側で複製元の
+  // チーム・HOME/AWAYを明示的に設定するため、ここでの自動選択は行わない
+  // （setTimeoutで遅延実行されるtryAutoHomeAwayが、複製元とは無関係な判定で後から
+  // 上書きしてしまう競合を防ぐため）
+  if(!editingTripId && !duplicateTemplateDetail){
     const favTeam = getFavoriteTeam(sport);
     const favTeamObj = teams.find(t=>t.name===favTeam);
     if(favTeamObj){
       if(favTeamObj.league && leagueSel){ leagueSel.value = favTeamObj.league; renderTeamOptionsForLeague(); }
       document.getElementById('f-team-select').value = favTeam;
       handleTeamSelectChange();
+      tryAutoHomeAway(sport, favTeam, favTeamObj.arena);
     }
   }
 }
@@ -1342,7 +1369,7 @@ function updateHomeAwayUI(){
   if(btnAway) btnAway.className = 'ha-btn' + (homeAwayMode==='AWAY' ? ' active' : '');
 }
 
-function setHomeAway(mode){
+function setHomeAway(mode, isAuto){
   homeAwayMode = mode;
   updateHomeAwayUI();
   const sport = document.getElementById('f-sport').value;
@@ -1357,8 +1384,8 @@ function setHomeAway(mode){
     if(myTeam && myTeam.arena){
       venueInput.value = myTeam.arena;
       venueList.innerHTML = `<option value="${myTeam.arena}">` + pastVenueOptionsHtml(sport);
-      note.textContent = '（自チームのホームアリーナをセット）';
-      note.style.cssText = noteStyleSuccess;
+      note.textContent = isAuto ? '（直近の登録パターンからHOMEを自動選択。違う場合はAWAYを選び直してください）' : '（自チームのホームアリーナをセット）';
+      note.style.cssText = isAuto ? noteStyleAction : noteStyleSuccess;
     }else{
       note.textContent = '（このチームのアリーナ情報が未登録です。会場欄に直接入力してください）';
       note.style.cssText = noteStyleAction;
@@ -1370,8 +1397,8 @@ function setHomeAway(mode){
     if(arenas.length){
       venueInput.value = arenas[0];
       venueList.innerHTML = arenas.map(a=>`<option value="${a}">`).join('') + pastVenueOptionsHtml(sport);
-      note.textContent = '（相手チームのホームアリーナをセット）';
-      note.style.cssText = noteStyleSuccess;
+      note.textContent = isAuto ? '（直近の登録パターンからAWAYを自動選択。違う場合はHOMEを選び直してください）' : '（相手チームのホームアリーナをセット）';
+      note.style.cssText = isAuto ? noteStyleAction : noteStyleSuccess;
     }else{
       venueInput.value = '';
       venueList.innerHTML = pastVenueOptionsHtml(sport);
@@ -1579,6 +1606,64 @@ const VENUE_AREA_MAP = {
   'ハピネスアリーナ': 'Japan-Nagasaki-Nagasaki', // 長崎ヴェルカのホームタウンとして確認済み
 };
 // 日付付きの楽天トラベル ホテル検索URLを組み立てる（試合当日チェックイン・翌日チェックアウトの1泊を想定）
+// WMO天気コード(Open-Meteo等、多くの気象APIで使われる標準コード)を絵文字と日本語表現に変換する
+function weatherCodeToInfo(code){
+  const map = {
+    0:['☀️','快晴'], 1:['🌤️','晴れ'], 2:['⛅','薄曇り'], 3:['☁️','曇り'],
+    45:['🌫️','霧'], 48:['🌫️','霧'],
+    51:['🌦️','小雨'], 53:['🌦️','霧雨'], 55:['🌧️','霧雨(強)'],
+    61:['🌧️','雨'], 63:['🌧️','雨'], 65:['🌧️','大雨'],
+    71:['🌨️','雪'], 73:['🌨️','雪'], 75:['❄️','大雪'],
+    80:['🌦️','にわか雨'], 81:['🌧️','にわか雨'], 82:['⛈️','激しいにわか雨'],
+    95:['⛈️','雷雨'], 96:['⛈️','雷雨(雹)'], 99:['⛈️','雷雨(雹)'],
+  };
+  return map[code] || ['🌡️','不明'];
+}
+// VENUE_AREA_MAPの値（例:'Japan-Miyagi-Sendai'）から、ジオコーディングAPIに渡す都市名部分だけを取り出す
+function getVenueCityForWeather(venueName){
+  const area = VENUE_AREA_MAP[venueName];
+  if(!area) return null;
+  const parts = area.split('-');
+  return parts[parts.length-1]; // 例: 'Sendai'
+}
+// 会場名・試合日から天気予報を取得する（ジオコーディング→天気予報の2段階、結果は6時間キャッシュする）
+// Open-Meteo（https://open-meteo.com）は非商用利用は無料・APIキー不要だが、このアプリは
+// 広告を掲載しているため、厳密には利用規約上のグレーゾーンであることに留意。表示時は出典を明記する。
+async function fetchWeatherForVenue(venueName, dateIso){
+  const city = getVenueCityForWeather(venueName);
+  if(!city || !dateIso) return null;
+  const daysAhead = Math.floor((new Date(dateIso) - new Date(TODAY)) / 86400000);
+  if(daysAhead < 0 || daysAhead > 15) return null; // 予報が提供される範囲外（過去 or 16日より先）
+
+  const cacheKey = `weather_${city}_${dateIso}`;
+  const cached = Settings.get(cacheKey, null);
+  if(cached && (Date.now() - cached.fetchedAt) < 6*60*60*1000) return cached.data; // 6時間以内なら再取得しない
+
+  try{
+    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=ja&format=json`);
+    const geoData = await geoRes.json();
+    const loc = geoData.results?.[0];
+    if(!loc) return null;
+
+    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16`);
+    const wData = await wRes.json();
+    const idx = wData.daily?.time?.indexOf(dateIso);
+    if(idx === undefined || idx < 0) return null;
+
+    const result = {
+      code: wData.daily.weather_code[idx],
+      tempMax: Math.round(wData.daily.temperature_2m_max[idx]),
+      tempMin: Math.round(wData.daily.temperature_2m_min[idx]),
+      precipProb: wData.daily.precipitation_probability_max[idx],
+    };
+    Settings.set(cacheKey, { data: result, fetchedAt: Date.now() });
+    return result;
+  }catch(e){
+    console.error('天気予報の取得に失敗:', e);
+    return null;
+  }
+}
+
 function rakutenHotelSearchUrl(venueName, checkinDateIso){
   const area = VENUE_AREA_MAP[venueName];
   if(!area || !checkinDateIso) return null;
@@ -1674,8 +1759,30 @@ function switchTab(name){
 
 /* ---------- hero: next upcoming trip ---------- */
 function renderHero(){
-  const upcoming = trips.filter(t=>new Date(tripEndDate(t)) >= new Date(TODAY) && !t.isCancelled).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const box = document.getElementById('hero');
+  // 「過去の遠征のみ」を選んで絞り込んでいる時に、画面上部には無関係な「次の遠征」(未来の試合)が
+  // 表示され続けると、フィルターが効いていないように見えて紛らわしい。この場合だけ、
+  // 直近の過去の遠征（最近行った試合）を表示することで、一貫性のある体験にする。
+  if(timeFilter === 'past'){
+    const recent = trips.filter(t=>new Date(tripEndDate(t)) < new Date(TODAY) && !t.isCancelled).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    if(!recent.length){ box.innerHTML=''; return; }
+    const t = recent[0];
+    box.innerHTML = `
+    <div class="hero" onclick="focusTrip('${t.id}')">
+      <div>
+        <div class="htitle">最近の遠征</div>
+        <div class="hmatch">${escapeHtml(t.team)} ${escapeHtml(t.match)}</div>
+        <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
+        ${t.result ? `<div class="hall-set">${t.result==='win'?'🎉 勝利':t.result==='loss'?'😢 敗戦':'△ 引き分け'}</div>` : ''}
+      </div>
+      <div class="hcountdown">
+        <div class="num">${Math.abs(daysUntil(t.date))}</div>
+        <div class="lbl">日前</div>
+      </div>
+    </div>`;
+    return;
+  }
+  const upcoming = trips.filter(t=>new Date(tripEndDate(t)) >= new Date(TODAY) && !t.isCancelled).sort((a,b)=>new Date(a.date)-new Date(b.date));
   if(!upcoming.length){ box.innerHTML=''; return; }
   const t = upcoming[0];
   const d = daysUntil(t.date);
@@ -1687,19 +1794,30 @@ function renderHero(){
   box.innerHTML = `
     <div class="hero" onclick="focusTrip('${t.id}')">
       <div>
-        <div class="htitle">次の遠征${isToday?' <span class="today-badge">本日</span>':''}</div>
+        <div class="htitle">次の遠征${isToday?' <span class="today-badge">GAME DAY</span>':''}</div>
         <div class="hmatch">${escapeHtml(t.team)} ${escapeHtml(t.match)}</div>
         <div class="hmeta">${fmtDate(t.date).md}（${fmtDate(t.date).dow}）${t.time?('　'+t.time):''}　${t.venue||''}</div>
+        <div id="hero-weather"></div>
         ${earliestItem ? `<div class="htoday-time">${earliestItem.icon} ${earliestItem.time} ${escapeHtml(earliestItem.label)}</div>` : ''}
         ${pending.length
           ? `<div class="hpending">${pending.map(k=>`<span>${catInfo(k).icon} ${catInfo(k).label}が未予約</span>`).join('')}</div>`
           : `<div class="hall-set">✓ 交通・チケット・宿泊はすべて予約済みです</div>`}
       </div>
       <div class="hcountdown">
-        <div class="num">${d===0?'当日':d}</div>
-        <div class="lbl">${d===0?'':'日後'}</div>
+        <div class="num ${d===0?'num-gameday':''}">${d===0?'TODAY':d}</div>
+        <div class="lbl">${d===0?'🔥 GAME DAY':'日後'}</div>
       </div>
     </div>`;
+  // 天気予報はAPI呼び出し（非同期）を伴うため、まずカードだけ描画してから、後追いで結果を差し込む。
+  // 対応会場（VENUE_AREA_MAP）・予報範囲（16日以内）の両方を満たす場合のみ表示する。
+  if(t.venue && getVenueCityForWeather(t.venue)){
+    fetchWeatherForVenue(t.venue, t.date).then(w=>{
+      const slot = document.getElementById('hero-weather');
+      if(!w || !slot) return;
+      const [icon, label] = weatherCodeToInfo(w.code);
+      slot.innerHTML = `<div class="hweather">${icon} ${label}　${w.tempMin}〜${w.tempMax}℃　☂️降水確率${w.precipProb}%<span class="hweather-credit">Weather by Open-Meteo.com</span></div>`;
+    });
+  }
 }
 
 /* ---------- forgotten-item alerts ---------- */
@@ -1721,7 +1839,7 @@ function renderSaleAlerts(){
       const {md, dow} = fmtDate(saleDate);
       return `<div class="alert-row alert-row-sale" onclick="focusTrip('${t.id}','ticket')">
         <div class="a-l"><span class="a-cat">🎫</span><span class="a-title">${escapeHtml(t.match)} のチケットが${md}(${dow})${saleTime?` ${saleTime}〜`:''}発売</span></div>
-        <span class="a-days">${d===0?'本日':`あと${d}日`}</span>
+        <span class="a-days ${d===0?'a-days-now':''}">${d===0?'🔔 発売中！':`あと${d}日`}</span>
       </div>`;
     }).join('')}
   `;
@@ -1756,7 +1874,7 @@ function renderAlerts(){
       const d = daysUntil(it.trip.date);
       return `<div class="alert-row" onclick="focusTrip('${it.trip.id}','${it.key}')">
         <div class="a-l"><span class="a-cat">${c.icon}</span><span class="a-title">${it.trip.match} の${c.label}が未予約</span></div>
-        <span class="a-days">あと${d}日</span>
+        <span class="a-days ${d===0?'a-days-now':''}">${d===0?'⚠️ 今日中に':`あと${d}日`}</span>
       </div>`;
     }).join('')}
     ${items.length>6 ? `<div class="more">ほか${items.length-6}件あります</div>` : ''}
@@ -1768,6 +1886,11 @@ function focusTrip(tripId, key){
   if(key){
     activeCat[tripId] = key;
   }
+  // 対象が過去の遠征の場合、showPastがfalseのままだとカード自体がDOM上に描画されず、
+  // 下のscrollIntoViewが要素を見つけられずサイレントに失敗してしまう
+  // （カレンダーから過去の試合の「詳細を見る」を押しても反応しない、という不具合の原因だった）
+  const targetTrip = trips.find(x=>x.id===tripId);
+  if(targetTrip && tripEndDate(targetTrip) < TODAY) showPast = true;
   focusExpandTripId = tripId; // この1回の描画だけ強制的に展開する
   render();
   focusExpandTripId = null; // 描画済みのHTMLはそのまま残るが、次回以降の描画では記録に残らないため自然に畳まれる
@@ -1864,6 +1987,14 @@ function renderFilters(){
   if(controlRow){
     controlRow.innerHTML = `
       <div class="sort-select-wrap">
+        <label class="sort-select-label">表示</label>
+        <select class="sort-select" onchange="setTimeFilter(this.value)" data-restore-key="setTimeFilter(this.value)">
+          <option value="upcoming" ${timeFilter==='upcoming'?'selected':''}>今後の遠征</option>
+          <option value="past" ${timeFilter==='past'?'selected':''}>過去の遠征のみ</option>
+          <option value="all" ${timeFilter==='all'?'selected':''}>すべて</option>
+        </select>
+      </div>
+      <div class="sort-select-wrap">
         <label class="sort-select-label">並び替え</label>
         <select class="sort-select" onchange="setSortMode(this.value)" data-restore-key="setSortMode(this.value)">
           <option value="date" ${sortMode==='date'?'selected':''}>📅 試合日順</option>
@@ -1879,6 +2010,7 @@ function renderFilters(){
 }
 function setFilter(s){ sportFilter = s; teamFilter = 'ALL'; render(); }
 function setTeamFilter(tm){ teamFilter = tm; render(); }
+function setTimeFilter(v){ timeFilter = v; render(); }
 function setSearchQuery(v){
   searchQuery = v;
   const clearBtn = document.getElementById('search-clear-btn');
@@ -1942,6 +2074,12 @@ function getUsualTripPattern(sport, team, excludeTripId){
       const d = t.detail[key];
       if(d && d.method && !d.notNeeded){
         pattern[key] = { method: d.method, cost: d.cost||0 };
+        // 交通(往路・復路)は、発着駅も「いつも同じ」であることが多いため、あわせて記憶しておく
+        // （毎回同じ電車で通う人が、駅名まで20回すべて打ち直す手間を省くため）
+        if((key==='transport_outbound' || key==='transport_return') && (d.departureStation || d.arrivalStation)){
+          pattern[key].departureStation = d.departureStation || '';
+          pattern[key].arrivalStation = d.arrivalStation || '';
+        }
         break;
       }
     }
@@ -1960,7 +2098,12 @@ async function applyUsualPattern(tripId){
   const labelOf = key => CATS.find(c=>c.key===key).label;
   if(!confirm(`前回までの「${t.team}」の遠征をもとに、${targets.map(([key])=>labelOf(key)).join('・')}をまとめて入力します。よろしいですか？`)) return;
   for(const [key, val] of targets){
-    await saveBookingDetail(tripId, key, { method: val.method, cost: val.cost, is_booked: false }, true);
+    const patch = { method: val.method, cost: val.cost, is_booked: false };
+    if(val.departureStation || val.arrivalStation){
+      patch.departureStation = val.departureStation || '';
+      patch.arrivalStation = val.arrivalStation || '';
+    }
+    await saveBookingDetail(tripId, key, patch, true);
   }
   showToast('✓ いつもの設定を一括反映しました', 2000);
 }
@@ -2243,14 +2386,25 @@ function catPanelContent(t, c){
   const hasStationData = !!(d.departureStation || d.arrivalStation || (d.legs && d.legs.length));
   const stationKey = `${t.id}:${c.key}`;
   const isStationOpen = hasStationData || stationDetailsOpen.has(stationKey);
+  // 乗り継ぎ（legs）を1件でも使っている場合、全体の発駅・着駅は「最初の区間の発駅→最後の区間の着駅」
+  // として自動的に導き出す（同じ「発駅・着駅」というラベルの入力欄が、全体用・区間ごとの2箇所にあると
+  // 紛らわしいため、乗り継ぎを使うなら全体側は自動表示に切り替え、二重入力を無くす）
+  const legsForRoute = isTransport ? (d.legs||[]) : [];
+  const effectiveDeparture = legsForRoute.length ? legsForRoute[0].departureStation : d.departureStation;
+  const effectiveArrival = legsForRoute.length ? legsForRoute[legsForRoute.length-1].arrivalStation : d.arrivalStation;
   const stationBlock = isTransport ? `
     <details class="station-details" ${isStationOpen ? 'open' : ''} ontoggle="if(this.open) stationDetailsOpen.add('${stationKey}'); else stationDetailsOpen.delete('${stationKey}');">
       <summary>🚉 発着駅・乗り継ぎを追加${hasStationData ? '' : '（任意）'}</summary>
+      ${legsForRoute.length ? `
+      <div style="font-size:12.5px; color:var(--text-dim); background:var(--surface-2); border-radius:8px; padding:10px 12px; margin-top:8px; margin-bottom:2px;">
+        🚉 ${escapeHtml(effectiveDeparture||'（未入力）')} → ${escapeHtml(effectiveArrival||'（未入力）')}
+        <span style="display:block; font-size:10.5px; color:var(--text-faint); margin-top:2px;">下の乗り継ぎ区間から自動で表示（区間を編集すると更新されます）</span>
+      </div>` : `
       <div class="field-row" style="margin-top:8px;">
         <div class="field"><label>発駅</label><input value="${(d.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','departureStation',this.value)" data-restore-key="updateDetail('${t.id}','${c.key}','departureStation',this.value)"`:'disabled'} placeholder="例）東京"></div>
         <div class="field"><label>着駅</label><input value="${(d.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)" data-restore-key="updateDetail('${t.id}','${c.key}','arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
-      </div>
-      ${(d.departureStation && d.arrivalStation) ? `<a class="link-open-btn" style="margin-bottom:10px;" href="https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(d.departureStation)}&to=${encodeURIComponent(d.arrivalStation)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🚃 乗換案内で経路を調べる</a>` : ''}
+      </div>`}
+      ${(effectiveDeparture && effectiveArrival) ? `<a class="link-open-btn" style="margin-bottom:10px;" href="https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(effectiveDeparture)}&to=${encodeURIComponent(effectiveArrival)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">🚃 乗換案内で経路を調べる</a>` : ''}
       <div class="legs-box">
         <div class="legs-label">乗り継ぎの内訳（新幹線＋特急など、別々に予約可能）</div>
         ${(d.legs||[]).map((leg,i)=>{
@@ -2263,8 +2417,8 @@ function catPanelContent(t, c){
               ${IS_EDITABLE ? `<button type="button" onclick="removeLeg('${t.id}','${c.key}',${i})" class="leg-remove">×</button>` : ''}
             </div>
             <div class="field-row">
-              <div class="field"><label>発駅</label><input value="${(leg.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)"`:'disabled'} placeholder="例）名古屋"></div>
-              <div class="field"><label>着駅</label><input value="${(leg.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
+              <div class="field"><label>この区間の発駅</label><input value="${(leg.departureStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'departureStation',this.value)"`:'disabled'} placeholder="例）名古屋"></div>
+              <div class="field"><label>この区間の着駅</label><input value="${(leg.arrivalStation||'').replace(/"/g,'&quot;')}" ${IS_EDITABLE?`onchange="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'arrivalStation',this.value)"`:'disabled'} placeholder="例）高山"></div>
             </div>
             <div class="field-row">
               <div class="field"><label>予約日</label><input type="date" value="${leg.bookedDate||''}" ${IS_EDITABLE?`onblur="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)" data-restore-key="updateLeg('${t.id}','${c.key}',${i},'bookedDate',this.value)"`:'disabled'}></div>
@@ -2326,7 +2480,7 @@ function catPanelContent(t, c){
 }
 
 
-function renderTicketCard(t, isPast){
+function renderTicketCard(t, isPast, usualPatternCache){
   const {md, dow} = fmtDate(t.date);
   const pct = completion(t);
   const pendingCount = BOOKABLE_CATS.filter(k=>!t.status[k] && !t.detail[k]?.notNeeded).length;
@@ -2353,7 +2507,7 @@ function renderTicketCard(t, isPast){
     <div class="ticket-compact-row" onclick="toggleExpand('${t.id}')">
       <div class="tcr-date">
         <div class="tcr-d">${md}</div>
-        <div class="tcr-dow">${t.date===TODAY?'<span class="today-badge today-badge-sm">本日</span>':dow}</div>
+        <div class="tcr-dow">${t.date===TODAY?'<span class="today-badge today-badge-sm">GAME</span>':dow}</div>
       </div>
       <div class="tcr-main">
         <div class="tcr-line1">
@@ -2406,7 +2560,7 @@ function renderTicketCard(t, isPast){
         </div>
         ${(() => {
           if(!IS_EDITABLE || isPast) return '';
-          const pattern = getUsualTripPattern(t.sport, t.team, t.id);
+          const pattern = usualPatternCache ? usualPatternCache.get(t.sport+'\u0000'+t.team) : getUsualTripPattern(t.sport, t.team, t.id);
           if(!pattern) return '';
           const hasTarget = Object.keys(pattern).some(key => !t.detail[key]?.method);
           if(!hasTarget) return '';
@@ -2477,6 +2631,21 @@ function renderGrid(){
   const upcoming = filtered.filter(t=>tripEndDate(t) >= TODAY);
   const past = filtered.filter(t=>tripEndDate(t) < TODAY).sort((a,b)=> new Date(b.date) - new Date(a.date));
 
+  // 表示フィルター（今後の遠征／過去の遠征のみ／すべて）を反映する。
+  // 'past'を選んだ時は、そもそもupcoming側のカードを描画対象から外す
+  // （過去の遠征をTOPで一覧して見返したい、というユースケースに対応するため）
+  if(timeFilter === 'past') upcoming.length = 0;
+  const forceShowPast = (timeFilter === 'past' || timeFilter === 'all');
+
+  // 「いつもの一括入力」ボタンの表示判定（getUsualTripPattern）は、本来チーム単位で1回計算すれば
+  // 十分な情報なのに、これまではカードを描画するたびに毎回trips配列全体を再スキャンしていた
+  // （カード枚数が多いほど計算量が二乗で増える設計上の負債だったため、ここで1回だけ計算してキャッシュする）
+  const usualPatternCache = new Map();
+  upcoming.forEach(t=>{
+    const cacheKey = t.sport + '\u0000' + t.team;
+    if(!usualPatternCache.has(cacheKey)) usualPatternCache.set(cacheKey, getUsualTripPattern(t.sport, t.team));
+  });
+
   if(sortMode === 'progress'){
     // 準備が遅れている順（進捗%が低い順）。進捗が同じ場合は試合日が近い順
     upcoming.sort((a,b)=> completion(a) - completion(b) || new Date(a.date) - new Date(b.date));
@@ -2508,14 +2677,14 @@ function renderGrid(){
   }
 
   html += upcoming.length
-    ? upcoming.map(t=>renderTicketCard(t,false)).join('')
+    ? upcoming.map(t=>renderTicketCard(t,false,usualPatternCache)).join('')
     : `<div class="empty">今後の遠征はまだ登録されていません。</div>`;
 
   grid.innerHTML = html;
-  renderPastToggle(past.length, past);
+  renderPastToggle(past.length, past, forceShowPast);
 }
 
-function renderPastToggle(count, past){
+function renderPastToggle(count, past, forceShowPast){
   let holder = document.getElementById('past-section');
   if(holder) holder.remove();
   const grid = document.getElementById('grid');
@@ -2524,6 +2693,9 @@ function renderPastToggle(count, past){
   wrap.style.gridColumn = '1/-1';
   if(count === 0){
     wrap.innerHTML = '';
+  }else if(forceShowPast){
+    // 「過去のみ」「すべて」フィルター選択時は、開閉ボタンを出さず常に展開表示する
+    wrap.innerHTML = `<div class="grid past-grid" style="padding:0;">${past.map(t=>renderTicketCard(t,true)).join('')}</div>`;
   }else if(!showPast){
     wrap.innerHTML = `<div class="past-toggle"><button onclick="togglePast()">▸ 過去の遠征を表示（${count}件）</button></div>`;
   }else{
@@ -3089,6 +3261,13 @@ function duplicateTrip(tripId){
   if(tOpt){tSel2.value=t.team; tSel2.style.display='block'; tInp2.style.display='none'; handleTeamSelectChange();}
   else{tSel2.style.display='none'; tInp2.style.display='block'; tInp2.value=t.team||'';}
   document.getElementById('f-venue').value = t.venue;
+  // HOME/AWAYボタンの選択状態（見た目）も、複製元の会場から逆算して合わせておく。
+  // setHomeAway()をそのまま呼ぶと、会場欄が「標準のアリーナ名」で上書きされてしまうため、
+  // ここでは見た目（homeAwayMode + updateHomeAwayUI）だけを更新し、会場欄には触れない。
+  if(savedTeamObj && savedTeamObj.arena){
+    homeAwayMode = (t.venue === savedTeamObj.arena) ? 'HOME' : 'AWAY';
+    updateHomeAwayUI();
+  }
   // 連戦（2日目・3日目）で複製するケースが多いため、翌日の日付を初期値として入れておく（自由に変更可能）
   if(t.date){
     const next = new Date(t.date);
@@ -3628,10 +3807,13 @@ async function submitTrip(keepOpen){
         for(const c of CATS){
           const d = detailTemplate[c.key];
           const hasContent = c.bookable ? (d.method || d.memo || d.cost) : d.memo;
-          if(hasContent){
+          // 複製元が「対象外」にしていた場合、その状態自体もコピーする
+          // （例：連戦で「宿泊は対象外」と設定した遠征を複製すると、これまでは対象外の状態が
+          // 引き継がれず、複製先でもう一度対象外を押し直す手間が発生していた）
+          if(hasContent || d.notNeeded){
             await saveBookingDetail(newId, c.key, c.bookable
-              ? { method:d.method||'', bookedDate:'', cost:d.cost||0, memo:d.memo||'', is_booked:false }
-              : { memo:d.memo||'' });
+              ? { method:d.method||'', bookedDate:'', cost:d.cost||0, memo:d.memo||'', is_booked:false, notNeeded: !!d.notNeeded }
+              : { memo:d.memo||'', notNeeded: !!d.notNeeded });
           }
         }
       }
@@ -3659,6 +3841,10 @@ async function submitTrip(keepOpen){
         document.getElementById('venue-suggest-note').textContent = '';
         document.getElementById('venue-suggest-note').style.cssText = 'font-weight:400; color:var(--text-faint); font-size:11.5px;';
         handleTeamSelectChange(); // 対戦相手のリーグ選択をチームの既定リーグに戻し、選択肢も作り直す
+        // HOME/AWAYの自動判定も、モーダルを開き直した時と同じ条件でかけ直す
+        // （でないと2件目以降、ずっとこの機能の恩恵を受けられなくなってしまう）
+        const teamObjForAuto = (TEAM_DATA[sport]||[]).find(x=>x.name===team);
+        if(teamObjForAuto) tryAutoHomeAway(sport, team, teamObjForAuto.arena);
         document.getElementById('modal-save-msg').textContent = `「${match}」を登録しました。続けて次の試合を入力できます。`;
         document.getElementById('f-date').focus();
       }else{
@@ -4406,9 +4592,20 @@ async function confirmScheduleImport(){
         });
         if(!error){
           const s={}, d2={};
-          CATS.forEach(c=>{ s[c.key]=false; d2[c.key]=c.bookable?{method:'',bookedDate:'',cost:0,memo:''}:{memo:''}; });
-          trips.push({ id:data, sport:g.sport||'未設定', team:g.team||'未設定', match:g.opponent||'', date:g.match_date, time:g.start_time||'', venue:g.venue||'', cost:0, status:s, detail:d2 });
+          // 通常登録時と同じく、飲食・その他は多くの人にとって「対象外」であることが多いため、
+          // デフォルトで対象外にしておく（一括インポート経由の遠征だけこの処理が抜けていた）
+          const DEFAULT_NOT_NEEDED_IMPORT = ['food', 'other'];
+          CATS.forEach(c=>{
+            const notNeeded = DEFAULT_NOT_NEEDED_IMPORT.includes(c.key);
+            s[c.key]=false;
+            d2[c.key]=c.bookable?{method:'',bookedDate:'',cost:0,memo:'',notNeeded}:{memo:'',notNeeded};
+          });
+          trips.push({ id:data, sport:g.sport||'未設定', team:g.team||'未設定', match:g.opponent||'', date:g.match_date, time:g.start_time||'', venue:g.venue||'', cost:0, status:s, detail:d2, packingList: packingTemplate.map(text => ({ text, checked:false })) });
           done++;
+          if(packingTemplate.length) await savePackingList(data).catch(()=>{});
+          for(const key of DEFAULT_NOT_NEEDED_IMPORT){
+            await sb.rpc('upsert_booking_detail', { p_edit_token: EDIT_TOKEN, p_trip_id: data, p_category: key, p_is_booked: false, p_method: null, p_booked_at: null, p_cost: null, p_memo: null, p_is_not_needed: true }).catch(()=>{});
+          }
         }
       }catch(e){ console.error(e); }
     }
