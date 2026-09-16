@@ -5461,10 +5461,9 @@ async function initApp(){
 }
 initApp();
 </script>
-<!-- Vercel Analytics（訪問者数・ページビューの計測）。
-     Vercelにホスティングしている場合、この2行だけで有効になる。
+<!-- Vercel Web Analytics（訪問者数・ページビューの計測）。
+     Vercelにホスティングしている場合、この1行だけで有効になる。
      ダッシュボードでの確認には、Vercel側でAnalyticsを有効化する操作も必要。 -->
-<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
-<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </body>
 </html>
