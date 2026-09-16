@@ -263,8 +263,10 @@
   .timeline-duration{ padding-left:26px; font-size:10.5px; color:var(--text-faint); }
   .packing-count{ font-weight:400; color:var(--text-faint); }
   .packing-item{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
-  .packing-item-shop{ font-size:15px; text-decoration:none; flex-shrink:0; opacity:0.75; }
-  .packing-item-shop:active{ opacity:1; }
+  .packing-item-shop{ font-size:10px; font-weight:700; text-decoration:none; flex-shrink:0; padding:3px 6px; border-radius:5px; line-height:1; white-space:nowrap; }
+  .packing-item-shop:active{ opacity:0.65; }
+  .shop-rakuten{ background:#BF0000; color:#fff; }
+  .shop-yahoo{ background:#FF0033; color:#fff; }
   .att-row{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
   .att-row:last-of-type{ border-bottom:none; }
   .att-name{ flex:1; font-size:13px; font-weight:700; }
@@ -2329,8 +2331,8 @@ function renderPackingListSection(t){
           <div class="packing-item">
             <input type="checkbox" ${item.checked?'checked':''} ${IS_EDITABLE?`onchange="togglePackingItem('${t.id}',${idx})" data-restore-key="togglePackingItem('${t.id}',${idx})"`:'disabled'}>
             <span class="packing-item-text ${item.checked?'checked':''}" ${IS_EDITABLE?`onclick="togglePackingItem('${t.id}',${idx})"`:''} style="${IS_EDITABLE?'cursor:pointer;':''}">${escapeHtml(item.text)}</span>
-            ${rakutenUrl ? `<a href="${rakutenUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation(); logClick('${t.id}','packing','楽天市場');" class="packing-item-shop" title="楽天市場で探す">🛒</a>` : ''}
-            ${yahooUrl ? `<a href="${yahooUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation(); logClick('${t.id}','packing','Yahoo!ショッピング');" class="packing-item-shop" title="Yahoo!ショッピングで探す">🛍️</a>` : ''}
+            ${rakutenUrl ? `<a href="${rakutenUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation(); logClick('${t.id}','packing','楽天市場');" class="packing-item-shop shop-rakuten" title="楽天市場で探す">楽天</a>` : ''}
+            ${yahooUrl ? `<a href="${yahooUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation(); logClick('${t.id}','packing','Yahoo!ショッピング');" class="packing-item-shop shop-yahoo" title="Yahoo!ショッピングで探す">Yahoo!</a>` : ''}
             ${IS_EDITABLE ? `<button type="button" class="leg-remove" style="width:26px; height:26px; font-size:12px;" onclick="removePackingItem('${t.id}',${idx})">×</button>` : ''}
           </div>`;
         }).join('')}
@@ -2346,7 +2348,7 @@ function renderPackingListSection(t){
         ${list.length ? `<button type="button" class="packing-template-btn" onclick="saveAsPackingTemplate('${t.id}')">📋 テンプレートとして保存</button>` : ''}
         ${list.some(item=>rakutenIchibaSearchUrl(item.text)) ? `<img src="https://i.moshimo.com/af/i/impression?a_id=5713296&p_id=54&pc_id=54&pl_id=616" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">` : ''}
         ${list.some(item=>yahooShoppingSearchUrl(item.text)) ? `<img src="https://i.moshimo.com/af/i/impression?a_id=5775525&p_id=1225&pc_id=1925&pl_id=18502" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">` : ''}
-        ${list.some(item=>rakutenIchibaSearchUrl(item.text) || yahooShoppingSearchUrl(item.text)) ? `<div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-top:4px;">🛒🛍️は提携サイトでの検索リンクです【PR】</div>` : ''}
+        ${list.some(item=>rakutenIchibaSearchUrl(item.text) || yahooShoppingSearchUrl(item.text)) ? `<div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-top:4px;">各ボタンは提携サイトでの検索リンクです【PR】</div>` : ''}
         ` : (list.length===0 ? `<div style="font-size:11.5px; color:var(--text-faint); text-align:center; padding:8px 0;">持ち物リストはまだありません</div>` : '')}
       </div>
     </details>`;
