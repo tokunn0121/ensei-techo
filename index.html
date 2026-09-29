@@ -266,7 +266,7 @@
   .packing-item-shop{ font-size:10px; font-weight:700; text-decoration:none; flex-shrink:0; padding:3px 6px; border-radius:5px; line-height:1; white-space:nowrap; }
   .packing-item-shop:active{ opacity:0.65; }
   .shop-rakuten{ background:#BF0000; color:#fff; }
-  .shop-yahoo{ background:#FF0033; color:#fff; }
+  .shop-yahoo{ background:#D6002B; color:#fff; }
   .att-row{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); }
   .att-row:last-of-type{ border-bottom:none; }
   .att-name{ flex:1; font-size:13px; font-weight:700; }
@@ -429,6 +429,14 @@
   .legs-total{ font-size:12px; font-weight:700; color:var(--rose-deep); background:var(--rose-wash); padding:8px 12px; border-radius:8px; margin-bottom:8px; }
   .legs-total b{ font-family:var(--font-num); }
   .link-open-btn{ display:block; text-align:center; font-size:12.5px; font-weight:700; color:#fff; background:var(--sage); padding:10px; border-radius:10px; text-decoration:none; margin-top:4px; position:relative; }
+  /* 広告リンクは、どのサービスへ飛ぶのかが一目で分かるよう、各社のブランドカラーで塗り分ける */
+  .link-open-btn.brand-rakuten{ background:#BF0000; }
+  .link-open-btn.brand-tabelog{ background:#E8B000; color:#4a3800; }
+  .link-open-btn.brand-hotpepper{ background:#C8161D; }
+  .link-open-btn.brand-ozmall{ background:#7A5C99; }
+  .link-open-btn.brand-skyticket{ background:#0B7CC1; }
+  .link-open-btn.brand-agoda{ background:#5C2D91; }
+  .link-open-btn.brand-yahoo{ background:#FF0033; }
   .link-open-btn.is-pr{ overflow:visible; } /* バッジがボタンの外にはみ出て表示されるようにする */
   .link-open-btn .pr-badge-inline{ position:absolute; top:-7px; right:-6px; background:var(--butter); color:#5a4213; font-family:var(--font-num); font-size:9px; font-weight:700; padding:1px 6px; border-radius:8px; white-space:nowrap; }
   .done-toggle input{ width:16px; height:16px; accent-color: var(--sage); }
@@ -2423,8 +2431,8 @@ function catPanelContent(t, c){
   // （日付・行き先を指定した検索URLの形式が未確認のため、現時点ではトップページへの汎用リンク）
   const transportSearchBlock = (c.key==='transport_outbound' && !(d.method||'').trim()) ? `
     <div style="display:flex; gap:8px; margin-bottom:2px;">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation(); logClick('${t.id}','transport_outbound','楽天レンタカー');">🚗 レンタカーを探す</a>
-      <a class="link-open-btn" style="flex:1; margin-bottom:0;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686889" target="_blank" rel="nofollow noopener" onclick="event.stopPropagation(); logClick('${t.id}','transport_outbound','スカイチケット');">✈️ 航空券を探す</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686889" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn brand-rakuten" style="flex:1; margin-bottom:0;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/cars/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation(); logClick('${t.id}','transport_outbound','楽天レンタカー');">🚗 楽天レンタカー</a>
+      <a class="link-open-btn brand-skyticket" style="flex:1; margin-bottom:0;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892686889" target="_blank" rel="nofollow noopener" onclick="event.stopPropagation(); logClick('${t.id}','transport_outbound','スカイチケット');">✈️ スカイチケット</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892686889" height="1" width="1" style="border:none; display:none;" alt="">
     </div>
     <div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-bottom:10px;">上記2つは提携サイトへのリンクです【PR】</div>` : '';
 
@@ -2439,9 +2447,9 @@ function catPanelContent(t, c){
   // （バリューコマースの参照リンク。行き先を指定できない固定リンクのため、各サイトのトップページへ遷移する）
   const gourmetSearchBlock = (c.key==='food' && !(d.placeName||'').trim()) ? `
     <div style="display:flex; gap:6px; margin-bottom:2px;">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892688295" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','food','食べログ');">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892688295" height="1" width="1" style="border:none; display:none;" alt="">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','food','ホットペッパー');">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
-      <a class="link-open-btn" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','food','OZmall');">✨ OZmall</a>
+      <a class="link-open-btn brand-tabelog" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892688295" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','food','食べログ');">🍜 食べログ</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892688295" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn brand-hotpepper" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685608" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','food','ホットペッパー');">🍽️ ホットペッパー</a><img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3776783&pid=892685608" height="1" width="1" style="border:none; display:none;" alt="">
+      <a class="link-open-btn brand-ozmall" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3776783&pid=892685610" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','food','OZmall');">✨ OZmall</a>
     </div>
     <div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-bottom:10px;">上記3つは提携サイトへのリンクです【PR】</div>` : '';
 
@@ -2452,11 +2460,17 @@ function catPanelContent(t, c){
   // 宿泊先がまだ決まっていない場合、試合日を自動で反映した楽天トラベルの検索リンクを出す
   // （決まっている場合は、上のルート検索の方が実用的なのでこちらは出さない）
   const hotelSearchUrl = (c.key==='hotel' && !(d.method||'').trim() && t.venue) ? rakutenHotelSearchUrl(t.venue, t.date) : null;
-  const hotelSearchBlock = (c.key==='hotel' && !(d.method||'').trim()) ? (hotelSearchUrl
-    ? `<a class="link-open-btn is-pr" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${hotelSearchUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation(); logClick('${t.id}','hotel','楽天トラベル(日付つき)');">🏨 試合日の空室を楽天トラベルで探す<span class="pr-badge-inline">PR</span></a><img src="https://i.moshimo.com/af/i/impression?a_id=5713301&p_id=55&pc_id=55&pl_id=624" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">`
+  const hotelSearchBlock = (c.key==='hotel' && !(d.method||'').trim()) ? ((hotelSearchUrl
+    ? `<a class="link-open-btn is-pr brand-rakuten" style="margin-bottom:6px;" href="${hotelSearchUrl}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc onclick="event.stopPropagation(); logClick('${t.id}','hotel','楽天トラベル(日付つき)');">🏨 試合日の空室を楽天トラベルで探す<span class="pr-badge-inline">PR</span></a><img src="https://i.moshimo.com/af/i/impression?a_id=5713301&p_id=55&pc_id=55&pl_id=624" width="1" height="1" style="border:none; display:none;" alt="" loading="lazy">`
     // 会場がVENUE_AREA_MAPに未登録の場合（バレーボール・サッカーJ2/J3・その他競技など）でも、
     // 日付・会場を反映できないだけで、最低限トップページへの導線は出す（収益機会を逃さないため）
-    : `<a class="link-open-btn is-pr" style="margin-bottom:10px; background:var(--rose-wash); color:var(--rose-deep); border-color:var(--rose);" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation(); logClick('${t.id}','hotel','楽天トラベル(汎用)');">🏨 楽天トラベルでホテルを探す<span class="pr-badge-inline">PR</span></a>`
+    : `<a class="link-open-btn is-pr brand-rakuten" style="margin-bottom:6px;" href="${moshimoWrapUrl('https://travel.rakuten.co.jp/')}" target="_blank" rel="nofollow noopener" referrerpolicy="no-referrer-when-downgrade" onclick="event.stopPropagation(); logClick('${t.id}','hotel','楽天トラベル(汎用)');">🏨 楽天トラベルでホテルを探す<span class="pr-badge-inline">PR</span></a>`
+  ) + `
+    <div style="display:flex; gap:6px; margin-bottom:2px;">
+      <a class="link-open-btn brand-agoda" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://px.a8.net/svt/ejp?a8mat=4BCKBU+61WO6Q+4X1W+TS3OI" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','hotel','Agoda');">Agoda</a><img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4BCKBU+61WO6Q+4X1W+TS3OI" alt="" style="display:none;">
+      <a class="link-open-btn brand-yahoo" style="flex:1; margin-bottom:0; font-size:11px; padding:10px 4px;" href="https://px.a8.net/svt/ejp?a8mat=4BCKBU+7SF6PE+4ZCO+5YRHE" rel="nofollow noopener" target="_blank" onclick="event.stopPropagation(); logClick('${t.id}','hotel','Yahoo!トラベル');">Yahoo!トラベル</a><img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BCKBU+7SF6PE+4ZCO+5YRHE" alt="" style="display:none;">
+    </div>
+    <div style="font-size:9.5px; color:var(--text-faint); text-align:right; margin-bottom:10px;">上記2つは提携サイトへのリンクです【PR】</div>`
   ) : '';
 
   // 宿泊パネルに、到着予定時刻（当日タイムライン用、任意項目）を出す
